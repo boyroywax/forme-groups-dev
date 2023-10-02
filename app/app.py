@@ -36,7 +36,7 @@ if __name__ == '__main__':
     print(value4._get_max_sublevel())
     print([item for item in iter(value4)])
 
-    value5: BaseInterface = BaseInterface({"key1": ["value1", "value2", {"key2": "value3"}, {"key3": (1,2,3,[1])}]})
+    value5: BaseInterface = BaseInterface({"key1": ["value1", "value2", {"key2": "value3"}, {"key3": (1,2,3,[1, [0]])}], "key02": {"key021": "value021", "key170": ["value170"]}})
     print(value5)
     print(repr(value5))
     print(value5._is_type())

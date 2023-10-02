@@ -78,7 +78,7 @@ class BaseInterface(ABC):
         else:
             return False
 
-    def _get_max_sublevel(self, data=None, level: int = 0) -> int:
+    def _get_max_sublevel(self, data=None, levels: list[int] = [], level: int = 0) -> int:
         """
         Returns the max sublevel of the data.
         """
@@ -86,16 +86,22 @@ class BaseInterface(ABC):
             for slot in self.__slots__:
                 data = getattr(self, slot)
                 break
+
+        if level is None:
+            level = 0
         
         if self._contains_sublevel(data):
-            level += 1
             if isinstance(data, (list, tuple, set, frozenset)):
                 for item in data:
-                    level = self._get_max_sublevel(item, level=level)
-            else:
+                    levels.append(self._get_max_sublevel(item, level=level + 1))
+                
+            elif isinstance(data, dict):
                 for key, value in data.items():
-                    level = self._get_max_sublevel(value, level=level)
-        return level
+                    levels.append(self._get_max_sublevel(value, level=level + 1))
+
+        else:
+            levels.append(level)
+        return max(levels)
     
     def _unpack_container(self, container_: Optional[container] = None, level: Optional[int] = 0):
         assert isinstance(container_, container), (
