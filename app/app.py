@@ -1,6 +1,7 @@
 from src import App
 from src.base import BaseInterface
 from typing import TypeAlias
+from attrs.exceptions import FrozenInstanceError
 
 if __name__ == '__main__':
     app = App()
@@ -36,9 +37,16 @@ if __name__ == '__main__':
     print(value4._get_max_sublevel())
     print([item for item in iter(value4)])
 
-    value5: BaseInterface = BaseInterface({"key1": ["value1", "value2", {"key2": "value3"}, {"key3": (1,2,3,[1, [0]])}], "key02": {"key021": "value021", "key170": ["value170"]}})
+    value5: BaseInterface = BaseInterface({"key1": ["value1", "value2", {"key2": "value3"}, {"key3": (1,2,3,[1, [0, [0, [0]]]])}], "key02": {"key021": "value021", "key170": ["value170"]}})
     print(value5)
     print(repr(value5))
     print(value5._is_type())
     print(value5._get_max_sublevel())
-    print([item for item in iter(value5)])
+    print([item for item in value5.iter_to_depth(8)])
+
+    try:
+        value5._value = {"key1": "value1"}
+    except FrozenInstanceError as e:
+        print(str(e))
+
+    print(value5)

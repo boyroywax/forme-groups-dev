@@ -106,11 +106,11 @@ class BaseInterface(ABC):
     def _unpack_container(self, container_: Optional[container] = None, level: Optional[int] = 0):
         assert isinstance(container_, container), (
             "container_ must be a container type")
-        
+
         if level == 0:
             yield container_
 
-        if level > 0:
+        if level >= 0:
             if isinstance(container_, (list, tuple, set, frozenset)):
                 for item in container_:
                     if isinstance(item, container):
@@ -126,9 +126,25 @@ class BaseInterface(ABC):
                         yield (key, value)
 
     def __iter__(self):
+        """
+
+        """
+        level = self._get_max_sublevel()
+        for slot in self.__slots__:
+            if isinstance(getattr(self, slot), container):
+                yield from self._unpack_container(getattr(self, slot), level=level)
+            else:
+                yield getattr(self, slot)
+
+    def iter_to_depth(self, level: int = 0):
+        """
+        Returns an iterator to the specified depth.
+        """
+        assert isinstance(level, int), (
+            "level must be an integer")
 
         for slot in self.__slots__:
             if isinstance(getattr(self, slot), container):
-                yield from self._unpack_container(getattr(self, slot), level=3)
+                yield from self._unpack_container(getattr(self, slot), level=level)
             else:
                 yield getattr(self, slot)
