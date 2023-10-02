@@ -1,0 +1,31 @@
+# Compiled Python files
+__pycache__/
+*.pyc
+
+# Compiled C extensions
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+*.venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# Miscellaneous
+*.log
+*.swp
+.DS_Store
+
+# Ignore all .env files
+*.env.example
+
+# Ignore all VSCode files
+.vscode/*
