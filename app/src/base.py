@@ -1,3 +1,4 @@
+import itertools
 from abc import ABCMeta, abstractmethod, ABC
 from attrs import define, field, validators, converters
 from typing import TypeAlias, Optional
@@ -5,9 +6,13 @@ from typing import TypeAlias, Optional
 
 number: TypeAlias = int | float
 text: TypeAlias = str | bytes
-container: TypeAlias = list | tuple | dict | set | frozenset
+named_container: TypeAlias = dict
+linear_container: TypeAlias = list | tuple | set | frozenset
+containers: TypeAlias = named_container | linear_container
 object_: TypeAlias = object | None
-unit_types: TypeAlias = number | text | container | object_
+unit_value_types: TypeAlias = number | text
+key_value: TypeAlias = tuple[unit_value_types, unit_value_types]
+unit_types: TypeAlias = unit_value_types | containers | object_
 
 
 @define(frozen=True, slots=True,  weakref_slot=False)
@@ -16,7 +21,7 @@ class BaseInterface[T: unit_types](ABC):
     A value object.
     """
 
-    _value: Optional[unit_types] = field(default=None, validator=validators.optional(validators.instance_of(unit_types)))
+    _value: Optional[T] = field(default=None, validator=validators.optional(validators.instance_of(unit_types)))
 
     def _is_type(self) -> TypeAlias:
         """
@@ -28,8 +33,8 @@ class BaseInterface[T: unit_types](ABC):
         if isinstance(self._value, text):
             return text
 
-        if isinstance(self._value, container):
-            return container
+        if isinstance(self._value, containers):
+            return containers
 
         if isinstance(self._value, object_):
             return object_
@@ -72,7 +77,7 @@ class BaseInterface[T: unit_types](ABC):
         """
         Returns True if the data contains a sublevel.
         """
-        if isinstance(data, container):
+        if isinstance(data, containers):
             return True
         else:
             return False
@@ -148,11 +153,11 @@ class BaseInterface[T: unit_types](ABC):
             levels.append(level)
         return max(levels)
 
-    def _unpack_container(self, container_: Optional[container] = None, level: Optional[int] = 0):
+    def _unpack_container(self, container_: Optional[containers] = None, level: Optional[int] = 0):
         # assert isinstance(container_, container), (
             # "container_ must be a container type")
         
-        if not isinstance(container_, container):
+        if not isinstance(container_, containers):
             return
 
         if level == 0:
@@ -161,13 +166,13 @@ class BaseInterface[T: unit_types](ABC):
         if level >= 0:
             if isinstance(container_, (list, tuple, set, frozenset)):
                 for item in container_:
-                    if isinstance(item, container):
+                    if isinstance(item, containers):
                         yield from self._unpack_container(item, level=level-1)
                     else:
                         yield item
             else:
                 for key, value in container_.items():
-                    if isinstance(value, container):
+                    if isinstance(value, containers):
                         yield (key, value)
                         yield from self._unpack_container(value, level=level-1)
                     else:
@@ -179,7 +184,7 @@ class BaseInterface[T: unit_types](ABC):
         """
         level = self._get_max_sublevel()
         for slot in self.__slots__:
-            if isinstance(getattr(self, slot), container):
+            if isinstance(getattr(self, slot), containers):
                 yield from self._unpack_container(getattr(self, slot), level=level)
             else:
                 yield getattr(self, slot)
@@ -192,7 +197,120 @@ class BaseInterface[T: unit_types](ABC):
             "level must be an integer")
 
         for slot in self.__slots__:
-            if isinstance(getattr(self, slot), container):
+            if isinstance(getattr(self, slot), containers):
                 yield from self._unpack_container(getattr(self, slot), level=level)
             else:
                 yield getattr(self, slot)
+
+def _convert_to_single_value[T: unit_types](item: T) -> unit_value_types:
+    """
+    Converts a container to a single value.
+    """
+    if isinstance(item, unit_value_types):
+        return item
+    if isinstance(item, linear_container):
+        if len(item) >= 1:
+            print(Exception("item is a list, tuple, set, or frozenset with more than one item, returning first item"))
+            return item[0]
+    elif isinstance(item, named_container):
+        if len(item) >= 1:
+            print(Exception("item is a dict with more than one item, returning first item"))
+            return item.values()[0]
+
+@define(frozen=True, slots=True,  weakref_slot=False)
+class BaseValue[T: unit_value_types]:
+    """
+    A value object.  Only accepts a single value and value type
+    """
+
+    _value: Optional[T] = field(default=None, validator=validators.optional(validators.instance_of(unit_types)), converter=_convert_to_single_value)
+
+def _split_container(container_: containers) -> tuple[BaseValue]:
+    """
+    Splits a container into a list of containers.
+    """
+    if isinstance(container_, linear_container):
+        return tuple(BaseValue(value) for value in container_)
+    elif isinstance(container_, named_container):
+        return tuple(BaseValue({key: value}) for key, value in container_.items())
+
+
+@define(frozen=True, slots=True,  weakref_slot=False)
+class BaseContainer[T: containers]:
+    """
+    A container object.
+    """
+    _values: tuple[BaseValue] = field(default=tuple(), validator=validators.optional(validators.instance_of(containers)), converter=_split_container)
+
+@define
+class TypeInterface[T]:
+    """
+    A type object.
+    """
+    _aliases: list[str] = field(default=list)
+    
+
+
+
+    # def __repr__(self) -> str:
+    #     return f"{self.__class__.__name__}({self._value})"
+
+    # def __eq__(self, other) -> bool:
+    #     return self._value == other._value
+
+    # def __ne__(self, other) -> bool:
+    #     return self._value != other._value
+
+    # def __gt__(self, other) -> bool:
+    #     return self._value > other._value
+
+    # def __lt__(self, other) -> bool:
+    #     return self._value < other._value
+
+    # def __ge__(self, other) -> bool:
+    #     return self._value >= other._value
+
+    # def __le__(self, other) -> bool:
+    #     return self._value <= other._value
+
+    # def __hash__(self) -> int:
+    #     return hash(self._value)
+
+    # def __bool__(self) -> bool:
+    #     return bool(self._value)
+
+    # def __int__(self) -> int:
+    #     return int(self._value)
+
+    # def __float__(self) -> float:
+    #     return float(self._value)
+
+    # def __complex__(self) -> complex:
+    #     return complex(self._value)
+
+    # def __bytes__(self) -> bytes:
+    #     return bytes(self._value)
+
+    # def __abs__(self) -> int | float:
+    #     return abs(self._value)
+
+    # def __add__(self, other) -> int | float:
+    #     return self._value + other._value
+
+    # def __sub__(self, other) -> int | float:
+    #     return self._value - other._value
+
+    # def __mul__(self, other) -> int | float:
+    #     return self._value * other._value
+
+    # def __truediv__(self, other) -> int | float:
+    #     return self._value / other._value
+
+    # def __floordiv__(self, other) -> int | float:
+    #     return self._value // other._value
+
+    # def __mod__(self, other) -> int | float:
+    #     return self._value % other._value
+
+    # def __divmod__(self, other) -> int | float:
+    #     return divmod(self._value, other._value)

@@ -1,5 +1,5 @@
 from src import App
-from src.base import BaseInterface
+from src.base import BaseInterface, BaseValue, unit_value_types, BaseContainer
 from typing import TypeAlias
 from attrs.exceptions import FrozenInstanceError
 
@@ -53,3 +53,25 @@ if __name__ == '__main__':
     print(value5)
     print(value5._map_sublevel())
     print(value5._list_items_with_sublevels())
+
+    base_value = BaseValue(1)
+    print(base_value)
+    try:
+        base_value._value = 2
+    except FrozenInstanceError as e:
+        print(str(e))
+
+    try:
+        new_base_value = BaseValue((1,2,3))
+        print(new_base_value)
+    except AssertionError as e:
+        print(str(e))
+
+    base_container = BaseContainer([1,2,3])
+    print(base_container)
+
+    base_container_dict = BaseContainer({"key1": "value1", "key2": "value2"})
+    print(base_container_dict)
+
+
+    
