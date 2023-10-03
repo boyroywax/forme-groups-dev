@@ -2,7 +2,7 @@ import itertools
 import hashlib
 from abc import ABCMeta, abstractmethod, ABC
 from attrs import define, field, validators, converters
-from typing import TypeAlias, Optional
+from typing import TypeAlias, Optional, Any
 
 
 number: TypeAlias = int | float
@@ -18,12 +18,6 @@ unit_types: TypeAlias = unit_value_types | containers | object_
 
 def hash_sha256(data: str) -> str:
     return hashlib.sha256(data.encode()).hexdigest()
-
-class Node:
-    def __init__(self, value: unit_types, left: Optional["Node"] = None, right: Optional["Node"] = None):
-        self.value = value
-        self.left = left
-        self.right = right
 
 
 @define(slots=True, weakref_slot=False)
@@ -64,7 +58,7 @@ def _convert_container_to_value(item: unit_types) -> unit_value_types:
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: unit_types](BaseInterface):
+class BaseValue(BaseInterface):
     """
     Base class for all classes
     """
@@ -85,7 +79,6 @@ def _convert_container_to_base_values(item: unit_types) -> tuple[BaseValue]:
     """
     Converts container to base values
     """
-    item_to_return: tuple[BaseValue] = item
     if isinstance(item, linear_container):
         print(Exception("Passed a container of values, but expected a container of base values, a tuple of BaseValue will be returned"))
 
@@ -123,8 +116,7 @@ def _convert_container_to_default(item: tuple[BaseValue], type_: TypeAlias | typ
             keys: tuple[unit_value_types] = item[::2]
             values: tuple[unit_value_types] = item[1::2]
             return {key.value: value.value for key, value in zip(keys, values)}
-
-    
+        
 
 @define(slots=True, weakref_slot=False)
 class BaseContainer(BaseInterface):
@@ -160,4 +152,55 @@ class BaseContainer(BaseInterface):
         return f"{self.__class__.__name__}(items={[item for item in iter(self)]}, type={self._type})"
 
     
+@define(slots=True, weakref_slot=False)
+class BaseSchema(BaseInterface):
+    """
+    Describes the data structure of a container
+    Data Schemas can be nested
+
+    Example Schema:
+    ```python
+    address_schema = {
+        "street": "string",
+        "city": "string",
+        "state": "string",
+        "zip": "string"
+    }
+    person_schema = {
+        "name": "string",
+        "age": "number",
+        "address": "schema:address_schema"
+    }
+    ```
+    """
+    _schema: dict[str, Any] = field(validator=validators.instance_of(dict))
+
+    def _sub_schema(self) -> list[dict[str, Any]]:
+        sub_schemas: list['BaseSchema' | str] = []
+        for key, value in self._schema.items():
+            if isinstance(value, BaseSchema):
+                sub_schemas.append({key: value})
+            elif isinstance(value, str):
+                if value.startswith("schema:"):
+                    sub_schemas.append({key: value})
+
+        return sub_schemas
+
+    def _sub_containers(self) -> list[dict[str, Any]]:
+        sub_units: list[str] = []
+        for key, value in self._schema.items():
+            if isinstance(value, BaseContainer):
+                sub_units.append({key: value})
+            if isinstance(value, str):
+                if value.startswith("list") or value.startswith("tuple") or value.startswith("set") or value.startswith("frozenset") or value.startswith("dict") or isinstance(value, containers):
+                    sub_units.append({key: value})
+
+        return sub_units
+
+    def __iter__(self):
+        for key, value in self._schema.items():
+            if isinstance(value, BaseSchema):
+                yield {key: [item for item in iter(value)]}
+            else:
+                yield {key: value}
 

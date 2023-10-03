@@ -1,7 +1,7 @@
 from src import App
 from typing import TypeAlias
 from attrs.exceptions import FrozenInstanceError
-from src.base import BaseInterface, BaseValue, BaseContainer
+from src.base import BaseInterface, BaseValue, BaseContainer, BaseSchema
 
 if __name__ == '__main__':
     app = App()
@@ -68,3 +68,30 @@ vase_container_instance: BaseContainer = BaseContainer({1, 2})
 print(str(vase_container_instance))
 print(str(vase_container_instance._package()))
 print(repr(vase_container_instance))
+
+sample_sub_schema = BaseSchema({
+    "favorite_game": "string",
+    "favorite_color": "string",
+    "favorite_numbers": "list[int]",
+})
+
+sample_schema1 = BaseSchema({
+    "name": "string",
+    "age": "int",
+    "height": "float",
+    "is_human": "bool",
+    "favorite_foods": "list[str]",
+    "favorite_numbers": "list[int]",
+    "favorite_numbers2": "tuple[int]",
+    "embedded_schema": sample_sub_schema
+})
+
+
+print(str(sample_schema1._sub_schema()))
+print(str(sample_schema1._sub_containers()))
+print([str(item) for item in iter(sample_schema1)])
+
+sample_schema2 = BaseSchema({
+    "schema": sample_schema1
+})
+print([str(item) for item in iter(sample_schema2)])
