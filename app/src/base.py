@@ -93,18 +93,38 @@ def _convert_container_to_base_values(item: unit_types) -> tuple[BaseValue]:
             item_to_return = tuple([BaseValue(value) for value in item])
 
         elif isinstance(item, set):
-            item_to_return = tuple([BaseValue(item.pop())])
+            item_to_return = tuple([BaseValue(item.pop()) for _ in range(len(item))])
 
         elif isinstance(item, frozenset):
-            item_to_return = tuple([BaseValue(set(item).pop())])
+            items = set(item)
+            item_to_return = tuple([BaseValue(items.pop()) for _ in range(len(items))])
 
     elif isinstance(item, named_container):
-        item_to_return = tuple([BaseValue(value) for value in item.values()])
+        keys: tuple[unit_value_types] = tuple(item.keys())
+        values: tuple[unit_value_types] = tuple(item.values())
+        item_to_return = tuple([BaseValue(value) for value in itertools.chain(keys, values)])
 
     return item_to_return
 
 def _convert_container_to_type(item: unit_types) -> TypeAlias | type:
     return type(item)
+
+def _convert_container_to_default(item: tuple[BaseValue], type_: TypeAlias | type) -> unit_types:
+    match (str(type_)):
+        case("<class 'list'>"):
+            return [value.value for value in item]
+        case("<class 'tuple'>"):
+            return tuple([value.value for value in item])
+        case("<class 'set'>"):
+            return {value.value for value in item}
+        case("<class 'frozenset'>"):
+            return frozenset({value.value for value in item})
+        case("<class 'dict'>"):
+            keys: tuple[unit_value_types] = item[::2]
+            values: tuple[unit_value_types] = item[1::2]
+            return {key.value: value.value for key, value in zip(keys, values)}
+
+    
 
 @define(slots=True, weakref_slot=False)
 class BaseContainer(BaseInterface):
@@ -127,6 +147,17 @@ class BaseContainer(BaseInterface):
     def type(self) -> TypeAlias | type:
         return self._type
     
+    def _package(self) -> unit_types:
+        return _convert_container_to_default(self._items, self._type)
+    
+    def __iter__(self):
+        yield from self._items
+    
+    def __str__(self) -> str:
+        return str(self._package())
+    
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(items={[item for item in iter(self)]}, type={self._type})"
 
     
 

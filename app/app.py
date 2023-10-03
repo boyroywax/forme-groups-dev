@@ -49,8 +49,22 @@ print(str(vase_container_instance))
 vase_container_instance: BaseContainer = BaseContainer({1, 2})
 print(str(vase_container_instance))
 
-vase_container_instance: BaseContainer = BaseContainer(frozenset({1, 2}))
+vase_container_instance: BaseContainer = BaseContainer(frozenset({1,2}))
 print(str(vase_container_instance))
 
 vase_container_instance: BaseContainer = BaseContainer({1: 2})
 print(str(vase_container_instance))
+print(str(vase_container_instance._package()))
+
+vase_container_instance: BaseContainer = BaseContainer((1, 2))
+print(str(vase_container_instance))
+print(str(vase_container_instance._package()))
+
+vase_container_instance: BaseContainer = BaseContainer([1, 2])
+print(str(vase_container_instance))
+print(str(vase_container_instance._package()))
+
+vase_container_instance: BaseContainer = BaseContainer({1, 2})
+print(str(vase_container_instance))
+print(str(vase_container_instance._package()))
+print(repr(vase_container_instance))
