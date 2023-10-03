@@ -11,14 +11,14 @@ unit_types: TypeAlias = number | text | container | object_
 
 
 @define(frozen=True, slots=True,  weakref_slot=False)
-class BaseInterface(ABC):
+class BaseInterface[T: unit_types](ABC):
     """
     A value object.
     """
 
-    _value: unit_types = field(default=None, validator=validators.optional(validators.instance_of(unit_types)))
+    _value: Optional[unit_types] = field(default=None, validator=validators.optional(validators.instance_of(unit_types)))
 
-    def _is_type(self) -> type:
+    def _is_type(self) -> TypeAlias:
         """
         Returns True if the value is of the type specified by the class.
         """
@@ -68,7 +68,6 @@ class BaseInterface(ABC):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self._slots_to_string(values_only=False)})"
     
-
     def _contains_sublevel(self, data) -> bool:
         """
         Returns True if the data contains a sublevel.
@@ -77,6 +76,52 @@ class BaseInterface(ABC):
             return True
         else:
             return False
+
+    def _get_sublevel(self, data=None) -> list[T]:
+        sublevel_value = []
+        if self._contains_sublevel(data):
+            for item in data:
+                sublevel_value.append(item)
+        return sublevel_value
+        
+    def _map_sublevel(self, data = None) -> list[T]:
+        """
+        Returns a list of the sublevels of the data.
+        """
+        sublevels = []
+        if data is None:
+            for slot in self.__slots__:
+                data = getattr(self, slot)
+                break
+
+        for item in self._list_items_with_sublevels(data):
+            sublevels.append(self._get_sublevel(data[item]))
+        
+        return sublevels
+
+    def _list_items_with_sublevels(self, data=None) -> list[T]:
+        """
+        Returns a list of the items with sublevels.
+        """
+        items_with_sublevels = []
+        if data is None:
+            for slot in self.__slots__:
+                data = getattr(self, slot)
+                break
+
+        if self._contains_sublevel(data):
+            if isinstance(data, (list, tuple, set, frozenset)):
+                for item in data:
+                    if self._contains_sublevel(item):
+                        items_with_sublevels.append(item)
+            elif isinstance(data, dict):
+                for key, value in data.items():
+                    if self._contains_sublevel(value):
+                        items_with_sublevels.append(key)
+
+        return items_with_sublevels
+
+
 
     def _get_max_sublevel(self, data=None, levels: list[int] = [], level: int = 0) -> int:
         """
@@ -89,12 +134,12 @@ class BaseInterface(ABC):
 
         if level is None:
             level = 0
-        
+
         if self._contains_sublevel(data):
             if isinstance(data, (list, tuple, set, frozenset)):
                 for item in data:
                     levels.append(self._get_max_sublevel(item, level=level + 1))
-                
+
             elif isinstance(data, dict):
                 for key, value in data.items():
                     levels.append(self._get_max_sublevel(value, level=level + 1))
@@ -102,10 +147,13 @@ class BaseInterface(ABC):
         else:
             levels.append(level)
         return max(levels)
-    
+
     def _unpack_container(self, container_: Optional[container] = None, level: Optional[int] = 0):
-        assert isinstance(container_, container), (
-            "container_ must be a container type")
+        # assert isinstance(container_, container), (
+            # "container_ must be a container type")
+        
+        if not isinstance(container_, container):
+            return
 
         if level == 0:
             yield container_

@@ -43,6 +43,7 @@ if __name__ == '__main__':
     print(value5._is_type())
     print(value5._get_max_sublevel())
     print([item for item in value5.iter_to_depth(8)])
+    print([item for item in value5.iter_to_depth(5)])
 
     try:
         value5._value = {"key1": "value1"}
@@ -50,3 +51,5 @@ if __name__ == '__main__':
         print(str(e))
 
     print(value5)
+    print(value5._map_sublevel())
+    print(value5._list_items_with_sublevels())
