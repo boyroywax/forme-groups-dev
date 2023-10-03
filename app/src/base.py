@@ -196,11 +196,85 @@ class BaseSchema(BaseInterface):
                     sub_units.append({key: value})
 
         return sub_units
+    
+    def _get_key_types(self) -> set[str]:
+        key_types: tuple[key_value] = ()
+        for dict_ in iter(self):
+            for key, value in dict_.items():
+                if isinstance(value, type(self).__class__):
+                    unpacked = self._unpack_schema(value)
+                    key_types = key_types + ((item, ) for item in unpacked)
+                else:
+                    key_types = key_types + (value, )
+            # print(key_types)
+        return set(key_types)
+
+    def _unpack_schema(self, schema: 'BaseSchema') -> dict[str, Any]:
+        schema_unpacked: dict[str, Any] = {}
+        for item in iter(schema):
+            for key, value in item.items():
+                schema[key] = value
+        return schema_unpacked
+            
+    def _verify_schema(self) -> (bool, str | None):
+        """
+        Verifies that the schema is valid
+        """
+        for key_type in self._get_key_types():
+            if isinstance(key_type, str):
+                try:
+                    if key_type.startswith("schema:") or key_type.startswith("schema"):
+                        continue
+
+                    elif key_type.startswith("list") or key_type.startswith("tuple") or key_type.startswith("set") or key_type.startswith("frozenset") or key_type.startswith("dict") or isinstance(key_type, containers):
+                        if key_type.startswith("list"):
+                            key_type = key_type.replace("list[", "").replace("]", "")
+                        elif key_type.startswith("tuple"):
+                            key_type = key_type.replace("tuple[", "").replace("]", "")
+                        elif key_type.startswith("set"):
+                            key_type = key_type.replace("set{", "").replace("}", "")
+                        elif key_type.startswith("frozenset"):
+                            key_type = key_type.replace("frozenset({", "").replace("})", "")
+                        elif key_type.startswith("dict"):
+                            key_type = key_type.replace("dict{", "").replace("}", "")
+                        elif isinstance(key_type, containers):
+                            key_type = type(key_type)
+
+                        print(str(key_type))
+                        if eval(str(key_type)) is not None:
+                            continue
+                        else:
+                            return False, f"Key type '{key_type}' is not valid"
+                        
+                    elif (key_type == "bool") or (key_type == "boolean"):
+                        key_type = bool
+                    
+                    elif (key_type == "int") or (key_type == "integer"):
+                        key_type = int
+
+                    elif (key_type == "float") or (key_type == "number"):
+                        key_type = float
+
+                    elif (key_type == "str") or (key_type == "string"):
+                        key_type = str
+
+                    elif (key_type == "bytes") or (key_type == "byte"):
+                        key_type = bytes
+                    else:
+                        return False, f"Key type '{key_type}' is not valid"          
+                except Exception:
+                    return False, f"Key type '{key_type}' is not valid"
+            elif isinstance(key_type, type):
+                continue
+            
+
+        return True, None
 
     def __iter__(self):
         for key, value in self._schema.items():
             if isinstance(value, BaseSchema):
-                yield {key: [item for item in iter(value)]}
+                yield {key: "schema"}
+                yield from [item for item in iter(value)]
             else:
                 yield {key: value}
 

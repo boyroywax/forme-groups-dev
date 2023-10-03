@@ -89,9 +89,20 @@ sample_schema1 = BaseSchema({
 
 print(str(sample_schema1._sub_schema()))
 print(str(sample_schema1._sub_containers()))
-print([str(item) for item in iter(sample_schema1)])
+print([item for item in iter(sample_schema1)])
 
 sample_schema2 = BaseSchema({
-    "schema": sample_schema1
+    "schema": sample_schema1,
+    "test": "string"
 })
-print([str(item) for item in iter(sample_schema2)])
+print([item for item in iter(sample_schema2)])
+key_types = sample_schema2._get_key_types()
+print(key_types)
+print (sample_schema2._verify_schema())
+
+
+sample_schema3 = BaseSchema({
+    "schema": sample_schema1,
+    "test": "string100"
+})
+print(sample_schema3._verify_schema())
