@@ -1,7 +1,7 @@
 from src import App
-from src.base import BaseInterface, BaseValue, unit_value_types, BaseContainer
 from typing import TypeAlias
 from attrs.exceptions import FrozenInstanceError
+from src.base import BaseInterface, BaseValue, BaseContainer
 
 if __name__ == '__main__':
     app = App()
@@ -9,69 +9,48 @@ if __name__ == '__main__':
     app.create_types()
     app.create_types2()
 
-    value: BaseInterface = BaseInterface(1)
-    number: TypeAlias = int | float
-    print(value)
-    print(value._value)
-    print(isinstance(value, BaseInterface))
-    print(isinstance(value._value, number))
-    print(type(value._value))
-    print(value._slots_to_string())
 
-    value2: BaseInterface = BaseInterface([1.0, 2.0, 3.0, "string1"])
-    print(value2)
-    print(repr(value2))
-    print(value2._is_type())
-    print([item for item in iter(value2)])
+base_interface_instance: BaseInterface = BaseInterface()
+print([str(slot) for slot in iter(base_interface_instance)])
 
-    value3: BaseInterface = BaseInterface({"key1": "value1", "key2": "value2"})
-    print(value3)
-    print(repr(value3))
-    print(value3._is_type())
-    print([item for item in iter(value3)])
+base_value_instance: BaseValue = BaseValue(1)
+print(str(base_value_instance))
+print(repr(base_value_instance))
 
-    value4: BaseInterface = BaseInterface({"key1": "value1", "key2": "value2", "key3": {"key4": "value4", "key5": "value5", "key6": {"key7": "value7", "key8": "value8", "key9": "value9"}}})
-    print(value4)
-    print(repr(value4))
-    print(value4._is_type())
-    print(value4._get_max_sublevel())
-    print([item for item in iter(value4)])
+try:
+    base_value_instance.value = 2
+except FrozenInstanceError:
+    print("FrozenInstanceError as expected")
 
-    value5: BaseInterface = BaseInterface({"key1": ["value1", "value2", {"key2": "value3"}, {"key3": (1,2,3,[1, [0, [0, [0]]]])}], "key02": {"key021": "value021", "key170": ["value170"]}})
-    print(value5)
-    print(repr(value5))
-    print(value5._is_type())
-    print(value5._get_max_sublevel())
-    print([item for item in value5.iter_to_depth(8)])
-    print([item for item in value5.iter_to_depth(5)])
+base_value_instance_from_tuple: BaseValue = BaseValue((1, 2))
+print(str(base_value_instance_from_tuple))
 
-    try:
-        value5._value = {"key1": "value1"}
-    except FrozenInstanceError as e:
-        print(str(e))
+base_value_instance_from_list: BaseValue = BaseValue([1, 2])
+print(str(base_value_instance_from_list))
 
-    print(value5)
-    print(value5._map_sublevel())
-    print(value5._list_items_with_sublevels())
+base_value_instance_from_set: BaseValue = BaseValue({1, 2})
+print(str(base_value_instance_from_set))
 
-    base_value = BaseValue(1)
-    print(base_value)
-    try:
-        base_value._value = 2
-    except FrozenInstanceError as e:
-        print(str(e))
+base_value_instance_from_frozenset: BaseValue = BaseValue(frozenset({1, 2}))
+print(str(base_value_instance_from_frozenset))
 
-    try:
-        new_base_value = BaseValue((1,2,3))
-        print(new_base_value)
-    except AssertionError as e:
-        print(str(e))
+base_value_instance_from_dict: BaseValue = BaseValue({1: 2})
+print(str(base_value_instance_from_dict))
 
-    base_container = BaseContainer([1,2,3])
-    print(base_container)
+base_value_instance_from_namedtuple: BaseValue = BaseValue((1, 2))
+print(str(base_value_instance_from_namedtuple))
 
-    base_container_dict = BaseContainer({"key1": "value1", "key2": "value2"})
-    print(base_container_dict)
+vase_container_instance: BaseContainer = BaseContainer((1, 2))
+print(str(vase_container_instance))
 
+vase_container_instance: BaseContainer = BaseContainer([1, 2])
+print(str(vase_container_instance))
 
-    
+vase_container_instance: BaseContainer = BaseContainer({1, 2})
+print(str(vase_container_instance))
+
+vase_container_instance: BaseContainer = BaseContainer(frozenset({1, 2}))
+print(str(vase_container_instance))
+
+vase_container_instance: BaseContainer = BaseContainer({1: 2})
+print(str(vase_container_instance))
