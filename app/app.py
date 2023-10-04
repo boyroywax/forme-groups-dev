@@ -113,5 +113,6 @@ sample_schema4 = BaseSchema({
     "schema": sample_schema1,
     "test": "list[string100]",
     "test2": "list[dict[string, int]]",
+    "test3": "list[dict[string, list[int]]]"
 })
 print(sample_schema4._verify_schema())
