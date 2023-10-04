@@ -1,10 +1,11 @@
+import itertools
 from attrs import define, field, validators
 from typing import Optional, TypeAlias
 
-from base.interface import BaseInterface
-from base.types import unit_value_types, unit_types, named_container, linear_container
-from base.value import BaseValue
-
+from .interface import BaseInterface
+from .types import unit_value_types, unit_types, named_container, linear_container
+from .value import BaseValue
+from ..utils.converters import _convert_container_to_default, _convert_container_to_type
 
 @define(slots=True, weakref_slot=False)
 class BaseContainer(BaseInterface):
@@ -17,7 +18,7 @@ class BaseContainer(BaseInterface):
     def __init__(self, *args, **kwargs):
         print(args, kwargs)
         self._type = _convert_container_to_type(args[0])
-        self._items = self._convert_container_to_base_values(args[0])
+        self._items = self._extract_base_values(args[0])
 
     @property
     def items(self) -> tuple[BaseValue]:

@@ -1,5 +1,4 @@
 from src import App
-from typing import TypeAlias
 from attrs.exceptions import FrozenInstanceError
 from src.base import BaseInterface, BaseValue, BaseContainer, BaseSchema
 

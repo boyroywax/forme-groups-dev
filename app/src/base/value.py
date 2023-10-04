@@ -1,8 +1,8 @@
 from attrs import define, field, validators
 
-from base.types import unit_value_types, unit_types
-from base.interface import BaseInterface
-from converters import _convert_container_to_value
+from .types import unit_value_types, unit_types
+from .interface import BaseInterface
+from ..utils.converters import _convert_container_to_value
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
