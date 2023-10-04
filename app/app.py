@@ -96,13 +96,23 @@ sample_schema2 = BaseSchema({
     "test": "string"
 })
 print([item for item in iter(sample_schema2)])
-key_types = sample_schema2._get_key_types()
+key_types = sample_schema2._get_key_types_from_schema()
 print(key_types)
 print (sample_schema2._verify_schema())
 
 
 sample_schema3 = BaseSchema({
     "schema": sample_schema1,
-    "test": "string100"
+    "test": "list[string100]",
+
 })
 print(sample_schema3._verify_schema())
+# print(sample_schema3._verify)
+
+
+sample_schema4 = BaseSchema({
+    "schema": sample_schema1,
+    "test": "list[string100]",
+    "test2": "list[dict[string, int]]",
+})
+print(sample_schema4._verify_schema())
