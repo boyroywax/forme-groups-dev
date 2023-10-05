@@ -141,4 +141,18 @@ class TestBaseSchema(unittest.TestCase):
         packed_string = "list[dict[str, str]]"
         self.assertEqual(BaseSchema._unpack_strings(packed_string), 'str, str')
 
-    def test_verify_base_types
+    def test_verify_base_types(self):
+        packed_text = ["string", "number", "boolean", "integer", "integer1"]
+        self.assertEqual(BaseSchema._verify_base_types(packed_text), (False, "Key type 'integer1' is not valid. "))
+
+    def test_verify_base_types2(self):
+        packed_text = ["string", "number", "boolean", "integer"]
+        self.assertEqual(BaseSchema._verify_base_types(packed_text), (True, ""))
+
+    def test_verify_base_types3(self):
+        packed_text = ["string", "number", "boolean", "integer", "list"]
+        self.assertEqual(BaseSchema._verify_base_types(packed_text), (False, "Key type 'list' is not valid. "))
+
+    def test_verify_base_types(self):
+        packed_text = ["string", "number", "boolean", "integer", "list[dict[str, str]]"]
+        self.assertEqual(BaseSchema._verify_base_types(packed_text), (False, "Key type 'list[dict[str, str]]' is not valid. "))

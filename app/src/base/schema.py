@@ -149,18 +149,19 @@ class BaseSchema(BaseInterface):
         else:
             return [types]
 
-    def _fully_unpack_types(self, types: list[text]) -> list[text]:
+    @staticmethod
+    def _fully_unpack_types(types: list[text]) -> list[text]:
         # print(f'types {types}')
         valid_unpacked: list[text] = []
         for key_type in types:
-            unpacked = self._unpack_strings(key_type)
+            unpacked = BaseSchema._unpack_strings(key_type)
 
             if "," in unpacked:
-                split_types = self._get_values_from_string_tuple(unpacked)
+                split_types = BaseSchema._get_values_from_string_tuple(unpacked)
 
                 if len(split_types) >= 1:
                     for split_type in split_types:
-                        units = self._fully_unpack_types([split_type])
+                        units = BaseSchema._fully_unpack_types([split_type])
                         # print(f'units {units}')
                         valid_unpacked = valid_unpacked + units
             else:
