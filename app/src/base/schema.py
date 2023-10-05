@@ -193,7 +193,7 @@ class BaseSchema(BaseInterface):
                 yield {key: value}
     
     def __str__(self) -> str:
-        return str(self._schema)
+        return str(iter(self))
     
     def __name__(self) -> str:
         return self.__class__.__name__

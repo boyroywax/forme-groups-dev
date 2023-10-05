@@ -153,6 +153,24 @@ class TestBaseSchema(unittest.TestCase):
         packed_text = ["string", "number", "boolean", "integer", "list"]
         self.assertEqual(BaseSchema._verify_base_types(packed_text), (False, "Key type 'list' is not valid. "))
 
-    def test_verify_base_types(self):
+    def test_verify_base_types4(self):
         packed_text = ["string", "number", "boolean", "integer", "list[dict[str, str]]"]
         self.assertEqual(BaseSchema._verify_base_types(packed_text), (False, "Key type 'list[dict[str, str]]' is not valid. "))
+
+    def test_iter(self):
+        self.maxDiff = None
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string",
+            "metadata": "list[dict[str, str]]"
+        
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        items = [item.__str__() for item in iter(person_schema)]
+        self.assertEqual(items, ["{'name': 'string'}", "{'age': 'number'}", "{'address': 'schema'}", "{'street': 'string'}", "{'city': 'string'}", "{'state': 'string'}", "{'zip': 'string'}", "{'metadata': 'list[dict[str, str]]'}"])
