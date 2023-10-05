@@ -88,10 +88,14 @@ class BaseSchema(BaseInterface):
             returned_type_strings = type_strings[5:-1]
         else:
             returned_type_strings = type_strings
-        
+
         print(f'is_text_instance_returned {returned_type_strings}')
-        
-        return returned_type_strings
+
+        if returned_type_strings == type_strings:
+            return returned_type_strings
+        else:
+            return self._unpack_strings(returned_type_strings)
+
 
     def _verify_base_types(self, base_types: list[text]) -> (bool, text | None):
         verified: bool = True
@@ -114,46 +118,34 @@ class BaseSchema(BaseInterface):
                 case(_):
                     verified = False
                     err_msg += f"Key type '{key_type}' is not valid. "
-        
+
         return verified, err_msg
-    
+
     def _get_values_from_string_tuple(self, types: text) -> list[text]:
-        if self._unpack_strings(types) != types:
-            return self._get_values_from_string_tuple(self._unpack_strings(types))
         if ", " in types:
             return types.split(", ")
         if "," in types:
             return types.split(",")
         else:
             return [types]
-    
+
     def _fully_unpack_types(self, types: list[text]) -> list[text]:
+        print(f'types {types}')
         valid_unpacked: list[text] = []
         for key_type in types:
             unpacked = self._unpack_strings(key_type)
             print(f'unpacked {unpacked}')
-            if unpacked != key_type:
+            if "," in unpacked:
                 split_types = self._get_values_from_string_tuple(unpacked)
                 print(f'split_types {split_types}')
-                
-            #     return self._fully_unpack_types([unpacked])
-            # else:
-            #     if "," not in unpacked:
-            #         valid_unpacked.append(unpacked)
-            #     else:
-            #         for item in unpacked.split(", "):
-            #             valid_unpacked.append(self._fully_unpack_types(item))
+                if len(split_types) >= 1:
+                    for split_type in split_types:
+                        units = self._fully_unpack_types([split_type])
+                        print(f'units {units}')
+                        valid_unpacked = valid_unpacked + units
+            else:
+                valid_unpacked.append(unpacked)
 
-            # if unpacked == key_type:
-            #     if "," not in unpacked:
-            #         valid_unpacked.append(unpacked)
-            #     else:
-
-            #     else:
-            #         for item in key_type.split(","):
-            #             valid_unpacked.append(self._fully_unpack_types(item))
-            # else:
-            #     valid_unpacked.append(self._fully_unpack_types(unpacked))
         return valid_unpacked
 
 
@@ -169,7 +161,7 @@ class BaseSchema(BaseInterface):
 
         key_types: type_set = self._get_key_types_from_schema()
         valid_types = self._fully_unpack_types(list(key_types))
-
+        print(f'valid_types {valid_types}')
         verified, err_msg = self._verify_base_types(valid_types)
 
         return verified, err_msg
