@@ -68,4 +68,35 @@ class TestBaseSchema(unittest.TestCase):
             random_schema = BaseSchema(random_schema)
             # print(random_schema)
             self.assertEqual(random_schema._verify_schema(), (True, ""))
+
+    def test_sub_schema_function(self):
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string"
+        
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        self.assertEqual(person_schema._sub_schema(), [{'address': address_schema}])
+
+    def test_sub_containers_function(self):
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string",
+            "metadata": "list[dict[str, str]]"
+        
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        self.assertEqual(person_schema._sub_containers(), [{"metadata": "list[dict[str, str]]"}])
         

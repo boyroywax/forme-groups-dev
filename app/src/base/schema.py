@@ -3,7 +3,7 @@ from typing import Any
 
 from .interface import BaseInterface
 from .container import BaseContainer
-from .types import type_set, key_value, type_containers_dict, schema, containers, text, linear_container, named_container
+from .types import type_set, key_value, type_containers_dict, base_schema, containers, text, linear_container, named_container
 
 
 
@@ -30,18 +30,14 @@ class BaseSchema(BaseInterface):
     """
     _schema: dict[str, Any] = field(validator=validators.instance_of(dict))
 
-    def __init__(self, schema: schema):
+    def __init__(self, schema: base_schema):
         self._schema = schema
         self._verify_schema()
 
-    # @property
-    # def schema(self) -> schema:
-        # schema: schema = 
 
-
-    def _sub_schema(self, schema_: schema = None) -> list[schema]:
+    def _sub_schema(self, schema_: base_schema = None) -> list[base_schema]:
         sub_schemas: list['BaseSchema' | str] = []
-        schema_to_scan: schema = schema_ is not None or self._schema
+        schema_to_scan: base_schema = schema_ is not None or self._schema
         for key, value in schema_to_scan.items():
             if isinstance(value, BaseSchema):
                 sub_schemas.append({key: value})
@@ -51,19 +47,26 @@ class BaseSchema(BaseInterface):
 
         return sub_schemas
 
-    def _sub_containers(self, schema_: schema = None) -> list[type_containers_dict]:
+    def _sub_containers(self, schema_: base_schema | text = None) -> list[type_containers_dict]:
         sub_units: list[type_containers_dict] = []
-        schema_to_scan: schema = schema_ is not None or self._schema
+        print(f'schema_ {schema_}')
+        # if isinstance(schema_, BaseSchema):
+
+        schema_to_scan: base_schema =   schema_._schema if schema_ is not None else self._schema
+        print(f'schema_to_scan {schema_to_scan}')
         for key, value in schema_to_scan.items():
             if isinstance(value, BaseContainer):
                 sub_units.append({key: value})
-            if isinstance(value, text):
+            if isinstance(value, text | containers):
+                print(f'value {value}')
                 if value.startswith("list") or value.startswith("tuple") or value.startswith("set") or value.startswith("frozenset") or value.startswith("dict") or isinstance(value, containers):
                     sub_units.append({key: value})
+            if isinstance(value, BaseSchema):
+                sub_units.extend(self._sub_containers(value))
 
         return sub_units
 
-    def _unpack_schema(self, schema: 'BaseSchema') -> schema:
+    def _unpack_schema(self, schema: 'BaseSchema') -> base_schema:
         schema_unpacked: dict[str, Any] = {}
         for item in iter(schema):
             for key, value in item.items():

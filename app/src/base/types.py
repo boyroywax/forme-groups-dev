@@ -12,4 +12,4 @@ unit_types: TypeAlias = unit_value_types | containers | object_
 type_set: TypeAlias = set[text]
 type_container: TypeAlias = text | containers
 type_containers_dict: TypeAlias = dict[text, text | containers]
-schema: TypeAlias = dict[text, Any]
+base_schema: TypeAlias = dict[text, Any]
