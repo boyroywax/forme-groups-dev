@@ -85,7 +85,8 @@ class BaseSchema(BaseInterface):
                     key_types = key_types + (value, )
         return set(key_types)
 
-    def _unpack_strings(self, type_strings: text) -> text:
+    @staticmethod
+    def _unpack_strings(type_strings: text) -> text:
         # print(f'is_text_instance {type_strings}')
         returned_type_strings: text = ""
         if type_strings.startswith("schema:"):
@@ -108,10 +109,10 @@ class BaseSchema(BaseInterface):
         if returned_type_strings == type_strings:
             return returned_type_strings
         else:
-            return self._unpack_strings(returned_type_strings)
+            return BaseSchema._unpack_strings(returned_type_strings)
 
-
-    def _verify_base_types(self, base_types: list[text]) -> (bool, text | None):
+    @staticmethod
+    def _verify_base_types(base_types: list[text]) -> (bool, text | None):
         verified: bool = True
         err_msg: text | None = ""
 
@@ -135,7 +136,8 @@ class BaseSchema(BaseInterface):
 
         return verified, err_msg
 
-    def _get_values_from_string_tuple(self, types: text) -> list[text]:
+    @staticmethod
+    def _get_values_from_string_tuple(types: text) -> list[text]:
         if ", " in types:
             return types.split(", ")
         if "," in types:

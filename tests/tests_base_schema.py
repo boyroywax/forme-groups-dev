@@ -116,4 +116,29 @@ class TestBaseSchema(unittest.TestCase):
         })
         print(f'{person_schema._unpack_schema(person_schema)}')
         self.assertEqual(person_schema._unpack_schema(person_schema), {'name': 'string', 'age': 'number', 'address': 'schema', 'street': 'string', 'city': 'string', 'state': 'string', 'zip': 'string', 'metadata': 'list[dict[str, str]]'})
+
+    def test_get_key_types_from_schema_function(self):
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string",
+            "metadata": "list[dict[str, str]]"
         
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        self.assertEqual(person_schema._get_key_types_from_schema(), {'string', 'number', 'schema', 'list[dict[str, str]]'})
+
+    def test_unpack_strings(self):
+        packed_string = "schema:person_schema"
+        self.assertEqual(BaseSchema._unpack_strings(packed_string), 'schema')
+
+    def test_unpack_strings2(self):
+        packed_string = "list[dict[str, str]]"
+        self.assertEqual(BaseSchema._unpack_strings(packed_string), 'str, str')
+
+    def test_verify_base_types
