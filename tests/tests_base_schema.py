@@ -99,4 +99,21 @@ class TestBaseSchema(unittest.TestCase):
             "address": address_schema
         })
         self.assertEqual(person_schema._sub_containers(), [{"metadata": "list[dict[str, str]]"}])
+
+    def test_unpack_schema_function(self):
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string",
+            "metadata": "list[dict[str, str]]"
+        
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        print(f'{person_schema._unpack_schema(person_schema)}')
+        self.assertEqual(person_schema._unpack_schema(person_schema), {'name': 'string', 'age': 'number', 'address': 'schema', 'street': 'string', 'city': 'string', 'state': 'string', 'zip': 'string', 'metadata': 'list[dict[str, str]]'})
         

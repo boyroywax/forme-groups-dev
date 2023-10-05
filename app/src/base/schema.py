@@ -50,9 +50,7 @@ class BaseSchema(BaseInterface):
     def _sub_containers(self, schema_: base_schema | text = None) -> list[type_containers_dict]:
         sub_units: list[type_containers_dict] = []
         print(f'schema_ {schema_}')
-        # if isinstance(schema_, BaseSchema):
-
-        schema_to_scan: base_schema =   schema_._schema if schema_ is not None else self._schema
+        schema_to_scan: base_schema = schema_._schema if schema_ is not None else self._schema
         print(f'schema_to_scan {schema_to_scan}')
         for key, value in schema_to_scan.items():
             if isinstance(value, BaseContainer):
@@ -70,7 +68,8 @@ class BaseSchema(BaseInterface):
         schema_unpacked: dict[str, Any] = {}
         for item in iter(schema):
             for key, value in item.items():
-                schema[key] = value
+                # schema_unpacked[key] = f'{schema.__name__()}.{value}'
+                schema_unpacked[key] = value
         return schema_unpacked
 
     def _get_key_types_from_schema(self) -> set[key_value]:
@@ -81,7 +80,7 @@ class BaseSchema(BaseInterface):
                     unpacked = self._unpack_schema(value)
                     key_types = key_types + ((item, ) for item in unpacked)
                 elif isinstance(value, named_container):
-                    raise Exception("Named containers are not supported, use a sub schema instead. Convert {key} to a schema and embed it in the parent schema.")
+                    raise Exception(f"Named containers are not supported, use a sub schema instead. Convert {key} to a schema and embed it in the parent schema.")
                 else:
                     key_types = key_types + (value, )
         return set(key_types)
@@ -192,4 +191,6 @@ class BaseSchema(BaseInterface):
     
     def __str__(self) -> str:
         return str(self._schema)
-
+    
+    def __name__(self) -> str:
+        return self.__class__.__name__
