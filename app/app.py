@@ -99,14 +99,14 @@ key_types = sample_schema2._get_key_types_from_schema()
 print(key_types)
 print (sample_schema2._verify_schema())
 
-
-sample_schema3 = BaseSchema({
-    "schema": sample_schema1,
-    "test": "list[string100]",
-
-})
-print(sample_schema3._verify_schema())
-# print(sample_schema3._verify)
+try:
+    sample_schema3 = BaseSchema({
+        "schema": sample_schema1,
+        "test": "list[string100]"
+    })
+    print(sample_schema3._verify_schema())
+except Exception as e:
+    print(e)
 
 
 sample_schema4 = BaseSchema({
@@ -130,18 +130,19 @@ print(sample_schema5._verify_schema())
 print(sample_schema5._get_key_types_from_schema())
 
 
-sample_schema6 = BaseSchema({
-    "name": "string",
-    "age": "number",
-    "address": {
-        "street": "string",
-        "city": "string",
-        "state": "string",
-        "zip": "string"
-    },
-    "phone_numbers": "list:string"
-})
+
 try:
+    sample_schema6 = BaseSchema({
+        "name": "string",
+        "age": "number",
+        "address": {
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string"
+        },
+        "phone_numbers": "list:string"
+    })
     print(sample_schema6._verify_schema())
 except Exception as e:
     print(e)
