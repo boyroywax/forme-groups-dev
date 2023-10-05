@@ -48,3 +48,11 @@ class TestBaseContainer(unittest.TestCase):
     def test_type_with_dict(self):
         container = BaseContainer({"a": 1, "b": 2, "c": 3})
         self.assertEqual(container.type, dict)
+
+    def test_has_slots(self):
+        container = BaseContainer((1, 2, 3))
+        self.assertEqual(container.__slots__, ('_items', '_type'))
+
+    def test_create_large_container(self):
+        container = BaseContainer(([i for i in range(10000)]))
+        self.assertEqual(len(container.items), 10000)

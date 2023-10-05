@@ -204,3 +204,19 @@ class TestBaseSchema(unittest.TestCase):
             "address": address_schema
         })
         self.assertEqual(person_schema.__repr__(), "BaseSchema(schema={name: string, age: number, address: schema, street: string, city: string, state: string, zip: string, metadata: list[dict[str, str]]})")
+
+    def test_has_slots(self):
+        self.maxDiff = None
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string",
+            "metadata": "list[dict[str, str]]"
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        self.assertEqual(person_schema.__slots__, ('_schema',))
