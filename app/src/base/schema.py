@@ -191,9 +191,14 @@ class BaseSchema(BaseInterface):
                 yield from [item for item in iter(value)]
             else:
                 yield {key: value}
-    
+
     def __str__(self) -> str:
-        return str(iter(self))
-    
+        processed_string: str = ""
+        for dict_ in iter(self):
+            for key, value in dict_.items():
+                processed_string += f"{key}: {value}, "
+
+        return processed_string[:-2]
+
     def __name__(self) -> str:
         return self.__class__.__name__

@@ -174,3 +174,20 @@ class TestBaseSchema(unittest.TestCase):
         })
         items = [item.__str__() for item in iter(person_schema)]
         self.assertEqual(items, ["{'name': 'string'}", "{'age': 'number'}", "{'address': 'schema'}", "{'street': 'string'}", "{'city': 'string'}", "{'state': 'string'}", "{'zip': 'string'}", "{'metadata': 'list[dict[str, str]]'}"])
+
+    def test_str(self):
+        self.maxDiff = None
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string",
+            "metadata": "list[dict[str, str]]"
+        
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        self.assertEqual(person_schema.__str__(), "name: string, age: number, address: schema, street: string, city: string, state: string, zip: string, metadata: list[dict[str, str]]")
