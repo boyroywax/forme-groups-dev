@@ -48,9 +48,12 @@ class BaseContainer(BaseInterface):
                 items_to_return = tuple([BaseValue(items.pop()) for _ in range(len(items))])
 
         elif isinstance(item, named_container):
-            keys: tuple[unit_value_types] = tuple(item.keys())
-            values: tuple[unit_value_types] = tuple(item.values())
-            items_to_return = tuple([BaseValue(value) for value in itertools.chain(keys, values)])
+            # keys: tuple[unit_value_types] = tuple(item.keys())
+            # values: tuple[unit_value_types] = tuple(item.values())
+            items_to_return: tuple[BaseValue] = tuple()
+            for key, value in item.items():
+                items_to_return += (BaseValue(key), BaseValue(value))
+            print(items_to_return)
 
         return items_to_return
 
