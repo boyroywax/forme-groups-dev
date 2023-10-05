@@ -51,14 +51,14 @@ class BaseSchema(BaseInterface):
                     sub_units.append({key: value})
 
         return sub_units
-    
+
     def _unpack_schema(self, schema: 'BaseSchema') -> schema:
         schema_unpacked: dict[str, Any] = {}
         for item in iter(schema):
             for key, value in item.items():
                 schema[key] = value
         return schema_unpacked
-    
+
     def _get_key_types_from_schema(self) -> set[key_value]:
         key_types: tuple[key_value] = ()
         for dict_ in iter(self):
@@ -147,8 +147,6 @@ class BaseSchema(BaseInterface):
                 valid_unpacked.append(unpacked)
 
         return valid_unpacked
-
-
 
     def _verify_schema(self) -> (bool, str | None):
         """

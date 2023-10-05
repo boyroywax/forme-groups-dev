@@ -123,7 +123,8 @@ sample_schema5 = BaseSchema({
     "test": "list[string100]",
     "test2": "list[dict[string, int]]",
     "test3": "list[dict[string, list[int]]]",
-    "test4": "list[dict[string, list[int1]]]"
+    "test4": "list[dict[string, list[int1]]]",
+    "test5": "list[dict[string, list[list[int]]]]"
 })
 print(sample_schema5._verify_schema())
 print(sample_schema5._get_key_types_from_schema())
