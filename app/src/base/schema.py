@@ -152,7 +152,6 @@ class BaseSchema(BaseInterface):
         """
         Verifies that the schema is valid
         """
-        invalid_types: list[text] = []
         valid_types: list[text] = []
         verified: bool = True
         err_msg: str | None = ""

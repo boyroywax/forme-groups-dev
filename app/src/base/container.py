@@ -23,11 +23,11 @@ class BaseContainer(BaseInterface):
     @property
     def items(self) -> tuple[BaseValue]:
         return self._items
-    
+
     @property
     def type(self) -> TypeAlias | type:
         return self._type
-    
+
     @staticmethod
     def _extract_base_values(item: unit_types) -> tuple[BaseValue]:
         """
@@ -54,15 +54,15 @@ class BaseContainer(BaseInterface):
 
         return items_to_return
 
-    
+
     def _package(self) -> unit_types:
         return _convert_container_to_default(self._items, self._type)
-    
+
     def __iter__(self):
         yield from self._items
-    
+
     def __str__(self) -> str:
         return str(self._package())
-    
+
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(items={[item for item in iter(self)]}, type={self._type})"
