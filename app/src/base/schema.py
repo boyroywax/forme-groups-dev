@@ -3,7 +3,7 @@ from typing import Any
 
 from .interface import BaseInterface
 from .container import BaseContainer
-from .types import type_set, key_value, type_containers_dict, schema, containers, text
+from .types import type_set, key_value, type_containers_dict, schema, containers, text, linear_container, named_container
 
 
 
@@ -30,9 +30,19 @@ class BaseSchema(BaseInterface):
     """
     _schema: dict[str, Any] = field(validator=validators.instance_of(dict))
 
-    def _sub_schema(self) -> list[schema]:
+    def __init__(self, schema: schema):
+        self._schema = schema
+        self._verify_schema()
+
+    # @property
+    # def schema(self) -> schema:
+        # schema: schema = 
+
+
+    def _sub_schema(self, schema_: schema = None) -> list[schema]:
         sub_schemas: list['BaseSchema' | str] = []
-        for key, value in self._schema.items():
+        schema_to_scan: schema = schema_ is not None or self._schema
+        for key, value in schema_to_scan.items():
             if isinstance(value, BaseSchema):
                 sub_schemas.append({key: value})
             elif isinstance(value, str):
@@ -41,9 +51,10 @@ class BaseSchema(BaseInterface):
 
         return sub_schemas
 
-    def _sub_containers(self) -> list[type_containers_dict]:
+    def _sub_containers(self, schema_: schema = None) -> list[type_containers_dict]:
         sub_units: list[type_containers_dict] = []
-        for key, value in self._schema.items():
+        schema_to_scan: schema = schema_ is not None or self._schema
+        for key, value in schema_to_scan.items():
             if isinstance(value, BaseContainer):
                 sub_units.append({key: value})
             if isinstance(value, text):
@@ -63,16 +74,17 @@ class BaseSchema(BaseInterface):
         key_types: tuple[key_value] = ()
         for dict_ in iter(self):
             for key, value in dict_.items():
-                if isinstance(value, type(self).__class__):
+                if isinstance(value, linear_container):
                     unpacked = self._unpack_schema(value)
                     key_types = key_types + ((item, ) for item in unpacked)
+                elif isinstance(value, named_container):
+                    raise Exception("Named containers are not supported, use a sub schema instead. Convert {key} to a schema and embed it in the parent schema.")
                 else:
                     key_types = key_types + (value, )
-            # print(key_types)
         return set(key_types)
 
     def _unpack_strings(self, type_strings: text) -> text:
-        print(f'is_text_instance {type_strings}')
+        # print(f'is_text_instance {type_strings}')
         returned_type_strings: text = ""
         if type_strings.startswith("schema:"):
             returned_type_strings = "schema"
@@ -83,13 +95,13 @@ class BaseSchema(BaseInterface):
         elif type_strings.startswith("set[") or type_strings[:-1].startswith("set{") or type_strings[:-1].startswith("set("):
             returned_type_strings = type_strings[4:-1]
         elif type_strings.startswith("frozenset({") or type_strings.startswith("frozenset(") or type_strings.startswith("frozenset["):
-            returned_type_strings = type_strings[11:-1].replace("frozenset({", "").replace("})", "") or type_strings[10:-1].replace("frozenset[", "")
+            returned_type_strings = type_strings[11:-1] or type_strings[10:-1]
         elif type_strings.startswith("dict{") or type_strings.startswith("dict["):
             returned_type_strings = type_strings[5:-1]
         else:
             returned_type_strings = type_strings
 
-        print(f'is_text_instance_returned {returned_type_strings}')
+        # print(f'is_text_instance_returned {returned_type_strings}')
 
         if returned_type_strings == type_strings:
             return returned_type_strings
@@ -126,22 +138,26 @@ class BaseSchema(BaseInterface):
             return types.split(", ")
         if "," in types:
             return types.split(",")
+        if " ," in types:
+            return types.split(" ,")
+        if " , " in types:
+            return types.split(" , ")
         else:
             return [types]
 
     def _fully_unpack_types(self, types: list[text]) -> list[text]:
-        print(f'types {types}')
+        # print(f'types {types}')
         valid_unpacked: list[text] = []
         for key_type in types:
             unpacked = self._unpack_strings(key_type)
-            print(f'unpacked {unpacked}')
+
             if "," in unpacked:
                 split_types = self._get_values_from_string_tuple(unpacked)
-                print(f'split_types {split_types}')
+
                 if len(split_types) >= 1:
                     for split_type in split_types:
                         units = self._fully_unpack_types([split_type])
-                        print(f'units {units}')
+                        # print(f'units {units}')
                         valid_unpacked = valid_unpacked + units
             else:
                 valid_unpacked.append(unpacked)
@@ -158,7 +174,7 @@ class BaseSchema(BaseInterface):
 
         key_types: type_set = self._get_key_types_from_schema()
         valid_types = self._fully_unpack_types(list(key_types))
-        print(f'valid_types {valid_types}')
+        # print(f'valid_types {valid_types}')
         verified, err_msg = self._verify_base_types(valid_types)
 
         return verified, err_msg
@@ -170,4 +186,7 @@ class BaseSchema(BaseInterface):
                 yield from [item for item in iter(value)]
             else:
                 yield {key: value}
+    
+    def __str__(self) -> str:
+        return str(self._schema)
 

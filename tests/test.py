@@ -5,6 +5,7 @@ import unittest
 
 # from .tests_general import TestsGeneral
 from tests_base_container import TestBaseContainer
+from tests_base_schema import TestBaseSchema
 
 
 def main():
@@ -13,6 +14,7 @@ def main():
     loader = unittest.TestLoader()
     # test_suite.addTest(loader.loadTestsFromTestCase(TestsGeneral))
     test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
 
     # Run the test suite
     runner = unittest.TextTestRunner()

@@ -128,3 +128,20 @@ sample_schema5 = BaseSchema({
 })
 print(sample_schema5._verify_schema())
 print(sample_schema5._get_key_types_from_schema())
+
+
+sample_schema6 = BaseSchema({
+    "name": "string",
+    "age": "number",
+    "address": {
+        "street": "string",
+        "city": "string",
+        "state": "string",
+        "zip": "string"
+    },
+    "phone_numbers": "list:string"
+})
+try:
+    print(sample_schema6._verify_schema())
+except Exception as e:
+    print(e)
