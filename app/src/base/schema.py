@@ -42,17 +42,24 @@ class BaseSchema(BaseInterface):
         return sub_schemas
 
     def _sub_containers(self) -> list[type_containers_dict]:
-        sub_units: list[str] = []
+        sub_units: list[type_containers_dict] = []
         for key, value in self._schema.items():
             if isinstance(value, BaseContainer):
                 sub_units.append({key: value})
-            if isinstance(value, str):
+            if isinstance(value, text):
                 if value.startswith("list") or value.startswith("tuple") or value.startswith("set") or value.startswith("frozenset") or value.startswith("dict") or isinstance(value, containers):
                     sub_units.append({key: value})
 
         return sub_units
     
-    def _get_key_types_from_schema(self) -> type_set:
+    def _unpack_schema(self, schema: 'BaseSchema') -> schema:
+        schema_unpacked: dict[str, Any] = {}
+        for item in iter(schema):
+            for key, value in item.items():
+                schema[key] = value
+        return schema_unpacked
+    
+    def _get_key_types_from_schema(self) -> set[key_value]:
         key_types: tuple[key_value] = ()
         for dict_ in iter(self):
             for key, value in dict_.items():
@@ -64,76 +71,29 @@ class BaseSchema(BaseInterface):
             # print(key_types)
         return set(key_types)
 
-    def _unpack_schema(self, schema: 'BaseSchema') -> schema:
-        schema_unpacked: dict[str, Any] = {}
-        for item in iter(schema):
-            for key, value in item.items():
-                schema[key] = value
-        return schema_unpacked
-    
-    def _unpack_type_containers(self, type_container_: text | containers):
-        print(f'Unpacking {type_container_}')
+    def _unpack_strings(self, type_strings: text) -> text:
+        print(f'is_text_instance {type_strings}')
+        returned_type_strings: text = ""
+        if type_strings.startswith("schema:"):
+            returned_type_strings = "schema"
+        elif type_strings.startswith("list["):
+            returned_type_strings = type_strings[5:-1]
+        elif type_strings.startswith("tuple[") or type_strings.startswith("tuple("):
+            returned_type_strings = type_strings[6:-1]
+        elif type_strings.startswith("set[") or type_strings[:-1].startswith("set{") or type_strings[:-1].startswith("set("):
+            returned_type_strings = type_strings[4:-1]
+        elif type_strings.startswith("frozenset({") or type_strings.startswith("frozenset(") or type_strings.startswith("frozenset["):
+            returned_type_strings = type_strings[11:-1].replace("frozenset({", "").replace("})", "") or type_strings[10:-1].replace("frozenset[", "")
+        elif type_strings.startswith("dict{") or type_strings.startswith("dict["):
+            returned_type_strings = type_strings[5:-1]
+        else:
+            returned_type_strings = type_strings
         
+        print(f'is_text_instance_returned {returned_type_strings}')
         
-        key_types: type_set = []
-        if isinstance(type_container_, list | set | tuple) :
-            print(f'a list has been passed - {type_container_}')
+        return returned_type_strings
 
-            for item in type_container_:
-                if isinstance(item, containers):
-                    key_types.append(str(item))
-                else:
-                    key_types.append(item)
-
-        key_types.append(type_container_)
-
-        processed_key_types: type_set = []
-        for key_type in key_types:
-            if isinstance(type_container_, text):
-                print(key_type)
-                if key_type.startswith("schema:"):
-                    pass
-                if key_type.startswith("list["):
-                    key_type = key_type[5:-1]
-                elif key_type.startswith("tuple[") or key_type.startswith("tuple("):
-                    key_type = key_type[:-1].replace("tuple[", "") or key_type[:-1].replace("tuple(", "")
-                    print(f'tuple_key_type: {key_type}')
-                elif key_type.startswith("set[") or key_type[:-1].startswith("set{") or key_type[:-1].startswith("set("):
-                    key_type = key_type[:-1].replace("set{", "") or key_type[:-1].replace("set[", "") or key_type[:-1].replace("set(", "")
-                elif key_type.startswith("frozenset({") or key_type.startswith("frozenset(") or key_type.startswith("frozenset["):
-                    key_type = key_type[:-1].replace("frozenset({", "").replace("})", "") or key_type[:-1].replace("frozenset[", "") or key_type[:-1].replace("frozenset(", "")
-
-                elif key_type.startswith("dict{") or key_type.startswith("dict["):
-                    # print(key_type)
-                    key_type = key_type[5:-1]
-                    print(key_type)
-
-                if "," in key_type and (key_type.startswith("schema") or key_type.startswith("list") or key_type.startswith("tuple") or key_type.startswith("set") or key_type.startswith("frozenset") or key_type.startswith("dict") or isinstance(key_type, containers)):
-                    return self._unpack_type_containers(key_type)
-                elif ", " in key_type:
-                    return self._unpack_type_containers(key_type.split(", "))
-                    # key_type_split = key_type.split(", ")
-                    # for item in key_type_split:
-                    #     if ("[" in item or "{" in item or "(" in item) and ("]" in item or "}" in item or ")" in item):
-                    #         print(f'key_type_item: {item}')
-                    #         return self._unpack_type_containers(item)
-                # elif :
-                #     return self._unpack_type_containers(key_type)
-                
-                print(f'debug: {key_type}')
-                processed_key_types.append(key_type)
-
-        return processed_key_types
-    
-    def _unpack_nested_type_strings(self, nested_key_types: type_set) -> type_set:
-        unpacked: type_set = []
-        for key_type in nested_key_types:
-            for item in self._unpack_type_containers(key_type):
-                unpacked.append(item)
-        
-        return unpacked
-
-    def _verify_base_types(self, base_types: type_set) -> (bool, text | None):
+    def _verify_base_types(self, base_types: list[text]) -> (bool, text | None):
         verified: bool = True
         err_msg: text | None = ""
 
@@ -156,8 +116,48 @@ class BaseSchema(BaseInterface):
                     err_msg += f"Key type '{key_type}' is not valid. "
         
         return verified, err_msg
+    
+    def _get_values_from_string_tuple(self, types: text) -> list[text]:
+        if self._unpack_strings(types) != types:
+            return self._get_values_from_string_tuple(self._unpack_strings(types))
+        if ", " in types:
+            return types.split(", ")
+        if "," in types:
+            return types.split(",")
+        else:
+            return [types]
+    
+    def _fully_unpack_types(self, types: list[text]) -> list[text]:
+        valid_unpacked: list[text] = []
+        for key_type in types:
+            unpacked = self._unpack_strings(key_type)
+            print(f'unpacked {unpacked}')
+            if unpacked != key_type:
+                split_types = self._get_values_from_string_tuple(unpacked)
+                print(f'split_types {split_types}')
+                
+            #     return self._fully_unpack_types([unpacked])
+            # else:
+            #     if "," not in unpacked:
+            #         valid_unpacked.append(unpacked)
+            #     else:
+            #         for item in unpacked.split(", "):
+            #             valid_unpacked.append(self._fully_unpack_types(item))
 
-            
+            # if unpacked == key_type:
+            #     if "," not in unpacked:
+            #         valid_unpacked.append(unpacked)
+            #     else:
+
+            #     else:
+            #         for item in key_type.split(","):
+            #             valid_unpacked.append(self._fully_unpack_types(item))
+            # else:
+            #     valid_unpacked.append(self._fully_unpack_types(unpacked))
+        return valid_unpacked
+
+
+
     def _verify_schema(self) -> (bool, str | None):
         """
         Verifies that the schema is valid
@@ -168,73 +168,10 @@ class BaseSchema(BaseInterface):
         err_msg: str | None = ""
 
         key_types: type_set = self._get_key_types_from_schema()
-        key_types = self._unpack_nested_type_strings(key_types)
-        # print(key_types)
+        valid_types = self._fully_unpack_types(list(key_types))
 
-        # key_types.add(set(self._unpack_nested_types(key_types)))
-        verified, err_msg = self._verify_base_types(key_types)
+        verified, err_msg = self._verify_base_types(valid_types)
 
-        # if verifies is False:
-        #     verified = False
-        #     err_msg += err_msg
-
-        
-            
-            
-                    
-
-
-                    # if key_type.startswith("schema:") or key_type.startswith("schema"):
-                    #     continue
-
-                    # elif key_type.startswith("list") or key_type.startswith("tuple") or key_type.startswith("set") or key_type.startswith("frozenset") or key_type.startswith("dict") or isinstance(key_type, containers):
-                    #     if key_type.startswith("list"):
-                    #         key_type = key_type.replace("list[", "")
-                    #     elif key_type.startswith("tuple"):
-                    #         key_type = key_type.replace("tuple[", "")
-                    #     elif key_type.startswith("set"):
-                    #         key_type = key_type.replace("set{", "").replace("}", "")
-                    #     elif key_type.startswith("frozenset"):
-                    #         key_type = key_type.replace("frozenset({", "").replace("})", "")
-                    #     elif key_type.startswith("dict"):
-                    #         key_type = key_type.replace("dict{", "").replace("}", "")
-                    #     elif isinstance(key_type, containers):
-                    #         key_type = type(key_type)
-
-                    #     print(str(key_type))
-                    #     if eval(str(key_type)) is not None:
-                    #         continue
-                    #     else:
-                    #         verified = False
-                    #         err_msg += f"Key type '{key_type}' is not valid. "
-                    #         # return False, f"Key type '{key_type}' is not valid"
-                        
-                    # elif (key_type == "bool") or (key_type == "boolean"):
-                    #     key_type = bool
-                    
-                    # elif (key_type == "int") or (key_type == "integer"):
-                    #     key_type = int
-
-                    # elif (key_type == "float") or (key_type == "number"):
-                    #     key_type = float
-
-                    # elif (key_type == "str") or (key_type == "string"):
-                    #     key_type = str
-
-                    # elif (key_type == "bytes") or (key_type == "byte"):
-                    #     key_type = bytes
-                    # else:
-                    #     verified = False
-                    #     err_msg += f"Key type '{key_type}' is not valid. "
-                    #     # return False, f"Key type '{key_type}' is not valid"          
-            #     except Exception:
-            #         verified = False
-            #         err_msg += f"Key type '{key_type}' is not valid. "
-            #         # return False, f"Key type '{key_type}' is not valid"
-
-            # elif isinstance(key_type, type):
-            #     continue
-            
         return verified, err_msg
 
     def __iter__(self):
