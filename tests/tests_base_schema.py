@@ -6,8 +6,6 @@ sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 
 from app.src.base.schema import BaseSchema
-from app.src.base.container import BaseContainer
-from app.src.base.value import BaseValue
 
 class TestBaseSchema(unittest.TestCase):
     def test_init_with_dict(self):
@@ -165,7 +163,7 @@ class TestBaseSchema(unittest.TestCase):
             "state": "string",
             "zip": "string",
             "metadata": "list[dict[str, str]]"
-        
+
         })
         person_schema = BaseSchema({
             "name": "string",
@@ -183,7 +181,6 @@ class TestBaseSchema(unittest.TestCase):
             "state": "string",
             "zip": "string",
             "metadata": "list[dict[str, str]]"
-        
         })
         person_schema = BaseSchema({
             "name": "string",
@@ -191,3 +188,19 @@ class TestBaseSchema(unittest.TestCase):
             "address": address_schema
         })
         self.assertEqual(person_schema.__str__(), "name: string, age: number, address: schema, street: string, city: string, state: string, zip: string, metadata: list[dict[str, str]]")
+
+    def test_repr(self):
+        self.maxDiff = None
+        address_schema = BaseSchema({
+            "street": "string",
+            "city": "string",
+            "state": "string",
+            "zip": "string",
+            "metadata": "list[dict[str, str]]"
+        })
+        person_schema = BaseSchema({
+            "name": "string",
+            "age": "number",
+            "address": address_schema
+        })
+        self.assertEqual(person_schema.__repr__(), "BaseSchema(schema={name: string, age: number, address: schema, street: string, city: string, state: string, zip: string, metadata: list[dict[str, str]]})")

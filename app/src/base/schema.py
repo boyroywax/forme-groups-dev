@@ -199,6 +199,9 @@ class BaseSchema(BaseInterface):
                 processed_string += f"{key}: {value}, "
 
         return processed_string[:-2]
+    
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}" + "(schema={" + str(self) + "})"
 
     def __name__(self) -> str:
         return self.__class__.__name__
