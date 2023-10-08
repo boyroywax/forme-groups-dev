@@ -1,5 +1,7 @@
 import unittest
 import sys
+import random
+import uuid
 
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 from app.src.base.value import BaseValue
@@ -261,4 +263,58 @@ class TestBaseValue(unittest.TestCase):
     def test_force_type_same_as_input(self):
         value = BaseValue(1)
         self.assertEqual(BaseValue._force_type(value, "int"), BaseValue(1))
+        
+    def test_base_value_hash_with_bool(self):
+        value = BaseValue(True)
+        self.assertEqual(value.hash_leaf(), 'da1fd978d5160bcb95764a4a7b7d3f6649a0d1e111b0d393339afea675d352b4')
+
+    def test_base_value_get_type_str_with_bool(self):
+        value = BaseValue(True)
+        self.assertEqual(value.get_type_str(), "bool")
+
+    def test_base_value_get_type_str_with_none(self):
+        value = BaseValue(None)
+        self.assertEqual(value.get_type_str(), "NoneType")
+
+    def test_base_value_get_type_str_with_bytes(self):
+        value = BaseValue(b"hello")
+        self.assertEqual(value.get_type_str(), "bytes")
+
+    def test_base_value_get_type_str_with_float(self):
+        value = BaseValue(1.6)
+        self.assertEqual(value.get_type_str(), "float")
+
+    def test_base_value_get_type_str_with_object(self):
+        class Test:
+            def __init__(self):
+                pass
+        self.assertRaises(GroupBaseValueException, BaseValue, Test)
+
+    def test_init_n_base_values(self):
+        for i in range(10000):
+            values = [
+                random.randint(0, 10000000000),
+                random.randbytes(256),
+                random.choice([True, False]),
+                random.random(),
+                None,
+                str(uuid.uuid4())
+            ]
+            random_value = random.choice(values)
+            value = BaseValue(random_value)
+            self.assertEqual(value.value, random_value)
+    
+    def test_hash_time_init_n_base_values(self):
+        for i in range(10000):
+            values = [
+                random.randint(0, 10000000000),
+                random.randbytes(256),
+                random.choice([True, False]),
+                random.random(),
+                None,
+                str(uuid.uuid4())
+            ]
+            random_value = random.choice(values)
+            value = BaseValue(random_value)
+            self.assertEqual(value.hash_leaf(), value.hash_leaf())
 

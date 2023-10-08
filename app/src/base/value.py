@@ -10,7 +10,7 @@ from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
 
 
-def _validator(instance, attribute, value):
+def _base_value_validator(instance, attribute, value):
     if not isinstance(value, UnitValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
@@ -19,7 +19,7 @@ def _validator(instance, attribute, value):
 class BaseValue[T: UnitValueTypes](BaseInterface):
     """Base class for values
     """
-    _value: T = field(validator=_validator)
+    _value: T = field(validator=_base_value_validator)
 
     @property
     def value(self) -> T:
