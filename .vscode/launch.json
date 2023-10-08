@@ -14,6 +14,23 @@
                 ],
                 "projectType": "general"
             }
+        },
+        {
+            "name": "Python: Run Tests",
+            "type": "python",
+            "request": "test",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "args": [
+                "-m",
+                "unittest",
+                "discover",
+                "-s",
+                "tests"
+            ]
         }
     ]
 }

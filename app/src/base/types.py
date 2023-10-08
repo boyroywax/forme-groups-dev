@@ -1,7 +1,7 @@
 from typing import TypeAlias, Any
 
 number: TypeAlias = int | float
-text: TypeAlias = str | bytes
+text: TypeAlias = str | bytes | bool | None
 named_container: TypeAlias = dict
 linear_container: TypeAlias = list | tuple | set | frozenset
 containers: TypeAlias = named_container | linear_container

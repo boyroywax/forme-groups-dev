@@ -4,6 +4,10 @@ from ..base.types import unit_types, unit_value_types, linear_container, named_c
 from typing import TypeAlias
 
 
+def _convert_value_to_type(item: unit_value_types) -> TypeAlias | type:
+    return type(item)
+
+
 def _convert_container_to_value(item: unit_types) -> unit_value_types:
     """
     Converts container to value
