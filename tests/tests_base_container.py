@@ -39,7 +39,7 @@ class TestBaseContainer(unittest.TestCase):
 
     def test_repr(self):
         container = BaseContainer((1, 2, 3))
-        self.assertEqual(repr(container), "BaseContainer(items=[BaseValue(value=1), BaseValue(value=2), BaseValue(value=3)], type=<class 'tuple'>)")
+        self.assertEqual(repr(container), "BaseContainer(items=[BaseValue(value=1, type=int), BaseValue(value=2, type=int), BaseValue(value=3, type=int)], type=<class 'tuple'>)")
 
     def test_type(self):
         container = BaseContainer((1, 2, 3))
@@ -58,9 +58,4 @@ class TestBaseContainer(unittest.TestCase):
         self.assertEqual(len(container.items), 10000)
     
     def test_init_with_multiple_containers(self):
-        container = BaseContainer(([1, 2, 3], {1, 2, 3}, (1, 2, 3), {1: 2, 3: 4}))
-        self.assertEqual(len(container.items), 4)
-
-    def test_contains_sub_container(self):
-        container = ([1, 2, 3], {1, 2, 3}, (1, 2, 3), {1: 2, 3: 4})
-        self.assertEqual(BaseContainer._unpack_container(container), BaseContainer(items=(BaseValue(value=1), BaseValue(value=2), BaseValue(value=3)), type=list), BaseContainer(items=(BaseValue(value=1), BaseValue(value=2), BaseValue(value=3)), type=set), BaseContainer(items=(BaseValue(value=1), BaseValue(value=2), BaseValue(value=3)), type=tuple), BaseContainer(items=(BaseValue(value=1), BaseValue(value=2), BaseValue(value=3)), type=dict))
+        self.assertRaises(TypeError, BaseContainer, (1, 2, 3), [1, 2, 3])

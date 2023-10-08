@@ -222,3 +222,23 @@ class TestBaseValue(unittest.TestCase):
                 pass
         self.assertRaises(TypeError, BaseValue, Test())
 
+    def test_base_value_force_type_str_to_int(self):
+        value = BaseValue("1")
+        self.assertEqual(BaseValue._force_type(value, "int"), BaseValue(1))
+
+    def test_base_value_force_type_str_to_float(self):
+        value = BaseValue("1.6")
+        self.assertEqual(BaseValue._force_type(value, "float"), BaseValue(1.6))
+
+    def test_base_value_force_type_str_to_bool(self):
+        value = BaseValue("True")
+        self.assertEqual(BaseValue._force_type(value, "bool"), BaseValue(True))
+
+    def test_base_value_force_type_str_to_bytes(self):
+        value = BaseValue("hello")
+        self.assertEqual(BaseValue._force_type(value, "bytes"), BaseValue(b"hello"))
+
+    def test_base_value_force_type_int_to_bytes(self):
+        value = BaseValue(1)
+        self.assertEqual(BaseValue._force_type(value, "bytes"), BaseValue(b'\x01'))
+

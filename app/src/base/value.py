@@ -2,24 +2,24 @@ from attrs import define, field, validators
 from typing import override, Any, Union
 
 
-from .types import unit_value_types, unit_types
+from .types import UnitValueTypes, UnitTypes, Number
 from .interface import BaseInterface
 # from ..utils.converters import _convert_container_to_value
 from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: unit_value_types](BaseInterface):
+class BaseValue[T: UnitValueTypes](BaseInterface):
     """Base class for values
     """
-    _value: T = field(validator=validators.instance_of(unit_value_types))
+    _value: T = field(validator=validators.instance_of(UnitValueTypes))
 
     @property
     def value(self) -> T:
         return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> unit_value_types:
+    def _peek_value(value: 'BaseValue') -> UnitValueTypes:
         """Peeks the value of a BaseValue
 
         Args:
@@ -34,7 +34,7 @@ class BaseValue[T: unit_value_types](BaseInterface):
         raise TypeError(f"Expected a BaseValue, but received {type(value)}")
     
     @staticmethod
-    def _force_type(value: Union["BaseValue", unit_value_types], type_: str) -> 'BaseValue':
+    def _force_type(value: Union["BaseValue", UnitValueTypes], type_: str) -> 'BaseValue':
         """Forces a value to a type
 
         Args:
@@ -45,9 +45,12 @@ class BaseValue[T: unit_value_types](BaseInterface):
             unit_value_types: The forced value
         """
         if isinstance(value, BaseValue):
+            if value.get_type_str() == type_:
+                return value
+            
             value = value.value
 
-        assert isinstance(value, unit_value_types), f"Expected a value, but received {type(value)}"
+        assert isinstance(value, UnitValueTypes), f"Expected a value, but received {type(value)}"
         forced_value: Any = None
 
         try:
@@ -63,7 +66,12 @@ class BaseValue[T: unit_value_types](BaseInterface):
                 case "<class 'str'>" | "str" | "string":
                     forced_value = str(value)
                 case "<class 'bytes'>" | "bytes":
-                    forced_value = bytes(value)
+                    if isinstance(value, str):
+                        forced_value = bytes(value.encode())  
+                    elif isinstance(value, Number):
+                        forced_value = value.to_bytes()
+                    else:
+                        forced_value = bytes(value)
                 case _:
                     raise TypeError(f"Could not force value {value} to type {type_}")
 
