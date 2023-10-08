@@ -1,18 +1,25 @@
+import struct
 from attrs import define, field, validators
 from typing import override, Any, Union
 
 
-from .types import UnitValueTypes, UnitTypes, Number
+from .types import UnitValueTypes, UnitTypes, Number, Integer
 from .interface import BaseInterface
+from .exceptions import GroupBaseValueException
 # from ..utils.converters import _convert_container_to_value
 from ..utils.crypto import MerkleTree
+
+
+def _validator(instance, attribute, value):
+    if not isinstance(value, UnitValueTypes):
+        raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseValue[T: UnitValueTypes](BaseInterface):
     """Base class for values
     """
-    _value: T = field(validator=validators.instance_of(UnitValueTypes))
+    _value: T = field(validator=_validator)
 
     @property
     def value(self) -> T:
@@ -27,14 +34,20 @@ class BaseValue[T: UnitValueTypes](BaseInterface):
 
         Returns:
             unit_value_types: The value of the BaseValue
+
+        Raises:
+            GroupBaseValueException: If the value is not a BaseValue
         """
         if isinstance(value, BaseValue):
             return value.value
 
-        raise TypeError(f"Expected a BaseValue, but received {type(value)}")
+        raise GroupBaseValueException(f"Expected a BaseValue, but received {type(value)}")
     
     @staticmethod
-    def _force_type(value: Union["BaseValue", UnitValueTypes], type_: str) -> 'BaseValue':
+    def _force_type(
+        value: Union["BaseValue", UnitValueTypes],
+        type_: str
+    ) -> 'BaseValue':
         """Forces a value to a type
 
         Args:
@@ -43,6 +56,15 @@ class BaseValue[T: UnitValueTypes](BaseInterface):
 
         Returns:
             unit_value_types: The forced value
+
+        Raises:
+            TypeError: If the value could not be forced to the type
+
+        Examples:
+            >>> value = BaseValue("1")
+            >>> forced_value = value._force_type(value, "int")
+            >>> forced_value
+            BaseValue(value=1, type=int)
         """
         if isinstance(value, BaseValue):
             if value.get_type_str() == type_:
@@ -52,6 +74,8 @@ class BaseValue[T: UnitValueTypes](BaseInterface):
 
         assert isinstance(value, UnitValueTypes), f"Expected a value, but received {type(value)}"
         forced_value: Any = None
+
+        base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_}")
 
         try:
             match(type_):
@@ -67,16 +91,18 @@ class BaseValue[T: UnitValueTypes](BaseInterface):
                     forced_value = str(value)
                 case "<class 'bytes'>" | "bytes":
                     if isinstance(value, str):
-                        forced_value = bytes(value.encode())  
-                    elif isinstance(value, Number):
+                        forced_value = bytes(value.encode())
+                    elif isinstance(value, Integer):
                         forced_value = value.to_bytes()
-                    else:
-                        forced_value = bytes(value)
+                    elif isinstance(value, float):
+                        forced_value = struct.pack('f', value)
+                    elif isinstance(value, bool):
+                        forced_value = struct.pack('?', value)
                 case _:
-                    raise TypeError(f"Could not force value {value} to type {type_}")
+                    raise base_exception
 
         except Exception as e:
-            raise TypeError(f"Could not force value {value} to type {type_}") from e
+            raise base_exception from e
 
         return BaseValue(forced_value)
     
@@ -109,4 +135,13 @@ class BaseValue[T: UnitValueTypes](BaseInterface):
     
     @override
     def hash_leaf(self) -> str:
+        """Hashes the representation of the base value
+        
+        Returns:
+            str: The hash of the base value
+            
+        Examples:
+            >>> value = BaseValue(1)
+            >>> value.hash_leaf()
+            '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f'"""
         return MerkleTree.hash_func(repr(self))

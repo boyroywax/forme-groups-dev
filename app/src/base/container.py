@@ -15,10 +15,10 @@ class BaseContainer(BaseInterface):
     _items: tuple[BaseValue] = field(validator=validators.deep_iterable(validators.instance_of(UnitTypes)))
     _type: Optional[type] = field(validator=validators.optional(validators.instance_of(UnitTypes)), default=None)
 
-    def __attrs_init__(self, *args, **kwargs):
+    def __pre_init__(self, *args, **kwargs):
         print(args, kwargs)
         items_ = kwargs.get("items", None) or kwargs.get("_items", None) or args[0] if len(args) > 0 else None
-        self._items = self._extract_base_values(items_)
+        self._items = BaseContainer._extract_base_values(items_)
 
         type_ = kwargs.get("type", None) or kwargs.get("_type", None) or args[1] if len(args) > 1 else None
         if type_ is None:
@@ -109,6 +109,25 @@ class BaseContainer(BaseInterface):
             for key, value in item.items():
                 yield BaseContainer._unpack_container(value)
                 yield BaseContainer._unpack_container(key)
+
+    @staticmethod
+    def _package(item: Containers, type_: TypeAlias | type) -> Containers:
+        """
+        Repackages the container
+        """
+        match (str(type_)):
+            case("<class 'list'>"):
+                return [value.value for value in item]
+            case("<class 'tuple'>"):
+                return tuple([value.value for value in item])
+            case("<class 'set'>"):
+                return {value.value for value in item}
+            case("<class 'frozenset'>"):
+                return frozenset({value.value for value in item})
+            case("<class 'dict'>"):
+                keys: tuple[UnitValueTypes] = item[::2]
+                values: tuple[UnitValueTypes] = item[1::2]
+                return {key.value: value.value for key, value in zip(keys, values)}
 
     def _package(self) -> UnitTypes:
         return _convert_container_to_default(self._items, self._type)

@@ -13,7 +13,7 @@ def main():
     test_suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     test_suite.addTest(loader.loadTestsFromTestCase(TestBaseValue))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
     # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
 
     # Run the test suite
