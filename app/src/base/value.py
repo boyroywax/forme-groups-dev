@@ -123,7 +123,7 @@ class BaseValue[T: BaseValueTypes.all](BaseInterface):
                 case "<class 'bytes'>" | "bytes":
                     if isinstance(value, str):
                         forced_value = bytes(value.encode())
-                    elif isinstance(value, BaseValueTypes.Integer):
+                    elif isinstance(value, BaseValueTypes.integer):
                         forced_value = value.to_bytes()
                     elif isinstance(value, float):
                         forced_value = struct.pack('f', value)
@@ -162,10 +162,10 @@ class BaseValue[T: BaseValueTypes.all](BaseInterface):
     def __eq__(self, other: 'BaseValue') -> bool:
         if not isinstance(other, BaseValue):
             return False
-        return self.hash_leaf() == other.hash_leaf()
+        return self._hash_leaf() == other._hash_leaf()
     
     @override
-    def hash_leaf(self) -> str:
+    def _hash_leaf(self) -> str:
         """Hashes the representation of the base value
         
         Returns:

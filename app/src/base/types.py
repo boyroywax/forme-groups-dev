@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from attrs import define
+from attrs import define, field, validators
 from typing import Any, Union, TypeAlias
 
 from .interface import BaseInterface
@@ -8,17 +8,16 @@ from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseTypesInterface(BaseInterface):
+class BaseTypesInterface(BaseInterface, ABC):
     """Base interface for all Base Type classes"""
-
+    
     @property
     @abstractmethod
-    def all(self) -> Union[TypeAlias, TypeAlias] | TypeAlias:
-        """The type alias for all types included in the type collection. 
-        This is used for type hinting.
+    def all(self) -> Union[TypeAlias, TypeAlias]:
+        """The base types
 
         Returns:
-            TypeAlias: The type alias for all types
+            type | TypeAlias: The base types
         """
 
     @property
@@ -31,7 +30,7 @@ class BaseTypesInterface(BaseInterface):
         """
 
     @staticmethod
-    def _type_contains_alias(type_: tuple, alias: str) -> bool:
+    def _type_contains_alias(type_: tuple[str], alias: str) -> bool:
         """Checks if type contains an alias
 
         Args:
@@ -84,14 +83,18 @@ class BaseTypesInterface(BaseInterface):
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseValueTypes(BaseTypesInterface):
     """BHolds the base value types for the Group Base Value Types"""
-    Integer = int
-    FloatingPoint = float
-    Boolean = bool
-    String = str
-    Bytes = bytes
-    Number = Integer | FloatingPoint
-    Text = String | Bytes | Boolean | None
-    all = Number | Text
+    integer: TypeAlias = field(default=int)
+    floating_point: TypeAlias = field(default=float)
+    boolean: TypeAlias = field(default=bool)
+    string: TypeAlias = field(default=str)
+    bytes_: TypeAlias = field(default=bytes)
+    number: TypeAlias = field(default=int | float)
+    text: TypeAlias = field(default=str | bytes | bool | None)
+    _all: TypeAlias = field(default=int | float | str | bytes | bool | None)
+
+    @property
+    def all(self) -> Union[TypeAlias, TypeAlias]:
+        return self._all
 
     @property
     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
@@ -101,39 +104,39 @@ class BaseValueTypes(BaseTypesInterface):
             dict[str, tuple[str]]: The aliases for the base value types
         """
         aliases: dict = {
-            self.Integer: (
+            self.integer: (
                 str("Integer"), "integer", "INTEGER",
                 str("Int"), str("Int"), "INT",
                 "IntegerType", "integer_type", "INTEGER_TYPE",
                 "IntType", "int_type", "INT_TYPE"
             ),
-            self.FloatingPoint: (
+            self.floating_point: (
                 str("FloatingPoint"), "floating_point", "FLOATING_POINT",
                 str("Float"), str("Float"), "FLOAT",
                 "FloatingPointType", "floating_point_type", "FLOATING_POINT_TYPE",
                 "FloatType", "float_type", "FLOAT_TYPE"
             ),
-            self.Boolean: (
+            self.boolean: (
                 str("Boolean"), "boolean", "BOOLEAN",
                 str("Bool"), str("Bool"), "BOOL",
                 "BooleanType", "boolean_type", "BOOLEAN_TYPE",
                 "BoolType", "bool_type", "BOOL_TYPE"
             ),
-            self.String: (
+            self.string: (
                 str("String"), "string", "STRING",
                 str("Str"), str("Str"), "STR",
                 "StringType", "string_type", "STRING_TYPE",
                 "StrType", "str_type", "STR_TYPE"
             ),
-            self.Bytes: (
+            self.bytes_: (
                 str("Bytes"), "bytes", "BYTES",
                 "BytesType", "bytes_type", "BYTES_TYPE"
             ),
-            self.Number: (
+            self.number: (
                 str("Number"), "number", "NUMBER",
                 "NumberType", "number_type", "NUMBER_TYPE"
             ),
-            self.Text: (
+            self.text: (
                 str("Text"), "text", "TEXT",
                 "TextType", "text_type", "TEXT_TYPE"
             ),
@@ -160,14 +163,24 @@ class BaseValueTypes(BaseTypesInterface):
             return False
 
 
+@define(frozen=True, slots=True, weakref_slot=False)
 class BaseContainerTypes(BaseTypesInterface):
     """Holds the base container types for the Group Base Container Types"""
-    NamedContainer = dict
-    LinearContainer = list | tuple | set | frozenset
-    all = NamedContainer | LinearContainer
+    dictionary: TypeAlias = field(default=dict)
+    list_: TypeAlias = field(default=list)
+    tuple_: TypeAlias = field(default=tuple)
+    set_: TypeAlias = field(default=set)
+    frozenset_: TypeAlias = field(default=frozenset)
+    named_container: TypeAlias = dict
+    linear_container: TypeAlias = list | tuple | set | frozenset
 
     @property
-    def aliases(self) -> dict:
+    def all(self) -> type | TypeAlias:
+        """The base container types"""
+        return self.named_container | self.linear_container
+
+    @property
+    def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
         aliases: dict = {
             "named_container": (
                 str("NamedContainer"), "named_container", "NAMED_CONTAINER",
@@ -185,13 +198,13 @@ class BaseContainerTypes(BaseTypesInterface):
         return aliases
 
 
-# Base Object Types
-Object = object | None
-KeyValue = tuple[BaseValueTypes.all, BaseValueTypes.all]
-UnitTypes = BaseValueTypes.all | BaseContainerTypes.All | Object
-TextSet = set[BaseValueTypes.Text]
-TextOrContainer = BaseValueTypes.Text | BaseContainerTypes.All
-TextContainersDict = dict[BaseValueTypes.Text, BaseContainerTypes.All]
+# # Base Object Types
+# Object = object | None
+# KeyValue = tuple[BaseValueTypes.all, BaseValueTypes.all]
+# UnitTypes = BaseValueTypes.all | BaseContainerTypes.all | Object
+# TextSet = set[BaseValueTypes.Text]
+# TextOrContainer = BaseValueTypes.Text | BaseContainerTypes.all
+# TextContainersDict = dict[BaseValueTypes.Text, BaseContainerTypes.all]
 
-# Base Schema Types
-BaseSchema = dict[BaseValueTypes.Text, Any]
+# # Base Schema Types
+# BaseSchema = dict[BaseValueTypes.Text, Any]

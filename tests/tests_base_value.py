@@ -123,11 +123,11 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_hash(self):
         value = BaseValue(1)
-        self.assertEqual(value.hash_leaf(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
+        self.assertEqual(value._hash_leaf(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
 
     def test_base_value_hash_with_different_value(self):
         value = BaseValue(1)
-        self.assertNotEqual(value.hash_leaf(), BaseValue(2).hash_leaf())
+        self.assertNotEqual(value._hash_leaf(), BaseValue(2)._hash_leaf())
 
     def test_base_value_peek_value(self):
         value = BaseValue(1)
@@ -148,7 +148,7 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_hash_with_str(self):
         value = BaseValue("hello")
-        self.assertEqual(value.hash_leaf(), 'd5a4e54701717a8350910a14f2d20038863f3da15f064d6ce656062438ad9264')
+        self.assertEqual(value._hash_leaf(), 'd5a4e54701717a8350910a14f2d20038863f3da15f064d6ce656062438ad9264')
 
     def test_base_value_get_type_str(self):
         value = BaseValue(1)
@@ -266,7 +266,7 @@ class TestBaseValue(unittest.TestCase):
         
     def test_base_value_hash_with_bool(self):
         value = BaseValue(True)
-        self.assertEqual(value.hash_leaf(), 'da1fd978d5160bcb95764a4a7b7d3f6649a0d1e111b0d393339afea675d352b4')
+        self.assertEqual(value._hash_leaf(), 'da1fd978d5160bcb95764a4a7b7d3f6649a0d1e111b0d393339afea675d352b4')
 
     def test_base_value_get_type_str_with_bool(self):
         value = BaseValue(True)
@@ -316,5 +316,5 @@ class TestBaseValue(unittest.TestCase):
             ]
             random_value = random.choice(values)
             value = BaseValue(random_value)
-            self.assertEqual(value.hash_leaf(), value.hash_leaf())
+            self.assertEqual(value._hash_leaf(), value._hash_leaf())
 
