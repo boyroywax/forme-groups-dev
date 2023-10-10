@@ -3,7 +3,7 @@ from attrs import define, field, validators
 from typing import override, Any, Union
 
 
-from .types import BaseValueTypes, UnitTypes, Number, Integer
+from .types import BaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 # from ..utils.converters import _convert_container_to_value
@@ -21,12 +21,12 @@ def _base_value_validator(instance, attribute, value):
     Raises:
         GroupBaseValueException: If the value is not a BaseValueTypes
     """
-    if not isinstance(value, BaseValueTypes):
+    if not isinstance(value, BaseValueTypes.all):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: BaseValueTypes](BaseInterface):
+class BaseValue[T: BaseValueTypes.all](BaseInterface):
     """Base class for values
 
     Args:
@@ -57,7 +57,7 @@ class BaseValue[T: BaseValueTypes](BaseInterface):
         return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> BaseValueTypes:
+    def _peek_value(value: 'BaseValue') -> BaseValueTypes.all:
         """Peeks the value of a BaseValue
 
         Args:
@@ -76,8 +76,8 @@ class BaseValue[T: BaseValueTypes](BaseInterface):
     
     @staticmethod
     def _force_type(
-        value: Union["BaseValue", BaseValueTypes],
-        type_: str
+        value: Union["BaseValue", BaseValueTypes.all],
+        type_alias: str
     ) -> 'BaseValue':
         """Forces a value to a type
 
@@ -98,18 +98,18 @@ class BaseValue[T: BaseValueTypes](BaseInterface):
             BaseValue(value=1, type=int)
         """
         if isinstance(value, BaseValue):
-            if value.get_type_str() == type_:
+            if value.get_type_str() == type_alias:
                 return value
             
             value = value.value
 
-        assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
+        assert isinstance(value, BaseValueTypes.all), f"Expected a value, but received {type(value)}"
         forced_value: Any = None
 
-        base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_}")
+        base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_alias}")
 
         try:
-            match(type_):
+            match type_alias:
                 case "<class 'NoneType'>" | "NoneType" | "None":
                     return BaseValue(None)
                 case "<class 'bool'>" | "bool" | "boolean":
@@ -123,7 +123,7 @@ class BaseValue[T: BaseValueTypes](BaseInterface):
                 case "<class 'bytes'>" | "bytes":
                     if isinstance(value, str):
                         forced_value = bytes(value.encode())
-                    elif isinstance(value, Integer):
+                    elif isinstance(value, BaseValueTypes.Integer):
                         forced_value = value.to_bytes()
                     elif isinstance(value, float):
                         forced_value = struct.pack('f', value)

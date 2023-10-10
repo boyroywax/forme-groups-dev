@@ -4,7 +4,7 @@ from attrs import define
 from ..utils.crypto import MerkleTree
 
 
-@define(slots=True, weakref_slot=False)
+@define(frozen=True, slots=True, weakref_slot=False)
 class BaseInterface(ABC):
     """
     Base interface for all classes
@@ -20,7 +20,7 @@ class BaseInterface(ABC):
         return f"{self.__class__.__name__}({', '.join([f'{slot}={getattr(self, slot)}' for slot in self._get_slots()])})"
 
     def __str__(self) -> str:
-        return f"{', '.join([f'{slot}: {getattr(self, slot)}' for slot in self._get_slots()])}"
+        return f"{', '.join([f'{slot}: {getattr(self, slot)}' for slot in self])}"
 
     def hash_leaf(self) -> str:
         return MerkleTree.hash_func(repr(self))
