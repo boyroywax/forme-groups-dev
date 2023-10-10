@@ -13,7 +13,7 @@ class BaseTypesInterface(BaseInterface, ABC):
     
     @property
     @abstractmethod
-    def all(self) -> Union[TypeAlias, TypeAlias]:
+    def all(self) -> Union[type, TypeAlias]:
         """The base types
 
         Returns:
@@ -83,18 +83,18 @@ class BaseTypesInterface(BaseInterface, ABC):
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseValueTypes(BaseTypesInterface):
     """BHolds the base value types for the Group Base Value Types"""
-    integer: TypeAlias = field(default=int)
-    floating_point: TypeAlias = field(default=float)
-    boolean: TypeAlias = field(default=bool)
-    string: TypeAlias = field(default=str)
-    bytes_: TypeAlias = field(default=bytes)
-    number: TypeAlias = field(default=int | float)
-    text: TypeAlias = field(default=str | bytes | bool | None)
-    _all: TypeAlias = field(default=int | float | str | bytes | bool | None)
+    integer: TypeAlias = int
+    floating_point: TypeAlias = float
+    boolean: TypeAlias = bool
+    string: TypeAlias = str
+    bytes_: TypeAlias = bytes
+    number: TypeAlias = int | float
+    text: TypeAlias = str | bytes | bool | None
+    # _all: TypeAlias = field(default=int | float | str | bytes | bool | None)
 
     @property
-    def all(self) -> Union[TypeAlias, TypeAlias]:
-        return self._all
+    def all(self) -> Union[type, TypeAlias]:
+        return Union[self.number, self.text]
 
     @property
     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:

@@ -63,10 +63,6 @@ class TestBaseTypesInterface(unittest.TestCase):
         print(self.base_types_interface.__slots__)
         self.assertEqual(repr(self.base_types_interface), "BaseTypesExample(integer=<class 'int'>, floating_point=<class 'float'>, boolean=<class 'bool'>, string=<class 'str'>, bytes_=<class 'bytes'>)")
 
-    
-
-
-
 
 class TestBaseValueTypes(unittest.TestCase):
     def setUp(self):
@@ -80,7 +76,7 @@ class TestBaseValueTypes(unittest.TestCase):
         self.assertEqual(self.base_value_types.bytes_, bytes)
         self.assertEqual(self.base_value_types.number, int | float)
         self.assertEqual(self.base_value_types.text, str | bytes | bool | None)
-        self.assertEqual(self.base_value_types._all, int | float | str | bytes | bool | None)
+        # self.assertEqual(self.base_value_types._all, int | float | str | bytes | bool | None)
 
     def test_base_value_type_has_slots(self):
         for slot in self.base_value_types.__slots__:
@@ -89,7 +85,7 @@ class TestBaseValueTypes(unittest.TestCase):
     def test_base_value_type_has_all_slots(self):
         self.assertEqual(
             self.base_value_types.__slots__, (
-                "integer", "floating_point", "boolean", "string", "bytes_", "number", "text", "_all"
+                "integer", "floating_point", "boolean", "string", "bytes_", "number", "text", # "_all"
             )
         )
 
@@ -102,7 +98,7 @@ class TestBaseValueTypes(unittest.TestCase):
     def test_base_value_type_repr(self):
         self.maxDiff = None
         self.assertEqual(
-            repr(self.base_value_types), "BaseValueTypes(integer=<class 'int'>, floating_point=<class 'float'>, boolean=<class 'bool'>, string=<class 'str'>, bytes_=<class 'bytes'>, number=int | float, text=str | bytes | bool | None, _all=int | float | str | bytes | bool | None)"
+            repr(self.base_value_types), "BaseValueTypes(integer=<class 'int'>, floating_point=<class 'float'>, boolean=<class 'bool'>, string=<class 'str'>, bytes_=<class 'bytes'>, number=int | float, text=str | bytes | bool | None)"
         )
 
     def _test_base_value_type_all_property(self):

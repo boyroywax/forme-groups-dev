@@ -1,6 +1,6 @@
 import struct
 from attrs import define, field, validators
-from typing import override, Any, Union
+from typing import override, Any, Union, TypeAlias
 
 
 from .types import BaseValueTypes
@@ -21,12 +21,12 @@ def _base_value_validator(instance, attribute, value):
     Raises:
         GroupBaseValueException: If the value is not a BaseValueTypes
     """
-    if not isinstance(value, BaseValueTypes.all):
+    if not isinstance(value, BaseValueTypes().all):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: BaseValueTypes.all](BaseInterface):
+class BaseValue[T: BaseValueTypes().all](BaseInterface):
     """Base class for values
 
     Args:
@@ -57,7 +57,7 @@ class BaseValue[T: BaseValueTypes.all](BaseInterface):
         return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> BaseValueTypes.all:
+    def _peek_value(value: 'BaseValue') -> BaseValueTypes().all:
         """Peeks the value of a BaseValue
 
         Args:
@@ -76,7 +76,7 @@ class BaseValue[T: BaseValueTypes.all](BaseInterface):
     
     @staticmethod
     def _force_type(
-        value: Union["BaseValue", BaseValueTypes.all],
+        value: Union["BaseValue", BaseValueTypes().all],
         type_alias: str
     ) -> 'BaseValue':
         """Forces a value to a type
@@ -103,7 +103,7 @@ class BaseValue[T: BaseValueTypes.all](BaseInterface):
             
             value = value.value
 
-        assert isinstance(value, BaseValueTypes.all), f"Expected a value, but received {type(value)}"
+        assert isinstance(value, BaseValueTypes().all), f"Expected a value, but received {type(value)}"
         forced_value: Any = None
 
         base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_alias}")
@@ -123,7 +123,7 @@ class BaseValue[T: BaseValueTypes.all](BaseInterface):
                 case "<class 'bytes'>" | "bytes":
                     if isinstance(value, str):
                         forced_value = bytes(value.encode())
-                    elif isinstance(value, BaseValueTypes.integer):
+                    elif isinstance(value, BaseValueTypes().integer):
                         forced_value = value.to_bytes()
                     elif isinstance(value, float):
                         forced_value = struct.pack('f', value)
