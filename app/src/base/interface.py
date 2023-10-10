@@ -3,12 +3,19 @@ BASE INTERFACE
 
 This interface is the base interface for all classes in the project.
 
-
-
-__str__() returns a string representation of the object.
-* The string is a comma-separated list of all slots and their values.
->>> # __str__() example
-
+NOTES:
+    A. SLOTS
+        1. __slots__ should not contain a __weakref__ slot.
+        2. __slots__ should not contain a __dict__ slot.
+        3. Slots should be frozen.
+        4. Public Slots should begin with a lowercase letter.
+        4. Private Slots should be prefixed with an underscore ("_").
+    B. REPRESENTATION
+        1. __repr should include all slots (including private slots).
+    C. STRING DUNDER METHOD
+        1. __str__ should include only public slots.
+    D. HASHING
+        1. Hashing a Base Item into a leaf
 
 
 
@@ -26,20 +33,27 @@ class BaseInterface(ABC):
     """
     Base interface for all classes
     """
-    def _get_slots(self, include_underscored_slots: bool = False):
+    def __iter__slots__(self, include_underscored_slots: bool = False, private_only: bool = False):
         """Returns an iterator over all slots."""
+        if not include_underscored_slots and private_only:
+            raise ValueError("Cannot exclude underscored slots and only include private slots.  Private slots are prefixed with an underscore (\"_\").")
+
         for slot in self.__slots__:
-            if not include_underscored_slots and slot.startswith("_"):
-                continue
+            if private_only:
+                if slot.startswith("_"):
+                    yield slot
             else:
-                yield slot
+                if not include_underscored_slots and slot.startswith("_"):
+                    continue
+                else:
+                    yield slot
 
     def __iter__(self):
         """Returns an iterator over all slots.
-        
+
         Returns:
             Iterator[str]: An iterator over all slots.
-            
+
             Example:
                 >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
                 >>> from attrs import define
@@ -49,9 +63,9 @@ class BaseInterface(ABC):
                 >>> list(BaseInterfaceExample())
                 ['test_property']
         """
-        yield from self._get_slots(include_underscored_slots=True)
+        yield from self.__iter__slots__(include_underscored_slots=True, private_only=False)
 
-    def __repr_private__(self, include_underscored_slots: bool = True) -> str:
+    def __repr_private__(self, include_underscored_slots: bool = True, private_only: bool = False) -> str:
         """Returns a string representation of the object in a standard format.
 
         NOTE: All slots are included in the string representation.
@@ -68,7 +82,7 @@ class BaseInterface(ABC):
             >>> BaseInterfaceExample().__repr__()
             'BaseInterfaceExample(test_property=1)'
         """
-        return f"{self.__class__.__name__}({', '.join([f'{slot}={getattr(self, slot)}' for slot in self._get_slots(include_underscored_slots=include_underscored_slots)])})"
+        return f"{self.__class__.__name__}({', '.join([f'{slot}={getattr(self, slot)}' for slot in self.__iter__slots__(include_underscored_slots=include_underscored_slots, private_only=private_only)])})"
 
     def __repr__(self) -> str:
         """Returns a string representation of the object in a standard format.
@@ -89,6 +103,45 @@ class BaseInterface(ABC):
         """
         return self.__repr_private__(include_underscored_slots=True)
 
+    def __str_item__(self, item: str) -> str:
+        """Returns a string of a slot and its value.
+
+        Returns:
+            str: A string containing a slot and its value.
+
+        Example:
+            >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
+            >>> from attrs import define
+            >>> @define(frozen=True, slots=True, weakref_slot=False)
+            ... class BaseInterfaceExample(BaseInterface):
+            ...     test_property: int = 1
+            >>> BaseInterfaceExample().__str_item__("test_property")
+            'test_property: 1'
+        """
+        return f"{item}: {getattr(self, item)}"
+
+    def __str_private__(self, include_underscored_slots: bool = True, private_only: bool = False) -> str:
+        """Returns a string of key-value pairs of slots and their values.
+
+        Returns:
+            str: A string containing both public and private slots and their values.
+
+        Example:
+            >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
+            >>> from attrs import define
+            >>> @define(frozen=True, slots=True, weakref_slot=False)
+            ... class BaseInterfaceExample(BaseInterface):
+            ...     test_property: int = 1
+            >>> BaseInterfaceExample().__str__()
+            'test_property: 1'
+        """
+
+        slot_string: str = ""
+        for slot in self.__iter__slots__(include_underscored_slots, private_only):
+            slot_string += f"{self.__str_item__(slot)}, "
+
+        return slot_string[:-2] if len(slot_string) > 0 else slot_string
+
     def __str__(self) -> str:
         """Returns a string of key-value pairs of slots and their values.
 
@@ -106,12 +159,9 @@ class BaseInterface(ABC):
             >>> BaseInterfaceExample().__str__()
             'test_property: 1'
         """
-        slot_string: str = ""
-        for slot in self._get_slots(include_underscored_slots=False):
-            slot_string += f'{slot}: {getattr(self, slot)}, '
-        return slot_string[:-2] if len(slot_string) > 0 else slot_string
+        return self.__str_private__(include_underscored_slots=False, private_only=False)
 
-    def _hash_leaf(self, include_underscored_slots: bool = False) -> str:
+    def _hash_leaf(self, include_underscored_slots: bool = True) -> str:
         """Returns the hash of the full representation of the object.
 
         Returns:
@@ -126,8 +176,8 @@ class BaseInterface(ABC):
             >>> BaseInterfaceExample().hash_leaf()
             '1f5cea5f9f2e15a85423063b80d372f4707d46a3c849d94ef2e7dd0c672daa17'
         """
-        return MerkleTree.hash_func(self.__repr_private__(include_underscored_slots))
-    
+        return MerkleTree.hash_func(self.__repr_private__(include_underscored_slots, private_only=False))
+
     def _hash_tree(self) -> str:
         """Returns the hash of the full representation of the object.
 
@@ -144,7 +194,7 @@ class BaseInterface(ABC):
             '1f5cea5f9f2e15a85423063b80d372f4707d46a3c849d94ef2e7dd0c672daa17'
         """
         hashed_slots: list[str] = []
-        for slot in self._get_slots(include_underscored_slots=True):
+        for slot in self.__iter__slots__(include_underscored_slots=True, private_only=False):
             hashed_slots.append(MerkleTree.hash_func(getattr(self, slot)))
 
         return MerkleTree(hashed_slots)

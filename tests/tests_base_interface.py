@@ -20,6 +20,7 @@ class TestBaseInterface(unittest.TestCase):
             _private_test_property: int = 2
 
         self.base_interface = base_interface()
+        self.base_interface2 = None
 
     def test_base_interface_init_(self):
         self.assertEqual(self.base_interface.__slots__, ("test_property", "_private_test_property"))
@@ -40,7 +41,7 @@ class TestBaseInterface(unittest.TestCase):
         self.assertEqual(repr(self.base_interface), "base_interface(test_property=1, _private_test_property=2)")
 
     def test_base_interface_hash_leaf(self):
-        self.assertEqual(self.base_interface._hash_leaf(), "1f5cea5f9f2e15a85423063b80d372f4707d46a3c849d94ef2e7dd0c672daa17")
+        self.assertEqual(self.base_interface._hash_leaf(), "d9e12b2e12010e3b8cd2022e84400d1eb68a4f377069d8759888f6e96082f1e9")
 
     def test_base_interface_iter(self):
         self.assertEqual(list(self.base_interface), ["test_property", "_private_test_property"])
@@ -61,10 +62,14 @@ class TestBaseInterface(unittest.TestCase):
             test_float: float = 1.0
             test_bytes: bytes = b"test"
             test_none: None = None
-
+            _private_test_property: int = 2
 
         self.base_interface2 = BaseInterfaceExample()
-        self.assertEqual(self.base_interface2._hash_leaf(), "3b7e51bc044f2ba226085c85d89934e4f112d07f9d86c6d52d96353e15358df1")
+        self.assertEqual(self.base_interface2._hash_leaf(), "b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271")
 
         self.assertEqual(str(self.base_interface2), "test_property: 1, test_string: test, test_bool: True, test_float: 1.0, test_bytes: b'test', test_none: None")
-        self.assertEqual(repr(self.base_interface2), "BaseInterfaceExample(test_property=1, test_string='test', test_bool=True, test_float=1.0, test_bytes=b'test', test_none=None)")
+        self.assertEqual(repr(self.base_interface2), "BaseInterfaceExample(test_property=1, test_string='test', test_bool=True, test_float=1.0, test_bytes=b'test', test_none=None, _private_test_property=2)")
+
+    def test_base_interface_is_frozen(self):
+        with self.assertRaises(AttributeError):
+            self.base_interface.test_property = 2
