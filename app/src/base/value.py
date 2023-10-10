@@ -3,7 +3,7 @@ from attrs import define, field, validators
 from typing import override, Any, Union
 
 
-from .types import UnitValueTypes, UnitTypes, Number, Integer
+from .types import BaseValueTypes, UnitTypes, Number, Integer
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 # from ..utils.converters import _convert_container_to_value
@@ -11,22 +11,53 @@ from ..utils.crypto import MerkleTree
 
 
 def _base_value_validator(instance, attribute, value):
-    if not isinstance(value, UnitValueTypes):
+    """Validates the argument is a BaseValueTypes
+
+    Args:
+        instance (Any): The instance
+        attribute (Any): The attribute
+        value (Any): The value
+
+    Raises:
+        GroupBaseValueException: If the value is not a BaseValueTypes
+    """
+    if not isinstance(value, BaseValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: UnitValueTypes](BaseInterface):
+class BaseValue[T: BaseValueTypes](BaseInterface):
     """Base class for values
+
+    Args:
+        value (BaseValueTypes): The value to hold
+
+    Raises:
+        GroupBaseValueException: If the value is not a BaseValueType
+
+    Examples:
+        >>> value = BaseValue(1)
+        >>> value
+        BaseValue(value=1, type=int)
     """
     _value: T = field(validator=_base_value_validator)
 
     @property
     def value(self) -> T:
+        """The single base value held by the BaseValue Class
+
+        Returns:
+            BaseValueTypes: The value held by the BaseValue Class
+
+        Examples:
+            >>> value = BaseValue(1)
+            >>> value.value
+            1
+        """
         return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> UnitValueTypes:
+    def _peek_value(value: 'BaseValue') -> BaseValueTypes:
         """Peeks the value of a BaseValue
 
         Args:
@@ -45,7 +76,7 @@ class BaseValue[T: UnitValueTypes](BaseInterface):
     
     @staticmethod
     def _force_type(
-        value: Union["BaseValue", UnitValueTypes],
+        value: Union["BaseValue", BaseValueTypes],
         type_: str
     ) -> 'BaseValue':
         """Forces a value to a type
@@ -72,7 +103,7 @@ class BaseValue[T: UnitValueTypes](BaseInterface):
             
             value = value.value
 
-        assert isinstance(value, UnitValueTypes), f"Expected a value, but received {type(value)}"
+        assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
         forced_value: Any = None
 
         base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_}")

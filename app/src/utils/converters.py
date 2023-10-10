@@ -1,18 +1,18 @@
-from ..base.types import UnitTypes, UnitValueTypes, LinearContainer, NamedContainer, Containers
+from ..base.types import UnitTypes, BaseValueTypes, LinearContainer, NamedContainer, BaseContainerTypes
 # from ..base import BaseValue
 
 from typing import TypeAlias
 
 
-def _convert_value_to_type(item: UnitValueTypes) -> TypeAlias | type:
+def _convert_value_to_type(item: BaseValueTypes) -> TypeAlias | type:
     return type(item)
 
 
-def _convert_container_to_value(item: UnitTypes) -> UnitValueTypes:
+def _convert_container_to_value(item: UnitTypes) -> BaseValueTypes:
     """
     Converts container to value
     """
-    item_to_return: UnitValueTypes = item
+    item_to_return: BaseValueTypes = item
     if isinstance(item, LinearContainer):
         print(Exception("Passed a container, but expected a value, returning the first value of the container"))
 
@@ -59,7 +59,7 @@ def _convert_container_to_value(item: UnitTypes) -> UnitValueTypes:
 def _convert_container_to_type(item: UnitTypes) -> TypeAlias | type:
     return type(item)
 
-def _convert_container_to_default(item: tuple[Containers], type_: TypeAlias | type) -> UnitTypes:
+def _convert_container_to_default(item: tuple[BaseContainerTypes], type_: TypeAlias | type) -> UnitTypes:
     match (str(type_)):
         case("<class 'list'>"):
             return [value.value for value in item]
@@ -70,6 +70,6 @@ def _convert_container_to_default(item: tuple[Containers], type_: TypeAlias | ty
         case("<class 'frozenset'>"):
             return frozenset({value.value for value in item})
         case("<class 'dict'>"):
-            keys: tuple[UnitValueTypes] = item[::2]
-            values: tuple[UnitValueTypes] = item[1::2]
+            keys: tuple[BaseValueTypes] = item[::2]
+            values: tuple[BaseValueTypes] = item[1::2]
             return {key.value: value.value for key, value in zip(keys, values)}

@@ -1,20 +1,27 @@
-from typing import TypeAlias, Any
+from enum import Enum
+from typing import TypeAlias, Any, Union
 
 
+# Base Value Types
 Integer: TypeAlias = int
+FloatingPoint: TypeAlias = float
 Boolean: TypeAlias = bool
 String: TypeAlias = str
+Bytes: TypeAlias = bytes
+Number: TypeAlias = Union[Integer, FloatingPoint]
+Text: TypeAlias = Union[String, Bytes, Boolean,  None]
+BaseValueTypes: TypeAlias = Union[Number, Text]
 
-Number: TypeAlias = Integer | float
-Text: TypeAlias = String | bytes | Boolean | None
+# Base Container Types
 NamedContainer: TypeAlias = dict
 LinearContainer: TypeAlias = list | tuple | set | frozenset
-Containers: TypeAlias = NamedContainer | LinearContainer
+BaseContainerTypes: TypeAlias = NamedContainer | LinearContainer
 Object: TypeAlias = object | None
-UnitValueTypes: TypeAlias = Number | Text
-KeyValue: TypeAlias = tuple[UnitValueTypes, UnitValueTypes]
-UnitTypes: TypeAlias = UnitValueTypes | Containers | Object
+KeyValue: TypeAlias = tuple[BaseValueTypes, BaseValueTypes]
+UnitTypes: TypeAlias = BaseValueTypes | BaseContainerTypes | Object
 TextSet: TypeAlias = set[Text]
-TextOrContainer: TypeAlias = Text | Containers
-TextContainersDict: TypeAlias = dict[Text, Text | Containers]
+TextOrContainer: TypeAlias = Text | BaseContainerTypes
+TextContainersDict: TypeAlias = dict[Text, Text | BaseContainerTypes]
+
+# Base Schema Types
 BaseSchema: TypeAlias = dict[Text, Any]

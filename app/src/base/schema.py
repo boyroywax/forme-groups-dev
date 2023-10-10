@@ -3,7 +3,7 @@ from typing import Any
 
 from .interface import BaseInterface
 from .container import BaseContainer
-from .types import TextSet, KeyValue, TextContainersDict, BaseSchema, Containers, Text, LinearContainer, NamedContainer
+from .types import TextSet, KeyValue, TextContainersDict, BaseSchema, BaseContainerTypes, Text, LinearContainer, NamedContainer
 
 
 
@@ -55,9 +55,9 @@ class BaseSchema(BaseInterface):
         for key, value in schema_to_scan.items():
             if isinstance(value, BaseContainer):
                 sub_units.append({key: value})
-            if isinstance(value, Text | Containers):
+            if isinstance(value, Text | BaseContainerTypes):
                 print(f'value {value}')
-                if value.startswith("list") or value.startswith("tuple") or value.startswith("set") or value.startswith("frozenset") or value.startswith("dict") or isinstance(value, Containers):
+                if value.startswith("list") or value.startswith("tuple") or value.startswith("set") or value.startswith("frozenset") or value.startswith("dict") or isinstance(value, BaseContainerTypes):
                     sub_units.append({key: value})
             if isinstance(value, BaseSchema):
                 sub_units.extend(self._sub_containers(value))

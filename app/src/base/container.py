@@ -2,7 +2,7 @@ from attrs import define, field, validators
 from typing import Optional, TypeAlias
 
 from .interface import BaseInterface
-from .types import UnitValueTypes, UnitTypes, NamedContainer, LinearContainer, Containers
+from .types import BaseValueTypes, UnitTypes, NamedContainer, LinearContainer, BaseContainerTypes
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.converters import _convert_container_to_default, _convert_container_to_type
@@ -35,11 +35,11 @@ class BaseContainer(BaseInterface):
         return self._type
 
     @staticmethod
-    def _contains_sub_container(item: Containers | UnitValueTypes) -> bool:
+    def _contains_sub_container(item: BaseContainerTypes | BaseValueTypes) -> bool:
         """
         Checks if container contains a sub container
         """
-        if isinstance(item, BaseValue | UnitValueTypes):
+        if isinstance(item, BaseValue | BaseValueTypes):
             return False
 
         elif isinstance(item, LinearContainer | BaseContainer | NamedContainer):
@@ -49,7 +49,7 @@ class BaseContainer(BaseInterface):
             raise GroupBaseContainerException(f"Passed a value, but expected a container. {item}")
         
     @staticmethod
-    def _extract_base_values(item: Containers) -> tuple[BaseValue]:
+    def _extract_base_values(item: BaseContainerTypes) -> tuple[BaseValue]:
         """
         Converts container to base values
         """
@@ -76,14 +76,14 @@ class BaseContainer(BaseInterface):
         return items_to_return
 
     @staticmethod
-    def _unpack_container(item: Containers, depth: int = 1) -> tuple[BaseValue]:
+    def _unpack_container(item: BaseContainerTypes, depth: int = 1) -> tuple[BaseValue]:
         """
         Unpacks the container to depth
         """
         unpacked_items: tuple[BaseValue] = tuple()
 
         if depth >= 1:
-            if isinstance(item, BaseValue | UnitValueTypes):
+            if isinstance(item, BaseValue | BaseValueTypes):
                 return (item, )
 
             elif BaseContainer._contains_sub_container(item):
@@ -94,11 +94,11 @@ class BaseContainer(BaseInterface):
         return unpacked_items
 
     @staticmethod
-    def _iter_all_(item: Containers | UnitValueTypes):
+    def _iter_all_(item: BaseContainerTypes | BaseValueTypes):
         """
         Checks if container contains a sub container
         """
-        if isinstance(item, BaseValue | UnitValueTypes):
+        if isinstance(item, BaseValue | BaseValueTypes):
             yield item
 
         elif isinstance(item, LinearContainer | BaseContainer):
@@ -111,7 +111,7 @@ class BaseContainer(BaseInterface):
                 yield BaseContainer._unpack_container(key)
 
     @staticmethod
-    def _package(item: Containers, type_: TypeAlias | type) -> Containers:
+    def _package(item: BaseContainerTypes, type_: TypeAlias | type) -> BaseContainerTypes:
         """
         Repackages the container
         """
@@ -125,8 +125,8 @@ class BaseContainer(BaseInterface):
             case("<class 'frozenset'>"):
                 return frozenset({value.value for value in item})
             case("<class 'dict'>"):
-                keys: tuple[UnitValueTypes] = item[::2]
-                values: tuple[UnitValueTypes] = item[1::2]
+                keys: tuple[BaseValueTypes] = item[::2]
+                values: tuple[BaseValueTypes] = item[1::2]
                 return {key.value: value.value for key, value in zip(keys, values)}
 
     def _package(self) -> UnitTypes:
