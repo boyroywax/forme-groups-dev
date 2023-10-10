@@ -12,12 +12,12 @@ class MerkleTree:
     """A Merkle Tree object.
     """
 
-    leaves: List[str] = field(default=[], validator=validators.instance_of(list))
-    levels: List[List[str]] = field(default=[], validator=validators.instance_of(list))
+    leaves: tuple[str] = field(default=[], validator=validators.instance_of(tuple))
+    levels: tuple[tuple[str]] = field(default=[], validator=validators.instance_of(tuple))
 
-    def __init__(self, hashed_data: list[str] = []):
-        self.leaves: List[str] = hashed_data
-        self.levels: List[List[str]] = [self.leaves]
+    def __init__(self, hashed_data: tuple[str] = ()):
+        self.leaves: tuple[str] = hashed_data
+        self.levels: tuple[tuple[str]] = (self.leaves, )
         self.build()
 
     def build(self):
@@ -27,17 +27,17 @@ class MerkleTree:
             # print(level)
             hashed_level = self.hash_level(level)
             # print(hashed_level)
-            self.levels.append(hashed_level)
+            self.levels = self.levels + (hashed_level, )
             level = self.levels[-1]
             # print(level)
 
-    def hash_level(self, level: List[str]) -> List[str]:
-        hashed_level = []
+    def hash_level(self, level: List[str]) -> tuple[str]:
+        hashed_level: tuple[str] = tuple()
         for i in range(0, len(level), 2):
             if i + 1 == len(level):
-                hashed_level.append(self.hash_func(level[i] + level[i]))
+                hashed_level = hashed_level + (self.hash_func(level[i] + level[i]), )
             else:
-                hashed_level.append(self.hash_func(level[i] + level[i + 1]))
+                hashed_level = hashed_level + (self.hash_func(level[i] + level[i + 1]), )
             # print(hashed_level)
         return hashed_level
 
@@ -47,7 +47,7 @@ class MerkleTree:
 
     def root(self) -> str | None:
         # print(self.leaves)
-        if self.levels is None or self.levels == [[]] or self.leaves == []:
+        if self.levels is None or self.levels == tuple(tuple[str]) or self.leaves == tuple[str]:
             return None
         return self.levels[-1][0]
 

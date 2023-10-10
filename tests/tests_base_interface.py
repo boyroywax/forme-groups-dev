@@ -80,3 +80,21 @@ class TestBaseInterface(unittest.TestCase):
 
     def test_base_interface_only_private_repr(self):
         self.assertEqual(self.base_interface.__repr_private__(include_underscored_slots=True, private_only=True), "base_interface(_private_test_property=2)")
+
+    def test_base_interface_only_private_iter(self):
+        self.assertEqual(list(self.base_interface.__iter_slots__(include_underscored_slots=True, private_only=True)), ["_private_test_property"])
+        self.assertEqual(getattr(self.base_interface, "_private_test_property"), 2)
+
+    def test_base_interface_hash_public(self):
+        self.assertEqual(self.base_interface._hash_public(), "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b")
+
+    def test_base_interface_hash_private(self):
+        self.assertEqual(self.base_interface._hash_private(), "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35")
+
+    def test_base_interface_hash_package(self):
+        self.maxDiff = None
+        self.assertEqual(self.base_interface._hash_package().root(), "33b675636da5dcc86ec847b38c08fa49ff1cace9749931e0a5d4dfdbdedd808a")
+
+    def text_base_interface_hash_package_verify(self):
+        self.maxDiff = None
+        self.assertTrue(self.base_interface._hash_package().verify(self.base_interface._hash_leaf()))
