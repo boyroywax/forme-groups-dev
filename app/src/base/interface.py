@@ -11,11 +11,17 @@ NOTES:
         4. Public Slots should begin with a lowercase letter.
         4. Private Slots should be prefixed with an underscore ("_").
     B. REPRESENTATION
-        1. __repr should include all slots (including private slots).
+        1. __repr__ should include all slots (including private slots).
+        2. __repr_private__ can return a string representation of the object with:
+            a. only public slots or
+            b. only private slots or
+            c. both
     C. STRING DUNDER METHOD
         1. __str__ should include only public slots.
     D. HASHING
-        1. Hashing a Base Item into a leaf
+        1. Hashing a Base Class into a leaf should hash the full representation of the object.
+        2. Hashing a Base Class into a tree should hash the full representation of the object.
+
 
 
 
@@ -161,7 +167,7 @@ class BaseInterface(ABC):
         """
         return self.__str_private__(include_underscored_slots=False, private_only=False)
 
-    def _hash_leaf(self, include_underscored_slots: bool = True) -> str:
+    def _hash_leaf(self, include_underscored_slots: bool = True, private_only: bool = False) -> str:
         """Returns the hash of the full representation of the object.
 
         Returns:
@@ -174,9 +180,9 @@ class BaseInterface(ABC):
             ... class BaseInterfaceExample(BaseInterface):
             ...     test_property: int = 1
             >>> BaseInterfaceExample().hash_leaf()
-            '1f5cea5f9f2e15a85423063b80d372f4707d46a3c849d94ef2e7dd0c672daa17'
+            'd9e12b2e12010e3b8cd2022e84400d1eb68a4f377069d8759888f6e96082f1e9'
         """
-        return MerkleTree.hash_func(self.__repr_private__(include_underscored_slots, private_only=False))
+        return MerkleTree.hash_func(self.__repr_private__(include_underscored_slots, private_only))
 
     def _hash_tree(self) -> str:
         """Returns the hash of the full representation of the object.
@@ -190,11 +196,11 @@ class BaseInterface(ABC):
             >>> @define(frozen=True, slots=True, weakref_slot=False)
             ... class BaseInterfaceExample(BaseInterface):
             ...     test_property: int = 1
-            >>> BaseInterfaceExample().hash_tree()
-            '1f5cea5f9f2e15a85423063b80d372f4707d46a3c849d94ef2e7dd0c672daa17'
+            >>> BaseInterfaceExample().hash_tree().root_hash
+            'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271'
         """
-        hashed_slots: list[str] = []
+        hashed_slots: tuple[str] = ()
         for slot in self.__iter__slots__(include_underscored_slots=True, private_only=False):
-            hashed_slots.append(MerkleTree.hash_func(getattr(self, slot)))
+            hashed_slots = hashed_slots + (MerkleTree.hash_func(getattr(self, slot)), )
 
         return MerkleTree(hashed_slots)

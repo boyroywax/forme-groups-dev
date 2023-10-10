@@ -20,7 +20,19 @@ class TestBaseInterface(unittest.TestCase):
             _private_test_property: int = 2
 
         self.base_interface = base_interface()
-        self.base_interface2 = None
+        
+
+        @define(frozen=True, slots=True, weakref_slot=False)
+        class BaseInterfaceExample(BaseInterface):
+            test_property: int = 1
+            test_string: str = "test"
+            test_bool: bool = True
+            test_float: float = 1.0
+            test_bytes: bytes = b"test"
+            test_none: None = None
+            _private_test_property: int = 2
+
+        self.base_interface2 = BaseInterfaceExample()
 
     def test_base_interface_init_(self):
         self.assertEqual(self.base_interface.__slots__, ("test_property", "_private_test_property"))
@@ -54,22 +66,17 @@ class TestBaseInterface(unittest.TestCase):
 
     def test_base_interface_more_properties(self):
 
-        @define(frozen=True, slots=True, weakref_slot=False)
-        class BaseInterfaceExample(BaseInterface):
-            test_property: int = 1
-            test_string: str = "test"
-            test_bool: bool = True
-            test_float: float = 1.0
-            test_bytes: bytes = b"test"
-            test_none: None = None
-            _private_test_property: int = 2
-
-        self.base_interface2 = BaseInterfaceExample()
         self.assertEqual(self.base_interface2._hash_leaf(), "b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271")
 
         self.assertEqual(str(self.base_interface2), "test_property: 1, test_string: test, test_bool: True, test_float: 1.0, test_bytes: b'test', test_none: None")
         self.assertEqual(repr(self.base_interface2), "BaseInterfaceExample(test_property=1, test_string='test', test_bool=True, test_float=1.0, test_bytes=b'test', test_none=None, _private_test_property=2)")
 
-    def test_base_interface_is_frozen(self):
+    def test_base_interface2_is_frozen(self):
         with self.assertRaises(AttributeError):
-            self.base_interface.test_property = 2
+            self.base_interface2.test_property = 2
+
+    def test_base_interface_only_private_str(self):
+        self.assertEqual(self.base_interface.__str_private__(include_underscored_slots=True, private_only=True), "_private_test_property: 2")
+
+    def test_base_interface_only_private_repr(self):
+        self.assertEqual(self.base_interface.__repr_private__(include_underscored_slots=True, private_only=True), "base_interface(_private_test_property=2)")
