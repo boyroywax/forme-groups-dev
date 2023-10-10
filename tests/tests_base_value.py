@@ -107,7 +107,7 @@ class TestBaseValue(unittest.TestCase):
     def test_base_value_repr(self):
         values = [1, 1.0, True, "hello", None, b"hello"]
         for value in values:
-            self.assertEqual(repr(BaseValue(value)), f"BaseValue(value={value}, type={type(value).__name__})")
+            self.assertEqual(repr(BaseValue(value)), f"BaseValue(value={repr(value)}, type={type(value).__name__})")
 
     def test_base_value_eq(self):
         value = BaseValue(1)
@@ -123,6 +123,7 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_hash(self):
         value = BaseValue(1)
+        print(repr(value))
         self.assertEqual(value._hash_leaf(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
 
     def test_base_value_hash_with_different_value(self):
@@ -148,7 +149,7 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_hash_with_str(self):
         value = BaseValue("hello")
-        self.assertEqual(value._hash_leaf(), 'd5a4e54701717a8350910a14f2d20038863f3da15f064d6ce656062438ad9264')
+        self.assertEqual(value._hash_leaf(), 'cbdba380edb6b63b8e0dc697952a7d4e420fc1ece0542bd22968345234ad4565')
 
     def test_base_value_get_type_str(self):
         value = BaseValue(1)

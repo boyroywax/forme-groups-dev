@@ -157,7 +157,7 @@ class BaseValueTypes(BaseTypesInterface):
         Returns:
             bool: Whether the value is a base type
         """
-        if isinstance(value, BaseValueTypes.all):
+        if isinstance(value, BaseValueTypes().all):
             return True
         else:
             return False
@@ -166,16 +166,16 @@ class BaseValueTypes(BaseTypesInterface):
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseContainerTypes(BaseTypesInterface):
     """Holds the base container types for the Group Base Container Types"""
-    dictionary: TypeAlias = field(default=dict)
-    list_: TypeAlias = field(default=list)
-    tuple_: TypeAlias = field(default=tuple)
-    set_: TypeAlias = field(default=set)
-    frozenset_: TypeAlias = field(default=frozenset)
+    dictionary: TypeAlias = dict
+    list_: TypeAlias = list
+    tuple_: TypeAlias = tuple
+    set_: TypeAlias = set
+    frozenset_: TypeAlias = frozenset
     named_container: TypeAlias = dict
     linear_container: TypeAlias = list | tuple | set | frozenset
 
     @property
-    def all(self) -> type | TypeAlias:
+    def all(self) -> Union[type,  TypeAlias]:
         """The base container types"""
         return self.named_container | self.linear_container
 

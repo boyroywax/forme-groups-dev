@@ -157,22 +157,22 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
     @override
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(value={self._value}, type={self.get_type_str()})"
+        return f"{self.__class__.__name__}(value={repr(self._value)}, type={self.get_type_str()})"
     
-    def __eq__(self, other: 'BaseValue') -> bool:
-        if not isinstance(other, BaseValue):
-            return False
-        return self._hash_leaf() == other._hash_leaf()
+    # def __eq__(self, other: 'BaseValue') -> bool:
+    #     if not isinstance(other, BaseValue):
+    #         return False
+    #     return super()._hash_leaf() == other._hash_leaf()
     
-    @override
-    def _hash_leaf(self) -> str:
-        """Hashes the representation of the base value
+    # @override
+    # def _hash_leaf(self) -> str:
+    #     """Hashes the representation of the base value
         
-        Returns:
-            str: The hash of the base value
+    #     Returns:
+    #         str: The hash of the base value
             
-        Examples:
-            >>> value = BaseValue(1)
-            >>> value.hash_leaf()
-            '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f'"""
-        return MerkleTree.hash_func(repr(self))
+    #     Examples:
+    #         >>> value = BaseValue(1)
+    #         >>> value.hash_leaf()
+    #         '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f'"""
+    #     return MerkleTree.hash_func(repr(self))

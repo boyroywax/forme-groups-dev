@@ -66,7 +66,7 @@ class TestBaseInterface(unittest.TestCase):
 
     def test_base_interface_more_properties(self):
 
-        self.assertEqual(self.base_interface2._hash_leaf(), "b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271")
+        self.assertEqual(self.base_interface2._hash_leaf(), "d463cd8fc83ebb139815e95d7d49e3a4a97cae611547c0a25c717664f9b59bea")
 
         self.assertEqual(str(self.base_interface2), "test_property: 1, test_string: test, test_bool: True, test_float: 1.0, test_bytes: b'test', test_none: None")
         self.assertEqual(repr(self.base_interface2), "BaseInterfaceExample(test_property=1, test_string='test', test_bool=True, test_float=1.0, test_bytes=b'test', test_none=None, _private_test_property=2)")
@@ -100,7 +100,7 @@ class TestBaseInterface(unittest.TestCase):
         self.assertTrue(self.base_interface._hash_package().verify(self.base_interface._hash_leaf()))
 
     def test_base_interface2_hashes(self):
-        self.assertEqual(self.base_interface2._hash_leaf(), 'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271')
+        self.assertEqual(self.base_interface2._hash_leaf(), 'd463cd8fc83ebb139815e95d7d49e3a4a97cae611547c0a25c717664f9b59bea')
         self.assertEqual(self.base_interface2._hash_slots(), ('6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b',
             '6e94a0aef218fd7aef18b257f0ba9fc33c92a2bc9788fc751868e43ab398137f',
             '3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18',

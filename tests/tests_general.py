@@ -15,5 +15,3 @@ class TestsGeneral(unittest.TestCase):
 
     def setUp(self):
         self.app = App()
-
-    d

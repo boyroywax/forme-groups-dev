@@ -45,8 +45,6 @@ NOTES:
             c. Next, each private slot is hashed into a leaf.
             d. Then, hashes the private leaves into a tree.
             e. Finally, the public and private trees are hashed together into a tree representing the package.
-
-
 """
 
 from abc import ABC
@@ -225,7 +223,8 @@ class BaseInterface(ABC):
             >>> BaseInterfaceExample().hash_leaf()
             'd9e12b2e12010e3b8cd2022e84400d1eb68a4f377069d8759888f6e96082f1e9'
         """
-        return MerkleTree.hash_func(self.__repr_private__(include_underscored_slots, private_only))
+        # return MerkleTree.hash_func(self.__repr_private__(include_underscored_slots, private_only))
+        return MerkleTree.hash_func(self.__repr__())
 
     def _hash_tree(self, include_underscored_slots: bool = True, private_only: bool = False) -> str:
         """Returns the hash of the full representation of the object.
@@ -243,7 +242,7 @@ class BaseInterface(ABC):
             'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271'
         """
         return MerkleTree(self._hash_slots(include_underscored_slots, private_only))
-    
+
     def _hash_public(self) -> str:
         """Returns the hash of the full representation of the object.
 
@@ -259,7 +258,7 @@ class BaseInterface(ABC):
             'd9e12b2e12010e3b8cd2022e84400d1eb68a4f377069d8759888f6e96082f1e9'
         """
         return self._hash_tree(include_underscored_slots=False, private_only=False).root()
-    
+
     def _hash_private(self) -> str:
         """Returns the hash of the full representation of the object.
 
@@ -275,7 +274,7 @@ class BaseInterface(ABC):
             'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271'
         """
         return self._hash_tree(include_underscored_slots=True, private_only=True).root()
-    
+
     def _hash_package(self) -> MerkleTree:
         """Returns the hash of the full representation of the object.
 
@@ -293,7 +292,7 @@ class BaseInterface(ABC):
         public_hash: str = self._hash_public()
         private_hash: str = self._hash_private()
         return MerkleTree((public_hash, private_hash))
-    
+
     def _verify_item_in_hash_package(self, item: str) -> bool:
         """Returns the hash of the full representation of the object.
 
@@ -313,6 +312,3 @@ class BaseInterface(ABC):
         private_tree = self._hash_private()
 
         return public_tree.verify(leaf_hash) or private_tree.verify(leaf_hash)
-        
-
-        
