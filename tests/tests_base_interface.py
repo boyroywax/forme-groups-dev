@@ -98,3 +98,18 @@ class TestBaseInterface(unittest.TestCase):
     def text_base_interface_hash_package_verify(self):
         self.maxDiff = None
         self.assertTrue(self.base_interface._hash_package().verify(self.base_interface._hash_leaf()))
+
+    def test_base_interface2_hashes(self):
+        self.assertEqual(self.base_interface2._hash_leaf(), 'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271')
+        self.assertEqual(self.base_interface2._hash_slots(), ('6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b',
+            '6e94a0aef218fd7aef18b257f0ba9fc33c92a2bc9788fc751868e43ab398137f',
+            '3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18',
+            'd0ff5974b6aa52cf562bea5921840c032a860a91a3512f7fe8f768f6bbe005f6',
+            '82fb6f322c62a7f4c9869b7a91e2f16ecd8113aa9fd797216d473bd00764b43d',
+            'dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91',
+            'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35'))
+        
+        self.assertEqual(self.base_interface2._hash_public(), '933c32b6ec12b7f41e028185cc2f347d3051c2561d70d48f62fb38f47c18a772')
+        self.assertEqual(self.base_interface2._hash_private(), 'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35')
+        self.assertEqual(self.base_interface2._hash_package().root(), '2fcc5d33093a3f813a3a607c85240c4443ac3531ea515df48118903ea6b437ee')
+

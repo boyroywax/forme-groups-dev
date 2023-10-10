@@ -11,27 +11,35 @@ NOTES:
         4. Slots are named in two ways:
             a. Public Slots -> should begin with a lowercase letter.
             b. Private Slots -> should be prefixed with an underscore ("_").
-    B. REPRESENTATION DUNDER METHOD
-        1. __repr__ should include all slots (including private slots).
+    B. ITERATION DUNDER METHOD
+        1. __iter__ should iterate over all slots (including private slots).
+        2. __iter_slots__ can return an iterator over:
+            a. only public slots or
+            b. only private slots or
+            c. both
+        3. __iter_slots__ will not unpack the slots if they are returned as a tuple, list, dict, or set.
+    C. REPRESENTATION DUNDER METHOD
+        1. __repr__ should include the repr() of all slots (including private slots).
         2. __repr_private__ can return a string representation of the object with:
             a. only public slots or
             b. only private slots or
             c. both
-    C. STRING DUNDER METHOD
+    D. STRING DUNDER METHOD
         1. __str__ should include only public slots.
         2. __str_private__ can return a string representation of the object with:
             a. only public slots or
             b. only private slots or
             c. both
-    D. HASHING
-        1. Hashing a Base Class into a Leaf
+    E. HASHING
+        1. The __hash__ dunder method is not used. (__hash__() expects a type int to be returned)
+        2. Hashing a Base Class into a Leaf
             a. Hashes the full representation of the object including private slots.
             b. Can only be used to verify the full representational string of the object.
-        2. Hashing a Base Class into a Tree
+        3. Hashing a Base Class into a Tree
             a. Hashes each slot into a leaf
             b. Then, hashes the leaves into a tree.
             c. Can be used to verify the findividual slots of the object.
-        3. Hashing a Base Class into a Package
+        4. Hashing a Base Class into a Package
             a. Hashes each public slot into a leaf.
             b. Then, hashes the public leaves into a tree.
             c. Next, each private slot is hashed into a leaf.
@@ -179,6 +187,28 @@ class BaseInterface(ABC):
             'test_property: 1'
         """
         return self.__str_private__(include_underscored_slots=False, private_only=False)
+    
+    def _hash_slots(self, include_underscored_slots: bool = True, private_only: bool = False) -> tuple[str]:
+        """Returns the sha256 hash of the representation of each slot in the object.
+
+        Returns:
+            str: The hash of the representation of the object.
+
+        Example:
+            >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
+            >>> from attrs import define
+            >>> @define(frozen=True, slots=True, weakref_slot=False)
+            ... class BaseInterfaceExample(BaseInterface):
+            ...     test_property: int = 1
+            >>> BaseInterfaceExample()._hash_slots()
+            ('d9e12b2e12010e3b8cd2022e84400d1eb68a4f377069d8759888f6e96082f1e9',)
+        """
+        hashed_slots: tuple[str] = ()
+        for slot in self.__iter_slots__(include_underscored_slots, private_only):
+            print(repr(getattr(self, slot)))
+            hashed_slots = hashed_slots + (MerkleTree.hash_func(repr(getattr(self, slot))), )
+
+        return hashed_slots
 
     def _hash_leaf(self, include_underscored_slots: bool = True, private_only: bool = False) -> str:
         """Returns the hash of the full representation of the object.
@@ -212,11 +242,7 @@ class BaseInterface(ABC):
             >>> BaseInterfaceExample().hash_tree().root_hash
             'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271'
         """
-        hashed_slots: tuple[str] = ()
-        for slot in self.__iter_slots__(include_underscored_slots, private_only):
-            hashed_slots = hashed_slots + (MerkleTree.hash_func(repr(getattr(self, slot))), )
-
-        return MerkleTree(hashed_slots)
+        return MerkleTree(self._hash_slots(include_underscored_slots, private_only))
     
     def _hash_public(self) -> str:
         """Returns the hash of the full representation of the object.
