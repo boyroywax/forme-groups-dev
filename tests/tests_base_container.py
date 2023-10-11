@@ -60,3 +60,9 @@ class TestBaseContainer(unittest.TestCase):
     
     def test_init_with_multiple_containers(self):
         self.assertRaises(TypeError, BaseContainer, (1, 2, 3), [1, 2, 3])
+
+    def test_init_with_improper_type(self):
+        self.assertRaises(TypeError, BaseContainer, (1, 2, 3), 1)
+
+    def test_init_with_improper_type2(self):
+        self.assertRaises(TypeError, BaseContainer, (1, 2, 3), "int")

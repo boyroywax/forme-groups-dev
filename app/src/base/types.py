@@ -71,15 +71,10 @@ class BaseTypesInterface(BaseInterface, ABC):
         Returns:
             BaseValueTypes.all: The type from the alias
         """
-        type_from_alias: type = None
         for type_, aliases in self.aliases.items():
             for alias_ in aliases:
                 if alias == alias_:
-                    type_from_alias = type_
-                    return type_from_alias
-        else:
-            raise GroupBaseTypeException(f"Could not find type for alias {alias}")
-    
+                    return type_
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -185,7 +180,7 @@ class BaseContainerTypes(BaseTypesInterface):
         aliases: dict[type | TypeAlias, tuple[str]] = {
             self.dictionary: (
                 str("Dictionary"), "dictionary", "DICTIONARY",
-                str("Dict"), str("Dict"), "DICT",
+                str("Dict"), str("dict"), "DICT",
                 "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
                 "DictType", "dict_type", "DICT_TYPE"
             ),
