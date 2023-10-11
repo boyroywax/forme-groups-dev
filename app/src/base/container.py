@@ -13,7 +13,7 @@ class BaseContainer(BaseInterface):
     Base class for all classes
     """
     _items: tuple[BaseValue] = field(validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes().all), iterable_validator=validators.instance_of(BaseContainerTypes().all)), converter=_extract_base_values)
-    _type: type = field(validator=validators.instance_of(type | str), default=_items.__repr__())
+    _type: type | str = field(validator=validators.instance_of(type | str), default=tuple)
 
     @property
     def items(self) -> tuple[BaseValue]:
