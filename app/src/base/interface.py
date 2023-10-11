@@ -11,6 +11,7 @@ NOTES:
         4. Slots are named in two ways:
             a. Public Slots -> begin with a lowercase letter.
             b. Private Slots -> prefixed with an underscore ("_").
+
     B. ITERATION DUNDER METHOD
         1. __iter__ should iterate over all slots (including private slots).
         2. __iter_slots__ can return an iterator over:
@@ -28,6 +29,7 @@ NOTES:
                 ...     _private_test_property: int = 2
                 >>> list(BaseInterfaceExample())
                 ['test_property', '_private_test_property']
+
     C. REPRESENTATION DUNDER METHOD
         1. __repr__ should include the repr() of all slots (including private slots).
         2. __repr_private__ can return a string representation of the object with:
@@ -44,6 +46,7 @@ NOTES:
                 ...     _private_test_property: int = 2
                 >>> BaseInterfaceExample().__repr__()
                 'BaseInterfaceExample(test_property=1, _private_test_property=2)'
+
     D. STRING DUNDER METHOD
         1. __str__ should include only public slots.
         2. __str_private__ can return a string representation of the object with:
@@ -61,6 +64,7 @@ NOTES:
                 ...     _private_test_property: int = 2
                 >>> BaseInterfaceExample().__str__()
                 'test_property: 1, _private_test_property: 2'
+
     E. HASHING
         1. The __hash__ dunder method is not used. (__hash__() expects a type int to be returned)
         2. Hashing a Base Class Representation
@@ -221,9 +225,10 @@ class BaseInterface(ABC):
         return self.__str_private__(include_underscored_slots=False, private_only=False)
 
     def _hash_slot(self, slot: str) -> str:
-        """Returns the sha256 hash of the representation of a slot in the object.
+        """Returns the sha256 hash of the representation of the value of a slot in the object.
 
         """
+        # print(repr(getattr(self, slot)))
         return MerkleTree.hash_func(repr(getattr(self, slot)))
 
     def _hash_slots(self, include_underscored_slots: bool = True, private_only: bool = False) -> tuple[str]:

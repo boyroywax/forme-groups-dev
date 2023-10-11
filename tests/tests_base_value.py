@@ -4,6 +4,7 @@ import random
 import uuid
 
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
+from app.src.utils.crypto import MerkleTree
 from app.src.base.value import BaseValue
 from app.src.base.exceptions import GroupBaseValueException
 
@@ -321,9 +322,14 @@ class TestBaseValue(unittest.TestCase):
 
     def test_hash_tree(self):
         value = BaseValue(1)
-        # print(value._hash_tree())
+
+        # The root hash of the tree is hashed from the repr of all the slots, public followed by private
         self.assertEqual(value._hash_tree().root(), '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b')
+        
+        # The levels of the tree are the hashes of the slots, public followed by private
         self.assertEqual(value._hash_tree().levels, (('6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b', ), ))
+        
+        # the re
         self.assertEqual(value._hash_repr(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
         self.assertEqual(value._hash_package().root(), "3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd")
         self.assertEqual(value._hash_package().levels, ((None, '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'), ('3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd', )))
@@ -341,4 +347,23 @@ class TestBaseValue(unittest.TestCase):
             random_value = random.choice(values)
             value = BaseValue(random_value)
             self.assertEqual(value._hash_public_slots(), value._hash_public_slots())
+
+    def test_hash_public_slot(self):
+        for i in range(10000):
+            values = [
+                random.randint(0, 10000000000),
+                random.randbytes(256),
+                random.choice([True, False]),
+                random.random(),
+                None,
+                str(uuid.uuid4())
+            ]
+            random_value = random.choice(values)
+            value = BaseValue(random_value)
+            self.assertIsNone(value._hash_public_slots())
+            self.assertIsNotNone(value._hash_private_slots())
+            self.assertEqual(str(value), str(random_value))
+            self.assertEqual(repr(value), f"BaseValue(value={repr(random_value)}, type={type(random_value).__name__})")
+            self.assertEqual(value._hash_repr(), MerkleTree.hash_func(repr(value)))
+            self.assertEqual(value._hash_tree().leaves, (MerkleTree.hash_func(repr(random_value)), ))
 

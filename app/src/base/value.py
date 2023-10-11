@@ -151,6 +151,17 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
     @override
     def __str__(self) -> str:
+        """The String of the value of the BaseValue
+
+        Returns:
+            str: The String of the value of the BaseValue
+
+        Examples:
+            >>> value = BaseValue(1)
+            >>> str(value)
+            '1'
+
+        """
         return str(self._value)
 
     @override
@@ -162,8 +173,8 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
             Examples:
                 >>> value = BaseValue(1)
-                >>> value
+                >>> repr(value)
                 BaseValue(value=1, type=int)
 
         """
-        return f"{self.__class__.__name__}(value={repr(self._value)}, type={self.get_type_str()})"
+        return f"{self.__class__.__name__}(value={repr(self.value)}, type={self.get_type_str()})"
