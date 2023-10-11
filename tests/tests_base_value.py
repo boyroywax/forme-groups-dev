@@ -124,11 +124,11 @@ class TestBaseValue(unittest.TestCase):
     def test_base_value_hash(self):
         value = BaseValue(1)
         print(repr(value))
-        self.assertEqual(value._hash_leaf(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
+        self.assertEqual(value._hash_repr(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
 
     def test_base_value_hash_with_different_value(self):
         value = BaseValue(1)
-        self.assertNotEqual(value._hash_leaf(), BaseValue(2)._hash_leaf())
+        self.assertNotEqual(value._hash_repr(), BaseValue(2)._hash_repr())
 
     def test_base_value_peek_value(self):
         value = BaseValue(1)
@@ -149,7 +149,7 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_hash_with_str(self):
         value = BaseValue("hello")
-        self.assertEqual(value._hash_leaf(), 'cbdba380edb6b63b8e0dc697952a7d4e420fc1ece0542bd22968345234ad4565')
+        self.assertEqual(value._hash_repr(), 'cbdba380edb6b63b8e0dc697952a7d4e420fc1ece0542bd22968345234ad4565')
 
     def test_base_value_get_type_str(self):
         value = BaseValue(1)
@@ -267,7 +267,7 @@ class TestBaseValue(unittest.TestCase):
         
     def test_base_value_hash_with_bool(self):
         value = BaseValue(True)
-        self.assertEqual(value._hash_leaf(), 'da1fd978d5160bcb95764a4a7b7d3f6649a0d1e111b0d393339afea675d352b4')
+        self.assertEqual(value._hash_repr(), 'da1fd978d5160bcb95764a4a7b7d3f6649a0d1e111b0d393339afea675d352b4')
 
     def test_base_value_get_type_str_with_bool(self):
         value = BaseValue(True)
@@ -304,7 +304,7 @@ class TestBaseValue(unittest.TestCase):
             random_value = random.choice(values)
             value = BaseValue(random_value)
             self.assertEqual(value.value, random_value)
-    
+
     def test_hash_time_init_n_base_values(self):
         for i in range(10000):
             values = [
@@ -317,5 +317,28 @@ class TestBaseValue(unittest.TestCase):
             ]
             random_value = random.choice(values)
             value = BaseValue(random_value)
-            self.assertEqual(value._hash_leaf(), value._hash_leaf())
+            self.assertEqual(value._hash_repr(), value._hash_repr())
+
+    def test_hash_tree(self):
+        value = BaseValue(1)
+        # print(value._hash_tree())
+        self.assertEqual(value._hash_tree().root(), '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b')
+        self.assertEqual(value._hash_tree().levels, (('6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b', ), ))
+        self.assertEqual(value._hash_repr(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
+        self.assertEqual(value._hash_package().root(), "3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd")
+        self.assertEqual(value._hash_package().levels, ((None, '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'), ('3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd', )))
+
+    def test_hash_public_init_n_base_values(self):
+        for i in range(10000):
+            values = [
+                random.randint(0, 10000000000),
+                random.randbytes(256),
+                random.choice([True, False]),
+                random.random(),
+                None,
+                str(uuid.uuid4())
+            ]
+            random_value = random.choice(values)
+            value = BaseValue(random_value)
+            self.assertEqual(value._hash_public_slots(), value._hash_public_slots())
 

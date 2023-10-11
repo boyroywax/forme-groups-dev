@@ -33,7 +33,7 @@ class MerkleTree:
 
     def hash_level(self, level: List[str]) -> tuple[str]:
         hashed_level: tuple[str] = tuple()
-        for i in range(0, len(level), 2):
+        for i in range(1, len(level), 2):
             if i + 1 == len(level):
                 hashed_level = hashed_level + (self.hash_func(level[i] + level[i]), )
             else:
@@ -47,7 +47,7 @@ class MerkleTree:
 
     def root(self) -> str | None:
         # print(self.leaves)
-        if self.levels is None or self.levels == tuple(tuple[str]) or self.leaves == tuple[str]:
+        if self.levels is None or len(self.levels) == 0 or len(self.leaves) == 0:
             return None
         return self.levels[-1][0]
 

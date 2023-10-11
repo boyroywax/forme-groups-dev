@@ -1,12 +1,10 @@
 import struct
-from attrs import define, field, validators
-from typing import override, Any, Union, TypeAlias
-
+from attrs import define, field
+from typing import override, Any, Union
 
 from .types import BaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
-# from ..utils.converters import _convert_container_to_value
 from ..utils.crypto import MerkleTree
 
 
@@ -73,7 +71,7 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
             return value.value
 
         raise GroupBaseValueException(f"Expected a BaseValue, but received {type(value)}")
-    
+
     @staticmethod
     def _force_type(
         value: Union["BaseValue", BaseValueTypes().all],
@@ -100,7 +98,7 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
         if isinstance(value, BaseValue):
             if value.get_type_str() == type_alias:
                 return value
-            
+
             value = value.value
 
         assert isinstance(value, BaseValueTypes().all), f"Expected a value, but received {type(value)}"
@@ -136,7 +134,7 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
             raise base_exception from e
 
         return BaseValue(forced_value)
-    
+
     def get_type_str(self) -> str:
         """Returns the type of the value as a string
 
@@ -147,7 +145,7 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
             >>> value = BaseValue(1)
             >>> value.get_type_str()
             'int'
-        
+
         """
         return type(self._value).__name__
 
@@ -157,22 +155,15 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
     @override
     def __repr__(self) -> str:
+        """The full String representation of the BaseValue
+
+            Returns:
+                str: The full String representation of the BaseValue, including the value and type.
+
+            Examples:
+                >>> value = BaseValue(1)
+                >>> value
+                BaseValue(value=1, type=int)
+
+        """
         return f"{self.__class__.__name__}(value={repr(self._value)}, type={self.get_type_str()})"
-    
-    # def __eq__(self, other: 'BaseValue') -> bool:
-    #     if not isinstance(other, BaseValue):
-    #         return False
-    #     return super()._hash_leaf() == other._hash_leaf()
-    
-    # @override
-    # def _hash_leaf(self) -> str:
-    #     """Hashes the representation of the base value
-        
-    #     Returns:
-    #         str: The hash of the base value
-            
-    #     Examples:
-    #         >>> value = BaseValue(1)
-    #         >>> value.hash_leaf()
-    #         '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f'"""
-    #     return MerkleTree.hash_func(repr(self))
