@@ -160,6 +160,7 @@ class TestBaseContainerTypes(unittest.TestCase):
         self.assertTrue(self.base_container_types._verify_base_container_type(set()))
         self.assertTrue(self.base_container_types._verify_base_container_type(frozenset()))
         self.assertTrue(self.base_container_types._verify_base_container_type(dict()))
+        self.assertTrue(self.base_container_types._verify_base_container_type([1,2,3]))
         self.assertFalse(self.base_container_types._verify_base_container_type(int))
         self.assertFalse(self.base_container_types._verify_base_container_type(float))
         self.assertFalse(self.base_container_types._verify_base_container_type(bool))

@@ -5,7 +5,6 @@ from typing import override, Any, Union
 from .types import BaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
-from ..utils.crypto import MerkleTree
 
 
 def _base_value_validator(instance, attribute, value):
