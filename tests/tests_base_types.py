@@ -110,3 +110,67 @@ class TestBaseContainerTypes(unittest.TestCase):
     def setUp(self):
         self.base_container_types = BaseContainerTypes()
         
+    def test_init_with_str(self):
+        self.assertEqual(self.base_container_types.dictionary, dict)
+        self.assertEqual(self.base_container_types.list_, list)
+        self.assertEqual(self.base_container_types.tuple_, tuple)
+        self.assertEqual(self.base_container_types.set_, set)
+        self.assertEqual(self.base_container_types.frozenset_, frozenset)
+        self.assertEqual(self.base_container_types.linear, tuple | list | set | frozenset)
+        self.assertEqual(self.base_container_types.named, dict)
+
+    def test_base_container_type_has_slots(self):
+        for slot in self.base_container_types.__slots__:
+            self.assertEqual(hasattr(self.base_container_types, slot), True)
+
+    def test_base_container_type_has_all_slots(self):
+        self.assertEqual(
+            self.base_container_types.__slots__, ('dictionary', 'list_', 'tuple_', 'set_', 'frozenset_', 'named', 'linear')
+        )
+
+    def test_base_container_type_has_no_weakref_slot(self):
+        self.assertFalse(hasattr(self.base_container_types, "__weakref__"))
+
+    def test_base_container_type_has_no_dict(self):
+        self.assertFalse(hasattr(self.base_container_types, "__dict__"))
+
+    def test_base_container_type_repr(self):
+        self.maxDiff = None
+        self.assertEqual(
+            repr(self.base_container_types), "BaseContainerTypes(dictionary=<class 'dict'>, list_=<class 'list'>, tuple_=<class 'tuple'>, set_=<class 'set'>, frozenset_=<class 'frozenset'>, named=<class 'dict'>, linear=list | tuple | set | frozenset)"
+        )
+
+    def test_base_container_type_all_property(self):
+        self.assertEqual(self.base_container_types.all, dict | list | tuple | set | frozenset)
+
+    def test_base_container_type_aliases(self):
+        self.maxDiff = None
+        self.assertEqual(
+            self.base_container_types.aliases, {
+                self.base_container_types.named: ("Named", "named", "NAMED", "NamedContainer", "named_container", "NAMED_CONTAINER", "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"),
+                self.base_container_types.linear: ("Linear", "linear", "LINEAR", "LinearContainer", "linear_container", "LINEAR_CONTAINER", "LinearContainerType", "linear_container_type", "LINEAR_CONTAINER_TYPE"),
+                self.base_container_types.all: ("BaseContainer", "base_container", "BASE_CONTAINER", "BaseContainerTypes", "base_container_types", "BASE_CONTAINER_TYPES", "BaseContainerType", "base_container_type", "BASE_CONTAINER_TYPE")
+            }
+        )
+
+    def test_base_container_type_verify_base_container_type(self):
+        self.assertTrue(self.base_container_types._verify_base_container_type(dict()))
+        self.assertTrue(self.base_container_types._verify_base_container_type(list()))
+        self.assertTrue(self.base_container_types._verify_base_container_type(tuple()))
+        self.assertTrue(self.base_container_types._verify_base_container_type(set()))
+        self.assertTrue(self.base_container_types._verify_base_container_type(frozenset()))
+        self.assertTrue(self.base_container_types._verify_base_container_type(dict()))
+        self.assertFalse(self.base_container_types._verify_base_container_type(int))
+        self.assertFalse(self.base_container_types._verify_base_container_type(float))
+        self.assertFalse(self.base_container_types._verify_base_container_type(bool))
+        self.assertFalse(self.base_container_types._verify_base_container_type(str))
+        self.assertFalse(self.base_container_types._verify_base_container_type(bytes))
+        self.assertFalse(self.base_container_types._verify_base_container_type(1))
+        self.assertFalse(self.base_container_types._verify_base_container_type(1.0))
+        self.assertFalse(self.base_container_types._verify_base_container_type(True))
+        self.assertFalse(self.base_container_types._verify_base_container_type("test"))
+        self.assertFalse(self.base_container_types._verify_base_container_type(b"test"))
+        self.assertFalse(self.base_container_types._verify_base_container_type(None))
+        self.assertFalse(self.base_container_types._verify_base_container_type(BaseValueTypes))
+        self.assertFalse(self.base_container_types._verify_base_container_type(BaseContainerTypes))
+        self.assertFalse(self.base_container_types._verify_base_container_type(BaseTypesInterface))

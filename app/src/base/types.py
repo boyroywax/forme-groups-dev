@@ -159,8 +159,7 @@ class BaseValueTypes(BaseTypesInterface):
         """
         if isinstance(value, BaseValueTypes().all):
             return True
-        else:
-            return False
+        return False
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -171,31 +170,49 @@ class BaseContainerTypes(BaseTypesInterface):
     tuple_: TypeAlias = tuple
     set_: TypeAlias = set
     frozenset_: TypeAlias = frozenset
-    named_container: TypeAlias = dict
-    linear_container: TypeAlias = list | tuple | set | frozenset
+    named: TypeAlias = dict
+    linear: TypeAlias = list | tuple | set | frozenset
 
     @property
     def all(self) -> Union[type,  TypeAlias]:
         """The base container types"""
-        return self.named_container | self.linear_container
+        return self.named | self.linear
 
     @property
     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-        aliases: dict = {
-            "named_container": (
+        aliases: dict[type | TypeAlias, tuple[str]] = {
+            self.named: (
+                str("Named"), "named", "NAMED",
                 str("NamedContainer"), "named_container", "NAMED_CONTAINER",
                 "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"
             ),
-            "linear_container": (
+            self.linear: (
+                str("Linear"), "linear", "LINEAR",
                 str("LinearContainer"), "linear_container", "LINEAR_CONTAINER",
                 "LinearContainerType", "linear_container_type", "LINEAR_CONTAINER_TYPE"
             ),
-            "base_container_type": (
+            self.all: (
+                str("BaseContainer"), "base_container", "BASE_CONTAINER",
                 str("BaseContainerTypes"), "base_container_types", "BASE_CONTAINER_TYPES",
                 str("BaseContainerType"), "base_container_type", "BASE_CONTAINER_TYPE"
             )
         }
         return aliases
+
+    @staticmethod
+    def _verify_base_container_type(value: Any) -> bool:
+        """Verifies that a value is a base container type
+
+        Args:
+            value (Any): The value to verify
+
+        Returns:
+            bool: Whether the value is a base container type
+        """
+        if isinstance(value, BaseContainerTypes().all):
+            return True
+
+        return False
 
 
 # # Base Object Types
