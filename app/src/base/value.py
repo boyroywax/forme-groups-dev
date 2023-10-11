@@ -1,6 +1,7 @@
 import struct
-from attrs import define, field
 from typing import override, Any, Union
+from attrs import define, field
+
 
 from .types import BaseValueTypes
 from .interface import BaseInterface

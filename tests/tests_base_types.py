@@ -147,6 +147,11 @@ class TestBaseContainerTypes(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(
             self.base_container_types.aliases, {
+                self.base_container_types.dictionary: ("Dictionary", "dictionary", "DICTIONARY", "Dict", "dict", "DICT", "DictType", "dict_type", "DICT_TYPE"),
+                self.base_container_types.list_: ("List", "list", "LIST", "ListType", "list_type", "LIST_TYPE"),
+                self.base_container_types.tuple_: ("Tuple", "tuple", "TUPLE", "TupleType", "tuple_type", "TUPLE_TYPE"),
+                self.base_container_types.set_: ("Set", "set", "SET", "SetType", "set_type", "SET_TYPE"),
+                self.base_container_types.frozenset_: ("FrozenSet", "frozenset", "FROZENSET", "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"),
                 self.base_container_types.named: ("Named", "named", "NAMED", "NamedContainer", "named_container", "NAMED_CONTAINER", "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"),
                 self.base_container_types.linear: ("Linear", "linear", "LINEAR", "LinearContainer", "linear_container", "LINEAR_CONTAINER", "LinearContainerType", "linear_container_type", "LINEAR_CONTAINER_TYPE"),
                 self.base_container_types.all: ("BaseContainer", "base_container", "BASE_CONTAINER", "BaseContainerTypes", "base_container_types", "BASE_CONTAINER_TYPES", "BaseContainerType", "base_container_type", "BASE_CONTAINER_TYPE")

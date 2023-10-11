@@ -181,6 +181,28 @@ class BaseContainerTypes(BaseTypesInterface):
     @property
     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
         aliases: dict[type | TypeAlias, tuple[str]] = {
+            self.dictionary: (
+                str("Dictionary"), "dictionary", "DICTIONARY",
+                str("Dict"), str("Dict"), "DICT",
+                "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
+                "DictType", "dict_type", "DICT_TYPE"
+            ),
+            self.list_: (
+                str("List"), "list", "LIST",
+                "ListType", "list_type", "LIST_TYPE"
+            ),
+            self.tuple_: (
+                str("Tuple"), "tuple", "TUPLE",
+                "TupleType", "tuple_type", "TUPLE_TYPE"
+            ),
+            self.set_: (
+                str("Set"), "set", "SET",
+                "SetType", "set_type", "SET_TYPE"
+            ),
+            self.frozenset_: (
+                str("FrozenSet"), "frozenset", "FROZENSET",
+                "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
+            ),
             self.named: (
                 str("Named"), "named", "NAMED",
                 str("NamedContainer"), "named_container", "NAMED_CONTAINER",

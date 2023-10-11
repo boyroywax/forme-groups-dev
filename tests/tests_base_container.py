@@ -54,7 +54,7 @@ class TestBaseContainer(unittest.TestCase):
         self.assertEqual(container.__slots__, ('_items', '_type'))
 
     def test_create_large_container(self):
-        container = BaseContainer(([i for i in range(10000)]))
+        container = BaseContainer([i for i in range(10000)])
         self.assertEqual(len(container.items), 10000)
     
     def test_init_with_multiple_containers(self):
