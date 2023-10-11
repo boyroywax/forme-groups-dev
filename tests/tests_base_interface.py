@@ -20,7 +20,6 @@ class TestBaseInterface(unittest.TestCase):
             _private_test_property: int = 2
 
         self.base_interface = base_interface()
-        
 
         @define(frozen=True, slots=True, weakref_slot=False)
         class BaseInterfaceExample(BaseInterface):
