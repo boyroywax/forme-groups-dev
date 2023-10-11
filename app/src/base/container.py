@@ -1,89 +1,88 @@
 from attrs import define, field, validators
-from typing import Optional, TypeAlias
+from typing import Optional, TypeAlias, TypeVar, Optional, Type, TypeGuard, override
+
 
 from .interface import BaseInterface
 from .types import BaseValueTypes, BaseContainerTypes
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
-from ..utils.converters import _convert_container_to_default, _convert_container_to_type, _extract_base_values
 
-@define(slots=True, weakref_slot=False)
-class BaseContainer(BaseInterface):
+
+def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue]:
     """
-    Base class for all classes
+    Converter function for _items field
     """
-    _items: tuple[BaseValue] = field(validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes().all), iterable_validator=validators.instance_of(BaseContainerTypes().all)), converter=_extract_base_values)
-    _type: type | str = field(validator=validators.instance_of(type | str), default=tuple)
+    base_values: tuple = tuple()
+    exc_message = f"Expected a non-container, but received {type(item)}"
+    # __UNIT__ = type(item)
+
+    if isinstance(item, BaseContainerTypes().linear):
+        for item_ in item:
+            if isinstance(item_, BaseContainerTypes().all):
+                raise GroupBaseContainerException(exc_message)
+            
+            if isinstance(item_, BaseValue):
+                base_values += tuple([item_], )
+            else:
+                base_values += tuple([BaseValue(item_)])
+
+    elif isinstance(item, BaseContainerTypes().named):
+        for key, value in item.items():
+            if isinstance(value, BaseContainerTypes().all):
+                raise GroupBaseContainerException(exc_message)
+
+            if isinstance(value, BaseValue):
+                base_values += tuple([BaseValue(key), value])
+            else:
+                base_values += tuple([BaseValue(key), BaseValue(value)])
+    else:
+        raise GroupBaseContainerException(f"Expected a container, but received a non-container {type(item)}")
+    
+    return base_values
+
+
+@define(frozen=True, slots=True, weakref_slot=False)
+class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
+
+    _items: tuple[BaseValue] = field(
+        validator=validators.deep_iterable(validators.instance_of(BaseValue)),
+        converter=_base_container_converter
+    )
+    _type: Optional[Type[BaseContainerTypes().all]] = field(
+        validator=validators.instance_of(type |  str),
+        default=tuple
+    )
 
     @property
     def items(self) -> tuple[BaseValue]:
+        """The items held by the BaseContainer Class
+
+        Returns:
+            tuple[BaseValue]: The items held by the BaseContainer Class
+
+        Examples:
+            >>> container = BaseContainer((1, 2, 3))
+            >>> container.items
+            (BaseValue(value=1, type=int), BaseValue(value=2, type=int), BaseValue(value=3, type=int))
+        """
         return self._items
 
     @property
-    def type(self) -> TypeAlias | type:
+    def type(self) -> Type[BaseContainerTypes().all]:
+        """The type of the BaseContainer
+
+        Returns:
+            Type[BaseContainerTypes]: The type of the BaseContainer
+
+        Examples:
+            >>> container = BaseContainer((1, 2, 3))
+            >>> container.type
+            tuple
+        """
         return self._type
-
+    
     @staticmethod
-    def _contains_sub_container(item: BaseContainerTypes().all | BaseValueTypes().all) -> bool:
-        """
-        Checks if container contains a sub container
-        """
-        if isinstance(item, BaseValue | BaseValueTypes().all):
-            return False
-
-        elif isinstance(item, BaseContainerTypes().all):
-            return True
-
-        else:
-            raise GroupBaseContainerException(f"Passed a value, but expected a container. {item}")
-        
-    @staticmethod
-    def _extract_base_values(item: BaseContainerTypes().all) -> tuple[BaseValue]:
-        """
-        Converts container to base values
-        """
-        items_to_return: tuple[BaseValue] = tuple()
-        if isinstance(item, BaseContainerTypes().linear):
-            print(Exception("Passed a container of values, but expected a container of base values, a tuple of BaseValue will be returned"))
-
-            if isinstance(item, list | tuple):
-                items_to_return = tuple([BaseValue(value) for value in item])
-
-            elif isinstance(item, set):
-                items_to_return = tuple([BaseValue(item.pop()) for _ in range(len(item))])
-
-            elif isinstance(item, frozenset):
-                items = set(item)
-                items_to_return = tuple([BaseValue(items.pop()) for _ in range(len(items))])
-
-        elif isinstance(item, BaseContainerTypes().named):
-            items_to_return: tuple[BaseValue] = tuple()
-            for key, value in item.items():
-                items_to_return += (BaseValue(key), BaseValue(value))
-            print(items_to_return)
-
-        return items_to_return
-
-    @staticmethod
-    def _unpack_container(item: BaseContainerTypes().all, depth: int = 1) -> tuple[BaseValue]:
-        """
-        Unpacks the container to depth
-        """
-        unpacked_items: tuple[BaseValue] = tuple()
-
-        if depth >= 1:
-            if isinstance(item, BaseValue | BaseValueTypes().all):
-                return (item, )
-
-            elif BaseContainer._contains_sub_container(item):
-                unpacked_items = unpacked_items + BaseContainer._extract_base_values(item)
-                for value in BaseContainer._iter_all_(item):
-                    unpacked_items = unpacked_items + BaseContainer._unpack_container(value, depth - 1)
-
-        return unpacked_items
-
-    @staticmethod
-    def _iter_all_(item: BaseContainerTypes().all | BaseValueTypes().all):
+    def _iter_all_(item: BaseContainerTypes().all | BaseValueTypes().all | BaseValue):
         """
         Checks if container contains a sub container
         """
@@ -104,7 +103,9 @@ class BaseContainer(BaseInterface):
         """
         Repackages the container
         """
-        match (str(type_)):
+        base_container_types = BaseContainerTypes()
+        type_from_alias: TypeAlias | type = base_container_types._get_type_from_alias(type_)
+        match (str(type_from_alias)):
             case("<class 'list'>"):
                 return [value.value for value in item]
             case("<class 'tuple'>"):
@@ -118,14 +119,14 @@ class BaseContainer(BaseInterface):
                 values: tuple[BaseValueTypes().all] = item[1::2]
                 return {key.value: value.value for key, value in zip(keys, values)}
 
-    # def _package(self) -> BaseValueTypes().all | BaseContainerTypes().all:
-    #     return _convert_container_to_default(self._items, self._type)
-
-    def __iter__(self):
-        yield from self._items
-
-    def __str__(self) -> str:
-        return str(self._package())
-
+    @override
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(items={[item for item in iter(self)]}, type={self._type})"
+        return f"BaseContainer(items={self.items}, type={self.type})"
+
+    @override
+    def __str__(self) -> str:
+        return str(self._package(item=self.items, type_=self.type))
+
+    @override
+    def __iter__(self):
+        return iter(self.items)

@@ -22,7 +22,7 @@ class BaseTypesInterface(BaseInterface, ABC):
 
     @property
     @abstractmethod
-    def aliases(self) -> dict[str, tuple[str]]:
+    def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
         """The aliases for the base types
 
         Returns:
@@ -71,13 +71,15 @@ class BaseTypesInterface(BaseInterface, ABC):
         Returns:
             BaseValueTypes.all: The type from the alias
         """
-        for types in self.aliases:
-            for alias_ in types:
+        type_from_alias: type = None
+        for type_, aliases in self.aliases.items():
+            for alias_ in aliases:
                 if alias == alias_:
-                    return types
-            break
+                    type_from_alias = type_
+                    return type_from_alias
         else:
             raise GroupBaseTypeException(f"Could not find type for alias {alias}")
+    
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
