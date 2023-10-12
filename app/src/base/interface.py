@@ -288,6 +288,7 @@ class BaseInterface(ABC):
             str: The hash of the representation of the object.
 
         """
+        # print(repr(self))
         return MerkleTree.hash_func(repr(self))
 
     def _hash_package(self) -> MerkleTree:

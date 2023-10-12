@@ -6,6 +6,7 @@ from attrs import define, field
 from .types import BaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
+from ..utils.crypto import MerkleTree
 
 
 def _base_value_validator(instance, attribute, value):
@@ -178,3 +179,12 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
         """
         return f"{self.__class__.__name__}(value={repr(self.value)}, type={self.get_type_str()})"
+    
+    def _hash_value(self) -> str:
+        return MerkleTree.hash_func(self.value)
+    
+    def _hash_type(self) -> str:
+        return MerkleTree.hash_func(self.get_type_str())
+
+    def _hash(self) -> MerkleTree:
+        return MerkleTree(hashed_data=(self._hash_value(), self._hash_type()))
