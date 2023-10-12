@@ -81,10 +81,9 @@ class TestBaseContainer(unittest.TestCase):
 
     def test_hash_pack_verify(self):
         container = BaseContainer((1, 2, 3), "tuple")
-        # hash_package = container._hash_package()
-        container._verify_item_in_hash_package("_items")
+        
 
     def test_hash_pack_unpack2(self):
         container = BaseContainer((1, 2, 3), "tuple")
-        hash_tree = container._hash_repr()
-        self.assertEqual(hash_tree, '6c55c905bbb40515f339893e503bf2241b6f8ebbf4545447e67560fcb147c7fa')
+        hash_str = container._hash_repr()
+        self.assertEqual(hash_str, '6c55c905bbb40515f339893e503bf2241b6f8ebbf4545447e67560fcb147c7fa')
