@@ -105,11 +105,11 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
         if isinstance(item, BaseValue | BaseValueTypes().all):
             yield item
 
-        elif isinstance(item, BaseContainerTypes().all().linear | BaseContainer):
+        elif isinstance(item, BaseContainerTypes().linear | BaseContainer):
             for value in item:
                 yield BaseContainer._unpack_container(value)
 
-        elif isinstance(item, BaseContainerTypes().all().named):
+        elif isinstance(item, BaseContainerTypes().named):
             for key, value in item.items():
                 yield BaseContainer._unpack_container(value)
                 yield BaseContainer._unpack_container(key)
