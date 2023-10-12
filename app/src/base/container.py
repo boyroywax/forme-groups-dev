@@ -7,6 +7,21 @@ from .types import BaseValueTypes, BaseContainerTypes
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 
+def _contains_sub_container(item: BaseContainerTypes().all) -> bool:
+    """
+    Checks if container contains a sub container
+    """
+    if isinstance(item, BaseContainerTypes().linear):
+        for value in item:
+            if isinstance(value, BaseContainerTypes().all):
+                return True
+
+    elif isinstance(item, BaseContainerTypes().named):
+        for value in item.values():
+            if isinstance(value, BaseContainerTypes().all):
+                return True
+
+    return False
 
 def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue]:
     """
@@ -15,6 +30,9 @@ def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue
     base_values: tuple = tuple()
     exc_message = f"Expected a non-container, but received {type(item)}"
     # __UNIT__ = type(item)
+
+    if _contains_sub_container(item):
+        raise GroupBaseContainerException(exc_message)
 
     if isinstance(item, BaseContainerTypes().linear):
         for item_ in item:

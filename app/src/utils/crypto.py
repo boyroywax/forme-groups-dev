@@ -1,5 +1,4 @@
 import hashlib
-from typing import List
 from attrs import define, field, validators
 
 
@@ -31,7 +30,7 @@ class MerkleTree:
             level = self.levels[-1]
             # print(level)
 
-    def hash_level(self, level: List[str]) -> tuple[str]:
+    def hash_level(self, level: list[str]) -> tuple[str]:
         hashed_level: tuple[str] = tuple()
         for i in range(1, len(level), 2):
             if i + 1 == len(level):
