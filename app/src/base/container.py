@@ -1,5 +1,5 @@
 from attrs import define, field, validators
-from typing import Optional, TypeAlias, TypeVar, Optional, Type, TypeGuard, override
+from typing import Optional, TypeAlias, TypeVar, Optional, Type, TypeGuard, override, Any
 
 
 from .interface import BaseInterface
@@ -41,40 +41,14 @@ def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue
     return base_values
 
 
-def _base_container_type_validator(instance, attribute, value):
-    """Validates the argument is a BaseContainerTypes
-
-    Args:
-        instance (Any): The instance
-        attribute (Any): The attribute
-        value (Any): The value
-
-    Raises:
-        GroupBaseContainerException: If the value is not a BaseContainerTypes
-    """
-    base_container_types = BaseContainerTypes()
-    if isinstance(value, str):
-        if base_container_types._get_type_from_alias(value) is None:
-            raise GroupBaseContainerException(f"Expected a container, but received {value}")
-    # elif isinstance(value, type):
-    #     print(value)
-    #     if base_container_types._verify_base_container_type(value.__name__) is False:
-    #             raise GroupBaseContainerException(f"Expected a container, but received {value}")
-    elif isinstance(value, BaseContainerTypes().all):
-        if len(value) > 0:
-            raise GroupBaseContainerException(f"Expected a container, but received {value}")
-
-
-def _base_container_type_converter(item: BaseContainerTypes().all) -> BaseContainerTypes().all:
+def _base_container_type_converter(item: BaseContainerTypes().all | str) -> BaseContainerTypes().all:
     """
     Converter function for _type field
     """
     base_container_types = BaseContainerTypes()
     type_from_alias: TypeAlias | type = None
-    if isinstance(item, str):
+    if isinstance(item, str) and len(item) > 0:
         type_from_alias = base_container_types._get_type_from_alias(item)
-        if type_from_alias is None:
-            raise GroupBaseContainerException(f"Expected a container, but received {type(item)}")
     elif isinstance(item, type):
         type_from_alias = item
 
@@ -85,12 +59,12 @@ def _base_container_type_converter(item: BaseContainerTypes().all) -> BaseContai
 class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
 
     _items: tuple[BaseValue] = field(
-        validator=validators.deep_iterable(validators.instance_of(BaseValue), iterable_validator=validators.instance_of(tuple)),
+        validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes().all), iterable_validator=validators.instance_of(tuple)),
         converter=_base_container_converter
     )
-    _type: Optional[Type[BaseContainerTypes().all]] = field(
-        # validator=validators.instance_of(type |  str),
-        validator=_base_container_type_validator,
+    _type: Optional[Type[BaseContainerTypes().all] | str] = field(
+        validator=validators.instance_of(type | str),
+        # validator=_base_container_type_validator,
         converter=_base_container_type_converter,
         default=tuple
     )
@@ -110,7 +84,7 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
         return self._items
 
     @property
-    def type(self) -> Type[BaseContainerTypes().all]:
+    def type(self) -> Type[BaseContainerTypes().all | str]:
         """The type of the BaseContainer
 
         Returns:
@@ -121,7 +95,7 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
             >>> container.type
             tuple
         """
-        return self._type.__name__
+        return self._type.__name__ if isinstance(self._type, type) else self._type
     
     @staticmethod
     def _iter_all_(item: BaseContainerTypes().all | BaseValueTypes().all | BaseValue):

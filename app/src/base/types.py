@@ -58,11 +58,10 @@ class BaseTypesInterface(BaseInterface, ABC):
             for alias in types:
                 if item == alias:
                     return True
-            break
-        else:
-            return False
 
-    def _get_type_from_alias(self, alias: all) -> type:
+        return False
+
+    def _get_type_from_alias(self, alias: str) -> type:
         """Gets the type from an alias
 
         Args:
@@ -72,8 +71,10 @@ class BaseTypesInterface(BaseInterface, ABC):
             BaseValueTypes.all: The type from the alias
         """
         for type_, aliases in self.aliases.items():
+            # print(type_, aliases)
             for alias_ in aliases:
                 if alias == alias_:
+                    # print(type_)
                     return type_
 
 
@@ -103,25 +104,25 @@ class BaseValueTypes(BaseTypesInterface):
         aliases: dict = {
             self.integer: (
                 str("Integer"), "integer", "INTEGER",
-                str("Int"), str("Int"), "INT",
+                str("Int"), str("int"), "INT",
                 "IntegerType", "integer_type", "INTEGER_TYPE",
                 "IntType", "int_type", "INT_TYPE"
             ),
             self.floating_point: (
                 str("FloatingPoint"), "floating_point", "FLOATING_POINT",
-                str("Float"), str("Float"), "FLOAT",
+                str("Float"), str("float"), "FLOAT",
                 "FloatingPointType", "floating_point_type", "FLOATING_POINT_TYPE",
                 "FloatType", "float_type", "FLOAT_TYPE"
             ),
             self.boolean: (
                 str("Boolean"), "boolean", "BOOLEAN",
-                str("Bool"), str("Bool"), "BOOL",
+                str("Bool"), str("bool"), "BOOL",
                 "BooleanType", "boolean_type", "BOOLEAN_TYPE",
                 "BoolType", "bool_type", "BOOL_TYPE"
             ),
             self.string: (
                 str("String"), "string", "STRING",
-                str("Str"), str("Str"), "STR",
+                str("Str"), str("str"), "STR",
                 "StringType", "string_type", "STRING_TYPE",
                 "StrType", "str_type", "STR_TYPE"
             ),
@@ -167,13 +168,13 @@ class BaseContainerTypes(BaseTypesInterface):
     tuple_: TypeAlias = tuple
     set_: TypeAlias = set
     frozenset_: TypeAlias = frozenset
-    named: TypeAlias = dict
-    linear: TypeAlias = list | tuple | set | frozenset
+    named: TypeAlias = dictionary
+    linear: TypeAlias = list_ | tuple_ | set_ | frozenset_
 
     @property
     def all(self) -> Union[type,  TypeAlias]:
         """The base container types"""
-        return self.named | self.linear
+        return Union[self.named, self.linear]
 
     @property
     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
@@ -181,7 +182,7 @@ class BaseContainerTypes(BaseTypesInterface):
             self.dictionary: (
                 str("Dictionary"), "dictionary", "DICTIONARY",
                 str("Dict"), str("dict"), "DICT",
-                "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
+                # "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
                 "DictType", "dict_type", "DICT_TYPE"
             ),
             self.list_: (
@@ -200,11 +201,11 @@ class BaseContainerTypes(BaseTypesInterface):
                 str("FrozenSet"), "frozenset", "FROZENSET",
                 "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
             ),
-            self.named: (
-                str("Named"), "named", "NAMED",
-                str("NamedContainer"), "named_container", "NAMED_CONTAINER",
-                "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"
-            ),
+            # self.named: (
+            #     str("Named"), "named", "NAMED",
+            #     str("NamedContainer"), "named_container", "NAMED_CONTAINER",
+            #     "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"
+            # ),
             self.linear: (
                 str("Linear"), "linear", "LINEAR",
                 str("LinearContainer"), "linear_container", "LINEAR_CONTAINER",
