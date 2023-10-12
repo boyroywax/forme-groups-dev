@@ -7,6 +7,7 @@ sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 from app.src.base.container import BaseContainer
 from app.src.base.value import BaseValue
 from app.src.base.exceptions import GroupBaseContainerException
+from app.src.utils.crypto import MerkleTree
 
 
 class TestBaseContainer(unittest.TestCase):
@@ -72,3 +73,18 @@ class TestBaseContainer(unittest.TestCase):
     def test_init_with_mismatched_types_will_work(self):
         contaienr = BaseContainer((1, 2, 3), "set")
         self.assertEqual(contaienr.items, (BaseValue(1), BaseValue(2), BaseValue(3)))
+
+    def test_hash_pack_unpack(self):
+        container = BaseContainer((1, 2, 3), "tuple")
+        hash_tree = container._hash_package()
+        self.assertEqual(hash_tree.root(), '0f9cb8d648193167b33504bf062ec2faccc429740ffc7666c6fe5ea61672e804')
+
+    def test_hash_pack_verify(self):
+        container = BaseContainer((1, 2, 3), "tuple")
+        # hash_package = container._hash_package()
+        container._verify_item_in_hash_package("_items")
+
+    def test_hash_pack_unpack2(self):
+        container = BaseContainer((1, 2, 3), "tuple")
+        hash_tree = container._hash_repr()
+        self.assertEqual(hash_tree, '6c55c905bbb40515f339893e503bf2241b6f8ebbf4545447e67560fcb147c7fa')
