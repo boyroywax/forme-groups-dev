@@ -1,6 +1,6 @@
 from src import App
 from attrs.exceptions import FrozenInstanceError
-from src.base import BaseInterface, BaseValue, BaseContainer, BaseSchema
+from .base import BaseInterface, BaseValue, BaseContainer, BaseSchema
 
 if __name__ == '__main__':
     app = App()

@@ -112,6 +112,15 @@ class BaseInterface(ABC):
     """
     Base interface for all classes
     """
+    def __iter_item__(self, slot_name: str = "_items"):
+        """Returns an iterator over all slots.
+
+        Returns:
+            Iterator[str]: An iterator over all slots.
+        """
+        yield from getattr(self, slot_name)
+
+
     def __iter_slots__(self, include_underscored_slots: bool = False, private_only: bool = False):
         """Returns an iterator over all slots."""
         if not include_underscored_slots and private_only:
@@ -318,3 +327,21 @@ class BaseInterface(ABC):
         private_tree = self._hash_private_slots()
 
         return public_tree.verify(leaf_hash) or private_tree.verify(leaf_hash)
+    
+    def _hash_container_items(self, slot_name: str = "_items") -> MerkleTree:
+        hashed_items: tuple[str] = ()
+        for item in self.__iter_item__(slot_name):
+            hashed_items = hashed_items + (MerkleTree.hash_func(repr(item)), )
+
+        hashed_items = hashed_items + (MerkleTree.hash_func(repr(self.type)), )
+
+        return MerkleTree(hashed_items)
+    
+    def _verify_item_in_hash_container_items(self, item, slot_name: str = "_items") -> bool:
+        # leaf_hash: str = MerkleTree.hash_func(repr(item))
+        leaf_hash: str = MerkleTree.hash_func(repr(item))
+        print(leaf_hash)
+        tree = self._hash_container_items(slot_name)
+        print(tree.levels)
+
+        return tree.verify(leaf_hash)
