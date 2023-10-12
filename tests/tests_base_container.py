@@ -7,7 +7,6 @@ sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 from app.src.base.container import BaseContainer, _contains_sub_container
 from app.src.base.value import BaseValue
 from app.src.base.exceptions import GroupBaseContainerException
-from app.src.utils.crypto import MerkleTree
 
 
 class TestBaseContainer(unittest.TestCase):
@@ -47,7 +46,6 @@ class TestBaseContainer(unittest.TestCase):
     def test_type(self):
         container = BaseContainer((1, 2, 3), "tuple")
         self.assertEqual(container.type, "tuple")
-
 
     def test_has_slots(self):
         container = BaseContainer((1, 2, 3), "tuple")
@@ -96,3 +94,6 @@ class TestBaseContainer(unittest.TestCase):
 
     def test_contains_sub_container2(self):
         self.assertTrue(_contains_sub_container, (1, 2, [3, 4, 5]))
+
+    def test_creating_container_with_sub_container(self):
+        self.assertRaises(GroupBaseContainerException, BaseContainer, (1, 2, [3, 4, 5]), "tuple")

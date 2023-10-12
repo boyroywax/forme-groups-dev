@@ -7,6 +7,7 @@ from .types import BaseValueTypes, BaseContainerTypes
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 
+
 def _contains_sub_container(item: BaseContainerTypes().all) -> bool:
     """
     Checks if container contains a sub container
@@ -22,6 +23,7 @@ def _contains_sub_container(item: BaseContainerTypes().all) -> bool:
                 return True
 
     return False
+
 
 def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue]:
     """
@@ -82,7 +84,6 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
     )
     _type: Optional[Type[BaseContainerTypes().all] | str] = field(
         validator=validators.instance_of(type | str),
-        # validator=_base_container_type_validator,
         converter=_base_container_type_converter,
         default=tuple
     )
