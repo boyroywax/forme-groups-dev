@@ -1,11 +1,11 @@
 from attrs import define, field, validators
-from typing import Optional, TypeAlias, TypeVar, Optional, Type, TypeGuard, override, Any
-
+from typing import Optional, TypeAlias, Type, override
 
 from .interface import BaseInterface
 from .types import BaseValueTypes, BaseContainerTypes
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
+from ..utils.crypto import MerkleTree
 
 
 def _contains_sub_container(item: BaseContainerTypes().all) -> bool:
@@ -115,26 +115,9 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
             tuple
         """
         return self._type.__name__ if isinstance(self._type, type) else self._type
-    
-    @staticmethod
-    def _iter_all_(item: BaseContainerTypes().all | BaseValueTypes().all | BaseValue):
-        """
-        Checks if container contains a sub container
-        """
-        if isinstance(item, BaseValue | BaseValueTypes().all):
-            yield item
-
-        elif isinstance(item, BaseContainerTypes().linear | BaseContainer):
-            for value in item:
-                yield BaseContainer._unpack_container(value)
-
-        elif isinstance(item, BaseContainerTypes().named):
-            for key, value in item.items():
-                yield BaseContainer._unpack_container(value)
-                yield BaseContainer._unpack_container(key)
 
     @staticmethod
-    def _package(item: BaseContainerTypes().all, type_: TypeAlias | type) -> BaseContainerTypes().all:
+    def _unpack(item: BaseContainerTypes().all, type_: TypeAlias | type) -> BaseContainerTypes().all:
         """
         Repackages the container
         """
@@ -160,8 +143,46 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
 
     @override
     def __str__(self) -> str:
-        return str(self._package(item=self.items, type_=self.type))
+        return str(self._unpack(item=self.items, type_=self.type))
+    
+    def __iter_items__(self, slot_name: str = "_items"):
+        """Returns an iterator over all slots.
+
+        Returns:
+            Iterator[str]: An iterator over all slots.
+        """
+        items: tuple = getattr(self, slot_name)
+
+        # if isinstance(items, BaseValue | BaseValueTypes().all):
+        #     yield items
+
+        if isinstance(items, BaseContainerTypes().linear | BaseContainer):
+            for value in items:
+                yield value
+
+        elif isinstance(items, BaseContainerTypes().named):
+            for key, value in items.items():
+                yield value
+                yield key
 
     @override
     def __iter__(self):
-        return iter(self.items)
+        yield from self.__iter_items__()
+    
+    def _hash(self) -> MerkleTree:
+        hashed_items: tuple[str] = ()
+        for item in self.__iter_items__():
+            hashed_items = hashed_items + (item._hash().root(), )
+
+        hashed_items = hashed_items + (MerkleTree.hash_func(repr(self.type)), )
+
+        return MerkleTree(hashed_items)
+
+    def _verify_item(self, item: BaseValue) -> bool:
+        # leaf_hash: str = MerkleTree.hash_func(repr(item))
+        leaf_hash: str = item._hash().root()
+        print(leaf_hash)
+        tree = self._hash()
+        print(tree.levels)
+
+        return tree.verify(leaf_hash)

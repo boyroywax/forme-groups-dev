@@ -69,8 +69,8 @@ class TestBaseContainer(unittest.TestCase):
         self.assertEqual(str(container), "{'a': 1, 'b': 2, 'c': 3}")
 
     def test_init_with_mismatched_types_will_work(self):
-        contaienr = BaseContainer((1, 2, 3), "set")
-        self.assertEqual(contaienr.items, (BaseValue(1), BaseValue(2), BaseValue(3)))
+        container = BaseContainer((1, 2, 3), "set")
+        self.assertEqual(container.items, (BaseValue(1), BaseValue(2), BaseValue(3)))
 
     def test_hash_pack_unpack(self):
         container = BaseContainer((1, 2, 3), "tuple")
@@ -81,7 +81,7 @@ class TestBaseContainer(unittest.TestCase):
         container = BaseContainer((1, 2, 3), "tuple")
         hash_repre_item_one = container.items[0]
         # print(hash_repre_item_one)
-        self.assertTrue(container._verify_item_in_hash_container_items(item=hash_repre_item_one))
+        self.assertTrue(container._verify_item(item=hash_repre_item_one))
 
     def test_hash_pack_unpack2(self):
         container = BaseContainer((1, 2, 3), "tuple")

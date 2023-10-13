@@ -23,12 +23,10 @@ class MerkleTree:
         level = self.leaves
 
         while len(level) > 1:
-            # print(level)
             hashed_level = self.hash_level(level)
             # print(hashed_level)
             self.levels = self.levels + (hashed_level, )
             level = self.levels[-1]
-            # print(level)
 
     def hash_level(self, level: list[str]) -> tuple[str]:
         hashed_level: tuple[str] = tuple()
@@ -37,7 +35,7 @@ class MerkleTree:
                 hashed_level = hashed_level + (self.hash_func(level[i] + level[i]), )
             else:
                 hashed_level = hashed_level + (self.hash_func(level[i] + level[i + 1]), )
-            # print(hashed_level)
+
         return hashed_level
 
     @staticmethod
