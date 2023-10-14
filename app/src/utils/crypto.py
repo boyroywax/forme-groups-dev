@@ -52,16 +52,16 @@ class MerkleTree:
     def hash_level(level: tuple[str]) -> tuple[str]:
         hashed_level = ()
         for i in range(0, len(level), 2):
-            print(f'level {i}: {level[i]}')
+            # print(f'level {i}: {level[i]}')
             if (i + 1) % 2 != 0 and i == len(level) - 1:
                 # if i == len(level) - 1:
-                print(f'hashing final item: {level[i]}')
+                # print(f'hashing final item: {level[i]}')
                 hashed_level = hashed_level + (MerkleTree._hash_items(level[i]), )
                 print(f'hashed level: {hashed_level}')
             elif (i + 1 <= len(level) - 1):
-                print(f'hashing items {i + 1}: {level[i + 1]}')
+                # print(f'hashing items {i + 1}: {level[i + 1]}')
                 hashed_level = hashed_level + (MerkleTree._hash_items(level[i], level[i + 1]), )
-                print(f'hashed level: {hashed_level}')
+                # print(f'hashed level: {hashed_level}')
             else:
                 raise Exception("This should never happen")
 

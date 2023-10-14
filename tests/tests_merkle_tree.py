@@ -100,8 +100,9 @@ class TestMerkleTree(unittest.TestCase):
         mt = MerkleTree((hash_test_func,))
         self.assertEqual(mt.root(), '0839734cbb5ab81cab6474a5ea4bd6a39ac09e3a7da1dd07f35d6b827d9a2177')
 
+    def test_hash_items_identical_two_values2(self):
+        hash_test_func = MerkleTree._hash_func("test")
+        mt = MerkleTree((hash_test_func, hash_test_func))
+        self.assertEqual(mt.root(), '0839734cbb5ab81cab6474a5ea4bd6a39ac09e3a7da1dd07f35d6b827d9a2177')
 
-    # def test_hash_items_identical_two_values(self):
-    #     hash_test_func = MerkleTree._hash_func("test")
-    #     mt = MerkleTree((hash_test_func, hash_test_func))
-    #     self.assertEqual(mt.root(), 'f1534392279bddbf9d43dde8701cb5be14b82f76ec6607bf8d6ad557f60f304e')
+    
