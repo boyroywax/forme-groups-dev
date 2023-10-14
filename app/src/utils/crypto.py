@@ -23,17 +23,16 @@ class MerkleTree:
     def build(self):
         level = self.leaves
 
-        if len(level) and len(self.levels) == 1:
-            self.levels = self.levels + (self.hash_level(level), )
-            print(f'level: {self.levels}')
+        if len(self.levels[0]) == 1:
+            print(f'hashing single item: {level[0]}')
+            self.levels = self.levels + ((self._hash_items(level[0]), ), )
 
         while len(level) > 1:
             hashed_level = self.hash_level(level)
             # print(hashed_level)
             self.levels = self.levels + (hashed_level, )
 
-            if len(hashed_level) != 1:
-                level = self.levels[-1]
+            level = self.levels[-1]
 
     @staticmethod
     def _hash_func(data) -> str:
@@ -43,12 +42,12 @@ class MerkleTree:
     def _hash_items(item1: str = None, item2: str = None) -> str:
         if item1 is None:
             raise ValueError('item1 cannot be None')
-        
+
         if item2 is None:
             return MerkleTree._hash_items(item1, item1)
-        
+
         return MerkleTree._hash_func(item1 + item2)
-        
+
     @staticmethod    
     def hash_level(level: tuple[str]) -> tuple[str]:
         hashed_level = ()
@@ -65,13 +64,8 @@ class MerkleTree:
                 print(f'hashed level: {hashed_level}')
             else:
                 raise Exception("This should never happen")
-        
+
         return hashed_level
-    
-    # def hash_levels(self):
-    #     for level in self.levels:
-    #         self.levels = self.hash_level(level)
-            
 
     def _find_levels_count(self) -> int:
         return len(self.levels)
