@@ -24,12 +24,10 @@ class MerkleTree:
         level = self.leaves
 
         if len(self.levels[0]) == 1:
-            # print(f'hashing single item: {level[0]}')
             self.levels = self.levels + ((self._hash_items(level[0]), ), )
 
         while len(level) > 1:
             hashed_level = self.hash_level(level)
-            # print(hashed_level)
             self.levels = self.levels + (hashed_level, )
 
             level = self.levels[-1]
@@ -52,16 +50,10 @@ class MerkleTree:
     def hash_level(level: tuple[str]) -> tuple[str]:
         hashed_level = ()
         for i in range(0, len(level), 2):
-            # print(f'level {i}: {level[i]}')
             if (i + 1) % 2 != 0 and i == len(level) - 1:
-                # if i == len(level) - 1:
-                # print(f'hashing final item: {level[i]}')
                 hashed_level = hashed_level + (MerkleTree._hash_items(level[i]), )
-                print(f'hashed level: {hashed_level}')
             elif (i + 1 <= len(level) - 1):
-                # print(f'hashing items {i + 1}: {level[i + 1]}')
                 hashed_level = hashed_level + (MerkleTree._hash_items(level[i], level[i + 1]), )
-                # print(f'hashed level: {hashed_level}')
             else:
                 raise Exception("This should never happen")
 
@@ -70,10 +62,7 @@ class MerkleTree:
     def _find_levels_count(self) -> int:
         return len(self.levels)
 
-
-
     def root(self) -> str | None:
-        # print(self.leaves)
         if self.levels[-1] is None or len(self.levels) == 0 or len(self.leaves) == 0:
             return None
         return self.levels[-1][0]
@@ -83,15 +72,6 @@ class MerkleTree:
             return False
         else:
             return True
-        # index = self.leaves.index(leaf_hash)
-        # current_hash = self.leaves[index]
-        # for i in range(len(self.levels) - 1):
-        #     if index % 2 == 0:
-        #         current_hash = self.hash_func(current_hash + self.levels[i][index + 1])
-        #     else:
-        #         current_hash = self.hash_func(self.levels[i][index - 1] + current_hash)
-        #     index //= 2
-        # return current_hash == self.root()
 
     def __str__(self) -> str:
         return f"{self.root()}"

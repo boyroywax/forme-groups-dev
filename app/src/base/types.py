@@ -220,7 +220,7 @@ class BaseContainerTypes(BaseTypesInterface):
         return aliases
 
     @staticmethod
-    def _verify_base_container_type(value: Any) -> bool:
+    def _is_container_type(value: Any) -> bool:
         """Verifies that a value is a base container type
 
         Args:
@@ -229,19 +229,17 @@ class BaseContainerTypes(BaseTypesInterface):
         Returns:
             bool: Whether the value is a base container type
         """
-        if isinstance(value, BaseContainerTypes().all):
-            return True
-
-        return False
+        return isinstance(value, BaseContainerTypes().all)
 
 
-# # Base Object Types
-# Object = object | None
-# KeyValue = tuple[BaseValueTypes.all, BaseValueTypes.all]
-# UnitTypes = BaseValueTypes.all | BaseContainerTypes.all | Object
-# TextSet = set[BaseValueTypes.Text]
-# TextOrContainer = BaseValueTypes.Text | BaseContainerTypes.all
-# TextContainersDict = dict[BaseValueTypes.Text, BaseContainerTypes.all]
+# Base Object Types
+Object = object | None
+KeyValue = tuple[BaseValueTypes().all, BaseValueTypes().all]
+UnitTypes = BaseValueTypes().all | BaseContainerTypes().all | Object
+Text = BaseValueTypes().text
+TextSet = set[BaseValueTypes().text]
+TextOrContainer = BaseValueTypes().text | BaseContainerTypes().all
+TextContainersDict = dict[BaseValueTypes().text, BaseContainerTypes().all]
 
-# # Base Schema Types
-# BaseSchema = dict[BaseValueTypes.Text, Any]
+# Base Schema Types
+BaseSchemaType = dict[BaseValueTypes().text, Any]

@@ -208,7 +208,6 @@ class BaseInterface(ABC):
             >>> BaseInterfaceExample().__str_private__()
             'test_property: 1, _private_test_property: 2'
         """
-
         slot_string: str = ""
         for slot in self.__iter_slots__(include_underscored_slots, private_only):
             slot_string += f"{self.__str_item__(slot)}, "

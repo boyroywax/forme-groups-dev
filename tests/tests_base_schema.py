@@ -21,7 +21,7 @@ class TestBaseSchema(unittest.TestCase):
             "age": "number",
             "address": address_schema
         })
-        self.assertEqual(person_schema._verify_schema(), (True, ""))
+        self.assertEqual(person_schema._verify_schema()), (True, ""))
 
     def test_init_with_dict2(self):
         address_schema = BaseSchema({

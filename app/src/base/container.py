@@ -7,25 +7,49 @@ from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
 
+AllBaseValueTypes = BaseValueTypes().all
+AllBaseContainerTypes: type | TypeAlias = BaseContainerTypes().all
+LinearContainer = BaseContainerTypes().linear
+NamedContainer = BaseContainerTypes().named
+BaseValueContainer = tuple[AllBaseValueTypes]
 
-def _contains_sub_container(item: BaseContainerTypes().all) -> bool:
+
+def is_linear_container(item: AllBaseContainerTypes) -> bool:
+    """
+    Checks if item is a linear container
+    """
+    return isinstance(item, LinearContainer)
+
+def is_named_container(item: AllBaseContainerTypes) -> bool:
+    """
+    Checks if item is a named container
+    """
+    return isinstance(item, NamedContainer)
+
+def is_any_container(item: AllBaseContainerTypes) -> bool:
+    """
+    Checks if item is any container
+    """
+    return is_linear_container(item) or is_named_container(item)
+
+def _contains_sub_container(item: AllBaseContainerTypes) -> bool:
     """
     Checks if container contains a sub container
     """
-    if isinstance(item, BaseContainerTypes().linear):
+    assert isinstance(item, AllBaseContainerTypes)
+    
+    if is_linear_container(item):
         for value in item:
-            if isinstance(value, BaseContainerTypes().all):
-                return True
+            return is_any_container(value)
 
-    elif isinstance(item, BaseContainerTypes().named):
+    elif is_named_container(item):
         for value in item.values():
-            if isinstance(value, BaseContainerTypes().all):
-                return True
+            return is_any_container(value)
 
     return False
 
 
-def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue]:
+def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
     """
     Converter function for _items field
     """
@@ -36,9 +60,9 @@ def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue
     if _contains_sub_container(item):
         raise GroupBaseContainerException(exc_message)
 
-    if isinstance(item, BaseContainerTypes().linear):
+    if is_linear_container(item):
         for item_ in item:
-            if isinstance(item_, BaseContainerTypes().all):
+            if isinstance(item_, AllBaseContainerTypes):
                 raise GroupBaseContainerException(exc_message)
             
             if isinstance(item_, BaseValue):
@@ -46,9 +70,9 @@ def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue
             else:
                 base_values += tuple([BaseValue(item_)])
 
-    elif isinstance(item, BaseContainerTypes().named):
+    elif is_named_container(item):
         for key, value in item.items():
-            if isinstance(value, BaseContainerTypes().all):
+            if isinstance(value, AllBaseContainerTypes):
                 raise GroupBaseContainerException(exc_message)
 
             if isinstance(value, BaseValue):
@@ -61,7 +85,7 @@ def _base_container_converter(item: BaseContainerTypes().all) -> tuple[BaseValue
     return base_values
 
 
-def _base_container_type_converter(item: BaseContainerTypes().all | str) -> BaseContainerTypes().all:
+def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBaseContainerTypes:
     """
     Converter function for _type field
     """
@@ -76,13 +100,13 @@ def _base_container_type_converter(item: BaseContainerTypes().all | str) -> Base
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
+class BaseContainer[T: AllBaseContainerTypes](BaseInterface):
 
     _items: tuple[BaseValue] = field(
         validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes().all), iterable_validator=validators.instance_of(tuple)),
         converter=_base_container_converter
     )
-    _type: Optional[Type[BaseContainerTypes().all] | str] = field(
+    _type: Optional[Type[AllBaseContainerTypes] | str] = field(
         validator=validators.instance_of(type | str),
         converter=_base_container_type_converter,
         default=tuple
@@ -103,7 +127,7 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
         return self._items
 
     @property
-    def type(self) -> Type[BaseContainerTypes().all | str]:
+    def type(self) -> Type[AllBaseContainerTypes | str]:
         """The type of the BaseContainer
 
         Returns:
@@ -117,7 +141,7 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
         return self._type.__name__ if isinstance(self._type, type) else self._type
 
     @staticmethod
-    def _unpack(item: BaseContainerTypes().all, type_: TypeAlias | type) -> BaseContainerTypes().all:
+    def _unpack(item: AllBaseContainerTypes, type_: TypeAlias | type) -> AllBaseContainerTypes:
         """
         Repackages the container
         """
@@ -156,11 +180,11 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
         # if isinstance(items, BaseValue | BaseValueTypes().all):
         #     yield items
 
-        if isinstance(items, BaseContainerTypes().linear | BaseContainer):
+        if isinstance(items, LinearContainer | BaseContainer):
             for value in items:
                 yield value
 
-        elif isinstance(items, BaseContainerTypes().named):
+        elif isinstance(items, NamedContainer):
             for key, value in items.items():
                 yield value
                 yield key
@@ -181,8 +205,8 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
     def _verify_item(self, item: BaseValue) -> bool:
         # leaf_hash: str = MerkleTree.hash_func(repr(item))
         leaf_hash: str = item._hash().root()
-        print(leaf_hash)
+        # print(leaf_hash)
         tree = self._hash()
-        print(tree.levels)
+        # print(tree.levels)
 
         return tree.verify(leaf_hash)

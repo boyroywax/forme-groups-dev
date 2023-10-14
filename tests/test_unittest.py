@@ -9,7 +9,6 @@ from tests_base_types import TestBaseTypesInterface
 from tests_base_types import TestBaseValueTypes, TestBaseContainerTypes
 from tests_base_value import TestBaseValue
 from tests_base_container import TestBaseContainer
-# from tests_base_container2 import TestBaseContainer
 # from tests_base_schema import TestBaseSchema
 
 

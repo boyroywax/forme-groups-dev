@@ -97,3 +97,7 @@ class TestBaseContainer(unittest.TestCase):
 
     def test_creating_container_with_sub_container(self):
         self.assertRaises(GroupBaseContainerException, BaseContainer, (1, 2, [3, 4, 5]), "tuple")
+
+    def test_creating_container_with_uneven_items_for_type_dict(self):
+        container_dict_invalid = BaseContainer(("a", 1, "b", 2, "c"), "dictionary")
+        self.assertRaises(Exception, f'{container_dict_invalid}')

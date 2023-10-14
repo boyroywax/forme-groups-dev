@@ -9,6 +9,9 @@ from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
 
 
+AllBaseValueTypes = BaseValueTypes().all
+
+
 def _base_value_validator(instance, attribute, value):
     """Validates the argument is a BaseValueTypes
 
@@ -20,12 +23,12 @@ def _base_value_validator(instance, attribute, value):
     Raises:
         GroupBaseValueException: If the value is not a BaseValueTypes
     """
-    if not isinstance(value, BaseValueTypes().all):
+    if not isinstance(value, AllBaseValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: BaseValueTypes().all](BaseInterface):
+class BaseValue[T: AllBaseValueTypes](BaseInterface):
     """Base class for values
 
     Args:
@@ -54,9 +57,23 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
             1
         """
         return self._value
+    
+    @value.getter
+    def value(self) -> T:
+        """The single base value held by the BaseValue Class
+
+        Returns:
+            BaseValueTypes: The value held by the BaseValue Class
+
+        Examples:
+            >>> value = BaseValue(1)
+            >>> value.value
+            1
+        """
+        return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> BaseValueTypes().all:
+    def _peek_value(value: 'BaseValue') -> AllBaseValueTypes:
         """Peeks the value of a BaseValue
 
         Args:
@@ -75,7 +92,7 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
     @staticmethod
     def _force_type(
-        value: Union["BaseValue", BaseValueTypes().all],
+        value: Union["BaseValue", AllBaseValueTypes],
         type_alias: str
     ) -> 'BaseValue':
         """Forces a value to a type
@@ -102,7 +119,7 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
             value = value.value
 
-        assert isinstance(value, BaseValueTypes().all), f"Expected a value, but received {type(value)}"
+        assert isinstance(value, AllBaseValueTypes), f"Expected a value, but received {type(value)}"
         forced_value: Any = None
 
         base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_alias}")
