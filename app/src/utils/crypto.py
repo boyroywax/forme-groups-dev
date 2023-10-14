@@ -24,7 +24,7 @@ class MerkleTree:
         level = self.leaves
 
         if len(self.levels[0]) == 1:
-            print(f'hashing single item: {level[0]}')
+            # print(f'hashing single item: {level[0]}')
             self.levels = self.levels + ((self._hash_items(level[0]), ), )
 
         while len(level) > 1:
