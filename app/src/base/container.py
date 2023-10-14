@@ -174,7 +174,7 @@ class BaseContainer[T: BaseContainerTypes().all](BaseInterface):
         for item in self.__iter_items__():
             hashed_items = hashed_items + (item._hash().root(), )
 
-        hashed_items = hashed_items + (MerkleTree.hash_func(repr(self.type)), )
+        hashed_items = hashed_items + (MerkleTree._hash_func(repr(self.type)), )
 
         return MerkleTree(hashed_items)
 

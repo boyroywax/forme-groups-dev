@@ -104,6 +104,7 @@ NOTES:
 from abc import ABC
 from attrs import define
 
+from .exceptions import GroupBaseException
 from ..utils.crypto import MerkleTree
 
 
@@ -233,14 +234,14 @@ class BaseInterface(ABC):
 
         """
         # print(repr(self))
-        return MerkleTree.hash_func(repr(self))
+        return MerkleTree._hash_func(repr(self))
 
     def _hash_slot(self, slot: str) -> str:
         """Returns the sha256 hash of the representation of the value of a slot in the object.
 
         """
         # print(repr(getattr(self, slot)))
-        return MerkleTree.hash_func(repr(getattr(self, slot)))
+        return MerkleTree._hash_func(repr(getattr(self, slot)))
 
     def _hash_slots(self, include_underscored_slots: bool = True, private_only: bool = False) -> tuple[str]:
         """Returns the sha256 hash of the representation of each slot in the object.
@@ -282,6 +283,22 @@ class BaseInterface(ABC):
 
         """
         return self._hash_tree(include_underscored_slots=True, private_only=True).root()
+    
+    def _check_for_none(self, item: str) -> bool:
+        """Returns the hash of the full representation of the object.
+
+        Returns:
+            str: The hash of the representation of the object.
+
+        Example:
+            >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
+            >>> from attrs import define
+            ... class BaseInterfaceExample(BaseInterface):
+            ...     test_property: int = 1
+            >>> BaseInterfaceExample().check_for_none("test_property")
+            False
+        """
+        return item is None
 
     def _hash_package(self) -> MerkleTree:
         """Returns the hash of the full representation of the object.
@@ -294,12 +311,25 @@ class BaseInterface(ABC):
             >>> from attrs import define
             ... class BaseInterfaceExample(BaseInterface):
             ...     test_property: int = 1
-            >>> BaseInterfaceExample().hash_package().root_hash
+            >>> BaseInterfaceExample().hash_package().root()
             'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271'
         """
-        public_hash: str = self._hash_public_slots()
-        private_hash: str = self._hash_private_slots()
-        return MerkleTree((public_hash, private_hash))
+        public_hash: str | None = self._hash_public_slots()
+        private_hash: str | None = self._hash_private_slots()
+
+        if self._check_for_none(public_hash) and self._check_for_none(private_hash):
+            raise GroupBaseException("Cannot hash a package with no public or private slots.")
+        
+        merkle_tree = None
+
+        if self._check_for_none(public_hash) and not self._check_for_none(private_hash):
+            merkle_tree = MerkleTree(hashed_data=(private_hash, ))
+        elif self._check_for_none(private_hash) and not self._check_for_none(public_hash):
+            merkle_tree = MerkleTree(hashed_data=(public_hash, ))
+        elif not self._check_for_none(public_hash) and not self._check_for_none(private_hash):
+            merkle_tree = MerkleTree(hashed_data=(public_hash, private_hash))
+
+        return merkle_tree
 
     def _verify_item_in_hash_package(self, item: str) -> bool:
         """Returns the hash of the full representation of the object.
@@ -315,7 +345,7 @@ class BaseInterface(ABC):
             >>> BaseInterfaceExample().verify_item_in_hash_package("test_property")
             True
         """
-        leaf_hash: str = MerkleTree.hash_func(repr(getattr(self, item)))
+        leaf_hash: str = MerkleTree._hash_func(repr(getattr(self, item)))
         public_tree = self._hash_public_slots()
         private_tree = self._hash_private_slots()
 

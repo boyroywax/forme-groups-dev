@@ -179,12 +179,22 @@ class BaseValue[T: BaseValueTypes().all](BaseInterface):
 
         """
         return f"{self.__class__.__name__}(value={repr(self.value)}, type={self.get_type_str()})"
-    
+
     def _hash_value(self) -> str:
-        return MerkleTree.hash_func(repr(self.value))
-    
+        return MerkleTree._hash_func(repr(self.value))
+
     def _hash_type(self) -> str:
-        return MerkleTree.hash_func(self.get_type_str())
+        return MerkleTree._hash_func(self.get_type_str())
 
     def _hash(self) -> MerkleTree:
-        return MerkleTree(hashed_data=(self._hash_value(), self._hash_type()))
+        # print(self._hash_value(), self._hash_type())
+        return MerkleTree(hashed_data=(self._hash_value(), self._hash_type(), ))
+
+    def _verify_hash_value(self, hash_value: str) -> bool:
+        return self._hash_value() == hash_value
+
+    def _verify_hash_type(self, hash_type: str) -> bool:
+        return self._hash_type() == hash_type
+
+    def _verify_hash(self, hash_: str) -> bool:
+        return self._hash().root() == hash_

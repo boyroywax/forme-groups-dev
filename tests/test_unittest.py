@@ -3,6 +3,7 @@
 
 import unittest
 
+from tests_merkle_tree import TestMerkleTree
 from tests_base_interface import TestBaseInterface
 from tests_base_types import TestBaseTypesInterface
 from tests_base_types import TestBaseValueTypes, TestBaseContainerTypes
@@ -22,6 +23,7 @@ def main():
     test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainerTypes))
     test_suite.addTest(loader.loadTestsFromTestCase(TestBaseValue))
     test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
     # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
 
     # Run the test suite
