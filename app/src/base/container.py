@@ -8,7 +8,7 @@ from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
 
 AllBaseValueTypes = BaseValueTypes().all
-AllBaseContainerTypes: type | TypeAlias = BaseContainerTypes().all
+AllBaseContainerTypes: type = BaseContainerTypes().all
 LinearContainer = BaseContainerTypes().linear
 NamedContainer = BaseContainerTypes().named
 BaseValueContainer = tuple[AllBaseValueTypes]
@@ -20,11 +20,13 @@ def is_linear_container(item: AllBaseContainerTypes) -> bool:
     """
     return isinstance(item, LinearContainer)
 
+
 def is_named_container(item: AllBaseContainerTypes) -> bool:
     """
     Checks if item is a named container
     """
     return isinstance(item, NamedContainer)
+
 
 def is_any_container(item: AllBaseContainerTypes) -> bool:
     """
@@ -32,12 +34,13 @@ def is_any_container(item: AllBaseContainerTypes) -> bool:
     """
     return is_linear_container(item) or is_named_container(item)
 
+
 def _contains_sub_container(item: AllBaseContainerTypes) -> bool:
     """
     Checks if container contains a sub container
     """
-    assert isinstance(item, AllBaseContainerTypes)
-    
+    assert is_any_container(item), f"Expected a container, but received a non-container {type(item)}"
+
     if is_linear_container(item):
         for value in item:
             return is_any_container(value)

@@ -18,19 +18,17 @@
         {
             "name": "Python: Run Tests",
             "type": "python",
-            "request": "test",
+            "request": "launch",
+            "module": "unittest",
+            "args": [
+                "-v",
+                "tests/test_unittest.py"
+            ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}"
-            },
-            "args": [
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "tests"
-            ]
+                "PYTHONPATH": "${workspaceFolder}/tests"
+            }
         }
     ]
 }
