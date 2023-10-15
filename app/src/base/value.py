@@ -23,6 +23,7 @@ def _base_value_validator(instance, attribute, value):
     Raises:
         GroupBaseValueException: If the value is not a BaseValueTypes
     """
+    # print(f'{instance=}, {attribute=}, {value=}')
     if not isinstance(value, AllBaseValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
@@ -42,6 +43,7 @@ class BaseValue[T: AllBaseValueTypes](BaseInterface):
         >>> value
         BaseValue(value=1, type=int)
     """
+
     _value: T = field(validator=_base_value_validator)
 
     @property
@@ -61,14 +63,6 @@ class BaseValue[T: AllBaseValueTypes](BaseInterface):
     @value.getter
     def value(self) -> T:
         """The single base value held by the BaseValue Class
-
-        Returns:
-            BaseValueTypes: The value held by the BaseValue Class
-
-        Examples:
-            >>> value = BaseValue(1)
-            >>> value.value
-            1
         """
         return self._value
 

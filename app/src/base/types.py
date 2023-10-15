@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from attrs import define, field, validators
+from attrs import define
 from typing import Any, Union, TypeAlias
 
 from .interface import BaseInterface
 from .exceptions import GroupBaseTypeException
-from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -55,9 +54,10 @@ class BaseTypesInterface(BaseInterface, ABC):
             bool: Whether the item is a base value type
         """
         for types in self.aliases.values():
-            for alias in types:
-                if item == alias:
-                    return True
+            # for alias in types:
+            #     if item == alias:
+            return item in types.values()
+                    # return True
 
         return False
 

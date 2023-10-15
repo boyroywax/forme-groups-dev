@@ -232,14 +232,12 @@ class BaseInterface(ABC):
             str: The hash of the representation of the object.
 
         """
-        # print(repr(self))
         return MerkleTree._hash_func(repr(self))
 
     def _hash_slot(self, slot: str) -> str:
         """Returns the sha256 hash of the representation of the value of a slot in the object.
 
         """
-        # print(repr(getattr(self, slot)))
         return MerkleTree._hash_func(repr(getattr(self, slot)))
 
     def _hash_slots(self, include_underscored_slots: bool = True, private_only: bool = False) -> tuple[str]:
@@ -251,7 +249,6 @@ class BaseInterface(ABC):
         """
         hashed_slots: tuple[str] = ()
         for slot in self.__iter_slots__(include_underscored_slots, private_only):
-            # print(repr(getattr(self, slot)))
             hashed_slots = hashed_slots + (self._hash_slot(slot), )
 
         return hashed_slots
