@@ -80,7 +80,7 @@ class BaseTypesInterface(BaseInterface, ABC):
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseValueTypes(BaseTypesInterface):
-    """BHolds the base value types for the Group Base Value Types"""
+    """Holds the base value types for the Group Base Value Types"""
     integer: TypeAlias = int
     floating_point: TypeAlias = float
     boolean: TypeAlias = bool
@@ -178,7 +178,7 @@ class BaseContainerTypes(BaseTypesInterface):
 
     @property
     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-        aliases: dict[type | TypeAlias, tuple[str]] = {
+        aliases: dict[type | TypeAlias, tuple[str, ...]] = {
             self.dictionary: (
                 str("Dictionary"), "dictionary", "DICTIONARY",
                 str("Dict"), str("dict"), "DICT",

@@ -1,5 +1,5 @@
 import struct
-from typing import override, Any, Union
+from typing import TypeAlias, override, Any, Union
 from attrs import define, field
 
 
@@ -8,8 +8,8 @@ from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
 
-
-AllBaseValueTypes = BaseValueTypes().all
+base_value_types = BaseValueTypes()
+AllBaseValueTypes = base_value_types.all
 
 
 def _base_value_validator(instance, attribute, value):
@@ -29,7 +29,7 @@ def _base_value_validator(instance, attribute, value):
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: AllBaseValueTypes](BaseInterface):
+class BaseValue[T: (int, float, str, bool, None)](BaseInterface):
     """Base class for values
 
     Args:

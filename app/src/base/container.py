@@ -8,7 +8,7 @@ from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
 
 AllBaseValueTypes = BaseValueTypes().all
-AllBaseContainerTypes: type = BaseContainerTypes().all
+AllBaseContainerTypes: type | TypeAlias = BaseContainerTypes().all
 LinearContainer = BaseContainerTypes().linear
 NamedContainer = BaseContainerTypes().named
 BaseValueContainer = tuple[AllBaseValueTypes]
@@ -103,7 +103,7 @@ def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBase
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseContainer[T: AllBaseContainerTypes](BaseInterface):
+class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
 
     _items: tuple[BaseValue] = field(
         validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes().all), iterable_validator=validators.instance_of(tuple)),
@@ -195,19 +195,23 @@ class BaseContainer[T: AllBaseContainerTypes](BaseInterface):
     @override
     def __iter__(self):
         yield from self.__iter_items__()
-    
-    def _hash(self) -> MerkleTree:
-        hashed_items: tuple[str] = ()
+
+    def _hash_type(self) -> str:
+        return MerkleTree._hash_func(self.type)
+
+    def _hash_items(self) -> MerkleTree:
+        hashed_items: tuple[str, ...] = ()
         for item in self.__iter_items__():
             hashed_items = hashed_items + (item._hash().root(), )
 
-        hashed_items = hashed_items + (MerkleTree._hash_func(repr(self.type)), )
-
         return MerkleTree(hashed_items)
+    
+    def _hash(self) -> MerkleTree:
+        return MerkleTree((self._hash_type(), self._hash_items().root(), ))
 
     def _verify_item(self, item: BaseValue) -> bool:
         # leaf_hash: str = MerkleTree.hash_func(repr(item))
-        leaf_hash: str = item._hash().root()
+        leaf_hash: str | None = item._hash().root()
         # print(leaf_hash)
         tree = self._hash()
         # print(tree.levels)
