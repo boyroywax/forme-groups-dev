@@ -8,7 +8,7 @@ from typing import Union, TypeAlias, Any, Optional, TypeVar, Type, Tuple, Callab
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 
-from app.src.base.types import BaseValueTypes, BaseTypesInterface, BaseContainerTypes
+from src.groups.base.types import BaseValueTypes, BaseTypesInterface, BaseContainerTypes
 
 
 class TestBaseTypesInterface(unittest.TestCase):

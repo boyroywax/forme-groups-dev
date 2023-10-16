@@ -8,7 +8,7 @@ from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
 
 AllBaseValueTypes = BaseValueTypes().all
-AllBaseContainerTypes: type | TypeAlias = BaseContainerTypes().all
+AllBaseContainerTypes = BaseContainerTypes().all
 LinearContainer = BaseContainerTypes().linear
 NamedContainer = BaseContainerTypes().named
 BaseValueContainer = tuple[AllBaseValueTypes]
@@ -210,6 +210,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
         return MerkleTree((self._hash_type(), self._hash_items().root(), ))
 
     def _verify_item(self, item: BaseValue) -> bool:
+        assert isinstance(item, BaseValue), f"Expected a BaseValue, but received {type(item)}"
         # leaf_hash: str = MerkleTree.hash_func(repr(item))
         leaf_hash: str | None = item._hash().root()
         # print(leaf_hash)

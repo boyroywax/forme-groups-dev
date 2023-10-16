@@ -4,9 +4,9 @@ import sys
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 
-from app.src.base.container import BaseContainer, _contains_sub_container
-from app.src.base.value import BaseValue
-from app.src.base.exceptions import GroupBaseContainerException
+from src.groups.base.container import BaseContainer, _contains_sub_container
+from src.groups.base.value import BaseValue
+from src.groups.base.exceptions import GroupBaseContainerException
 
 
 class TestBaseContainer(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestBaseContainer(unittest.TestCase):
     def test_hash_pack_verify(self):
         container = BaseContainer((1, 2, 3), "tuple")
         hash_repre_item_one = container.items[0]
-        # print(hash_repre_item_one)
+        print(hash_repre_item_one)
         self.assertTrue(container._verify_item(item=hash_repre_item_one))
 
     def test_hash_pack_unpack2(self):

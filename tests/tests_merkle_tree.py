@@ -4,7 +4,8 @@ import random
 import uuid
 
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
-from app.src.utils.crypto import MerkleTree
+# from app.src.utils.crypto import MerkleTree
+from src.groups.utils.merkle_tree_speed import MerkleTree
 
 
 class TestMerkleTree(unittest.TestCase):
@@ -106,3 +107,7 @@ class TestMerkleTree(unittest.TestCase):
         self.assertEqual(mt.root(), '0839734cbb5ab81cab6474a5ea4bd6a39ac09e3a7da1dd07f35d6b827d9a2177')
 
     
+    def test_hash_items_with_wrong_data_type(self):
+        hash_test_func = MerkleTree._hash_func("test")
+        with self.assertRaises(TypeError):
+            mt = MerkleTree((hash_test_func, 1))

@@ -8,7 +8,7 @@ from attrs import define
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 
-from app.src.base.interface import BaseInterface
+from src.groups.base.interface import BaseInterface
 
 
 class TestBaseInterface(unittest.TestCase):

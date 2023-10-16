@@ -1,26 +1,27 @@
 import hashlib
+from typing import TypeVar
 from attrs import define, field, validators
 
 
 
-def hash_sha256(data: str) -> str:
+def hash_sha256[T4: str](data: T4) -> T4:
     return hashlib.sha256(data.encode()).hexdigest()
 
 
 @define(slots=True)
-class MerkleTree:
+class MerkleTree[T: tuple[str, ...]]:
     """A Merkle Tree object.
     """
 
-    leaves: tuple[str] = field(default=[], validator=validators.instance_of(tuple))
-    levels: tuple[tuple[str]] = field(default=[], validator=validators.instance_of(tuple))
+    leaves: tuple[str, ...] = field(default=[], validator=validators.instance_of(tuple))
+    levels: tuple[tuple[str, ...]] = field(default=[], validator=validators.instance_of(tuple))
 
-    def __init__(self, hashed_data: tuple[str] = ()):
-        self.leaves: tuple[str] = hashed_data
-        self.levels: tuple[tuple[str]] = (self.leaves, )
+    def __init__(self, hashed_data: T = ()) -> None:
+        self.leaves = hashed_data
+        self.levels = (self.leaves, )
         self.build()
 
-    def build(self):
+    def build(self) -> None:
         level = self.leaves
 
         if len(self.levels[0]) == 1:
@@ -33,13 +34,16 @@ class MerkleTree:
             level = self.levels[-1]
 
     @staticmethod
-    def _hash_func(data) -> str:
+    def _hash_func[T0: str](data: T0) -> T0:
+        # assert T.__bound__ is str, f"T must be str, but received {T.__bound__}"
+
         return hash_sha256(data)
 
     @staticmethod
-    def _hash_items(item1: str = None, item2: str = None) -> str:
+    def _hash_items[T1: (str, None)](item1: T1 = None, item2: T1 = None) -> str:
+        # assert ((type(item1) is str) or (type(item2) is None)), f"{type(item2)} must be str or None"
         if item1 is None:
-            raise ValueError('item1 cannot be None')
+            raise ValueError(f'item1 cannot be None, but received {T}')
 
         if item2 is None:
             return MerkleTree._hash_items(item1, item1)
@@ -47,7 +51,7 @@ class MerkleTree:
         return MerkleTree._hash_func(item1 + item2)
 
     @staticmethod    
-    def hash_level(level: tuple[str]) -> tuple[str]:
+    def hash_level(level: T) -> T:
         hashed_level = ()
         for i in range(0, len(level), 2):
             if (i + 1) % 2 != 0 and i == len(level) - 1:
@@ -61,7 +65,6 @@ class MerkleTree:
 
     def _find_levels_count(self) -> int:
         return len(self.levels)
-
     def root(self) -> str | None:
         if self.levels[-1] is None or len(self.levels) == 0 or len(self.leaves) == 0:
             return None

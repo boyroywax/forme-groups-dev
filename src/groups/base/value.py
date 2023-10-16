@@ -27,7 +27,6 @@ def _base_value_validator(instance, attribute, value):
     if not isinstance(value, AllBaseValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
-
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseValue[T: (int, float, str, bool, None)](BaseInterface):
     """Base class for values
@@ -83,7 +82,7 @@ class BaseValue[T: (int, float, str, bool, None)](BaseInterface):
             return value.value
 
         raise GroupBaseValueException(f"Expected a BaseValue, but received {type(value)}")
-
+    
     @staticmethod
     def _force_type(
         value: Union["BaseValue", AllBaseValueTypes],
@@ -201,7 +200,7 @@ class BaseValue[T: (int, float, str, bool, None)](BaseInterface):
         # print(self._hash_value(), self._hash_type())
         return MerkleTree(hashed_data=(self._hash_value(), self._hash_type(), ))
 
-    def _verify_hash_value(self, hash_value: str) -> bool:
+    def _verify_hash_value[T: str](self, hash_value: T) -> bool:
         return self._hash_value() == hash_value
 
     def _verify_hash_type(self, hash_type: str) -> bool:

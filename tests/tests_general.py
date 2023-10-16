@@ -7,7 +7,7 @@ import os
 # sys.path.append('/Users/j/Documents/Forme/code/forme-groups-python-3-12')
 
 # from app.src import App
-from app.src.base import BaseInterface
+from src.groups.base import BaseInterface
 
 
 class TestsGeneral(unittest.TestCase):
