@@ -214,7 +214,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
         # leaf_hash: str = MerkleTree.hash_func(repr(item))
         leaf_hash: str | None = item._hash().root()
         # print(leaf_hash)
-        tree = self._hash()
+        tree = self._hash_items()
         # print(tree.levels)
 
         return tree.verify(leaf_hash)

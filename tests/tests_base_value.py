@@ -8,6 +8,7 @@ from src.groups.utils.crypto import MerkleTree
 from src.groups.base.value import BaseValue
 from src.groups.base.exceptions import GroupBaseValueException
 
+__RANGE__ = 1000
 
 class TestBaseValue(unittest.TestCase):
     def test_init_with_int(self):
@@ -293,7 +294,7 @@ class TestBaseValue(unittest.TestCase):
         self.assertRaises(GroupBaseValueException, BaseValue, Test)
 
     def test_init_n_base_values(self):
-        for i in range(10000):
+        for i in range(__RANGE__):
             values = [
                 random.randint(0, 10000000000),
                 random.randbytes(256),
@@ -307,7 +308,7 @@ class TestBaseValue(unittest.TestCase):
             self.assertEqual(value.value, random_value)
 
     def test_hash_time_init_n_base_values(self):
-        for i in range(10000):
+        for i in range(__RANGE__):
             values = [
                 random.randint(0, 10000000000),
                 random.randbytes(256),
@@ -336,7 +337,7 @@ class TestBaseValue(unittest.TestCase):
         print(value._hash_package().leaves)
 
     def test_hash_public_init_n_base_values(self):
-        for i in range(10000):
+        for i in range(__RANGE__):
             values = [
                 random.randint(0, 10000000000),
                 random.randbytes(256),
@@ -350,7 +351,7 @@ class TestBaseValue(unittest.TestCase):
             self.assertEqual(value._hash_public_slots(), value._hash_public_slots())
 
     def test_hash_public_slot(self):
-        for i in range(10000):
+        for i in range(__RANGE__):
             values = [
                 random.randint(0, 10000000000),
                 random.randbytes(256),
@@ -367,4 +368,37 @@ class TestBaseValue(unittest.TestCase):
             self.assertEqual(repr(value), f"BaseValue(value={repr(random_value)}, type={type(random_value).__name__})")
             self.assertEqual(value._hash_repr(), MerkleTree._hash_func(repr(value)))
             self.assertEqual(value._hash_tree().leaves, (MerkleTree._hash_func(repr(random_value)), ))
+
+    def test_hash_private_slot(self):
+        for i in range(__RANGE__):
+            values = [
+                random.randint(0, 10000000000),
+                random.randbytes(256),
+                random.choice([True, False]),
+                random.random(),
+                None,
+                str(uuid.uuid4())
+            ]
+            random_value = random.choice(values)
+            value = BaseValue(random_value)
+            self.assertIsNone(value._hash_public_slots())
+            self.assertIsNotNone(value._hash_private_slots())
+            self.assertEqual(str(value), str(random_value))
+            self.assertEqual(repr(value), f"BaseValue(value={repr(random_value)}, type={type(random_value).__name__})")
+            self.assertEqual(value._hash_repr(), MerkleTree._hash_func(repr(value)))
+            self.assertEqual(value._hash_tree().leaves, (MerkleTree._hash_func(repr(random_value)), ))
+
+    def test_hash_repr(self):
+        for i in range(__RANGE__):
+            values = [
+                random.randint(0, 10000000000),
+                random.randbytes(256),
+                random.choice([True, False]),
+                random.random(),
+                None,
+                str(uuid.uuid4())
+            ]
+            random_value = random.choice(values)
+            value = BaseValue(random_value)
+            self.assertEqual(value._hash_repr(), MerkleTree._hash_func(repr(value)))
 

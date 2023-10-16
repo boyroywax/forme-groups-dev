@@ -286,13 +286,6 @@ class BaseInterface(ABC):
         Returns:
             str: The hash of the representation of the object.
 
-        Example:
-            >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
-            >>> from attrs import define
-            ... class BaseInterfaceExample(BaseInterface):
-            ...     test_property: int = 1
-            >>> BaseInterfaceExample().check_for_none("test_property")
-            False
         """
         return item is None
 
@@ -302,13 +295,6 @@ class BaseInterface(ABC):
         Returns:
             str: The hash of the representation of the object.
 
-        Example:
-            >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
-            >>> from attrs import define
-            ... class BaseInterfaceExample(BaseInterface):
-            ...     test_property: int = 1
-            >>> BaseInterfaceExample().hash_package().root()
-            'b4c5b6872918d107cff29a9b6a0c81e7c2c450dd46285055beb0deefefa04271'
         """
         public_hash: str | None = self._hash_public_slots()
         private_hash: str | None = self._hash_private_slots()
@@ -334,13 +320,6 @@ class BaseInterface(ABC):
         Returns:
             str: The hash of the representation of the object.
 
-        Example:
-            >>> from <GROUPS_PIP_PACKAGE_NAME>.base.interface import BaseInterface
-            >>> from attrs import define
-            ... class BaseInterfaceExample(BaseInterface):
-            ...     test_property: int = 1
-            >>> BaseInterfaceExample().verify_item_in_hash_package("test_property")
-            True
         """
         leaf_hash: str = MerkleTree._hash_func(repr(getattr(self, item)))
         public_tree = self._hash_public_slots()
