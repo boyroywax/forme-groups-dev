@@ -3,13 +3,10 @@ from typing import TypeAlias, override, Any, Union
 from attrs import define, field
 
 
-from .types import BaseValueTypes
+from .types import BaseValueTypes, AllBaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
-
-base_value_types = BaseValueTypes()
-AllBaseValueTypes = base_value_types.all
 
 
 def _base_value_validator(instance, attribute, value):

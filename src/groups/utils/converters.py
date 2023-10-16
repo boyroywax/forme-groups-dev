@@ -2,9 +2,60 @@ from ..base.types import BaseContainerTypes, BaseValueTypes
 from ..base import BaseValue
 
 from typing import TypeAlias
+from ..base.types import AllBaseContainerTypes
+from ..base.exceptions import GroupBaseContainerException
+from .checks import _contains_sub_container, is_linear_container, is_named_container
 
 
 base_types: TypeAlias = BaseValueTypes().all | BaseContainerTypes().all
+
+def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBaseContainerTypes:
+    """
+    Converter function for _type field
+    """
+    base_container_types = BaseContainerTypes()
+    type_from_alias: TypeAlias | type = None
+    if isinstance(item, str) and len(item) > 0:
+        type_from_alias = base_container_types._get_type_from_alias(item)
+    elif isinstance(item, type):
+        type_from_alias = item
+
+    return type_from_alias
+
+def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
+    """
+    Converter function for _items field
+    """
+    base_values: tuple = tuple()
+    exc_message = f"Expected a non-container, but received {type(item)}"
+    # __UNIT__ = type(item)
+
+    if _contains_sub_container(item):
+        raise GroupBaseContainerException(exc_message)
+
+    if is_linear_container(item):
+        for item_ in item:
+            if isinstance(item_, AllBaseContainerTypes):
+                raise GroupBaseContainerException(exc_message)
+            
+            if isinstance(item_, BaseValue):
+                base_values += tuple([item_], )
+            else:
+                base_values += tuple([BaseValue(item_)])
+
+    elif is_named_container(item):
+        for key, value in item.items():
+            if isinstance(value, AllBaseContainerTypes):
+                raise GroupBaseContainerException(exc_message)
+
+            if isinstance(value, BaseValue):
+                base_values += tuple([BaseValue(key), value])
+            else:
+                base_values += tuple([BaseValue(key), BaseValue(value)])
+    else:
+        raise GroupBaseContainerException(f"Expected a container, but received a non-container {type(item)}")
+    
+    return base_values
 
 def _convert_value_to_type(item: base_types) -> TypeAlias | type:
     print(item)

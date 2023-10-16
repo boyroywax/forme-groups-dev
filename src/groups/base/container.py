@@ -2,104 +2,14 @@ from attrs import define, field, validators
 from typing import Optional, TypeAlias, Type, override
 
 from .interface import BaseInterface
-from .types import BaseValueTypes, BaseContainerTypes
+from .types import BaseValueTypes, BaseContainerTypes, AllBaseValueTypes, LinearContainer, NamedContainer, AllBaseContainerTypes
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
-
-AllBaseValueTypes = BaseValueTypes().all
-AllBaseContainerTypes = BaseContainerTypes().all
-LinearContainer = BaseContainerTypes().linear
-NamedContainer = BaseContainerTypes().named
-BaseValueContainer = tuple[AllBaseValueTypes]
+from ..utils.converters import _base_container_type_converter, _base_container_converter
+from ..utils.checks import _contains_sub_container
 
 
-def is_linear_container(item: AllBaseContainerTypes) -> bool:
-    """
-    Checks if item is a linear container
-    """
-    return isinstance(item, LinearContainer)
-
-
-def is_named_container(item: AllBaseContainerTypes) -> bool:
-    """
-    Checks if item is a named container
-    """
-    return isinstance(item, NamedContainer)
-
-
-def is_any_container(item: AllBaseContainerTypes) -> bool:
-    """
-    Checks if item is any container
-    """
-    return is_linear_container(item) or is_named_container(item)
-
-
-def _contains_sub_container(item: AllBaseContainerTypes) -> bool:
-    """
-    Checks if container contains a sub container
-    """
-    assert is_any_container(item), f"Expected a container, but received a non-container {type(item)}"
-
-    if is_linear_container(item):
-        for value in item:
-            return is_any_container(value)
-
-    elif is_named_container(item):
-        for value in item.values():
-            return is_any_container(value)
-
-    return False
-
-
-def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
-    """
-    Converter function for _items field
-    """
-    base_values: tuple = tuple()
-    exc_message = f"Expected a non-container, but received {type(item)}"
-    # __UNIT__ = type(item)
-
-    if _contains_sub_container(item):
-        raise GroupBaseContainerException(exc_message)
-
-    if is_linear_container(item):
-        for item_ in item:
-            if isinstance(item_, AllBaseContainerTypes):
-                raise GroupBaseContainerException(exc_message)
-            
-            if isinstance(item_, BaseValue):
-                base_values += tuple([item_], )
-            else:
-                base_values += tuple([BaseValue(item_)])
-
-    elif is_named_container(item):
-        for key, value in item.items():
-            if isinstance(value, AllBaseContainerTypes):
-                raise GroupBaseContainerException(exc_message)
-
-            if isinstance(value, BaseValue):
-                base_values += tuple([BaseValue(key), value])
-            else:
-                base_values += tuple([BaseValue(key), BaseValue(value)])
-    else:
-        raise GroupBaseContainerException(f"Expected a container, but received a non-container {type(item)}")
-    
-    return base_values
-
-
-def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBaseContainerTypes:
-    """
-    Converter function for _type field
-    """
-    base_container_types = BaseContainerTypes()
-    type_from_alias: TypeAlias | type = None
-    if isinstance(item, str) and len(item) > 0:
-        type_from_alias = base_container_types._get_type_from_alias(item)
-    elif isinstance(item, type):
-        type_from_alias = item
-
-    return type_from_alias
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -211,10 +121,8 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
 
     def _verify_item(self, item: BaseValue) -> bool:
         assert isinstance(item, BaseValue), f"Expected a BaseValue, but received {type(item)}"
-        # leaf_hash: str = MerkleTree.hash_func(repr(item))
+
         leaf_hash: str | None = item._hash().root()
-        # print(leaf_hash)
         tree = self._hash_items()
-        # print(tree.levels)
 
         return tree.verify(leaf_hash)

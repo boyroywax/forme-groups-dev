@@ -232,6 +232,12 @@ class BaseContainerTypes(BaseTypesInterface):
         return isinstance(value, BaseContainerTypes().all)
 
 
+AllBaseValueTypes = BaseValueTypes().all
+AllBaseContainerTypes = BaseContainerTypes().all
+LinearContainer = BaseContainerTypes().linear
+NamedContainer = BaseContainerTypes().named
+BaseValueContainer = tuple[AllBaseValueTypes]
+
 # Base Object Types
 Object = object | None
 KeyValue = tuple[BaseValueTypes().all, BaseValueTypes().all]
