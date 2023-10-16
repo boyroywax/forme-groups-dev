@@ -1,5 +1,5 @@
 """
-The Schema declares the structure of the data that is being stored in a Container.
+The Schema declares the structure of the Group Unit Data.
 
 
 """
@@ -22,5 +22,3 @@ class SchemaEntry(BaseInterface):
 @define(slots=True, weakref_slot=False)
 class BaseSchema(BaseInterface):
     _schema: tuple[SchemaEntry, ...] = field(validator=validators.deep_iterable(validators.instance_of(SchemaEntry), iterable_validator=validators.instance_of(tuple)))
-    
-

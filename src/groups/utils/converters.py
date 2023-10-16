@@ -9,6 +9,7 @@ from .checks import _contains_sub_container, is_linear_container, is_named_conta
 
 base_types: TypeAlias = BaseValueTypes().all | BaseContainerTypes().all
 
+
 def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBaseContainerTypes:
     """
     Converter function for _type field
@@ -21,6 +22,7 @@ def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBase
         type_from_alias = item
 
     return type_from_alias
+
 
 def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
     """
@@ -111,8 +113,10 @@ def _extract_base_values(item: BaseContainerTypes().all) -> tuple[BaseValue]:
 
     return items_to_return
 
+
 def _convert_container_to_type(item: base_types) -> TypeAlias | type:
     return type(item)
+
 
 def _convert_container_to_default(item: tuple[BaseContainerTypes().all], type_: TypeAlias | type) -> base_types:
     match (str(type_)):
