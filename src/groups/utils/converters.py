@@ -10,7 +10,7 @@ from .checks import _contains_sub_container, is_linear_container, is_named_conta
 base_types: TypeAlias = BaseValueTypes().all | BaseContainerTypes().all
 
 
-def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | set | frozenset) -> TypeAlias | type:
+def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | set | frozenset |type) -> TypeAlias | type:
     """
     Converter function for _value field
     """
@@ -24,6 +24,8 @@ def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | 
         type_from_alias = type_from_value_alias if type_from_value_alias is not None else type_from_container_alias
     elif isinstance(item, type):
         type_from_alias = item
+    elif isinstance(item, (int, float, bytes, dict, list, tuple, set, frozenset)):
+        type_from_alias = type(item)
 
     return type_from_alias
 
