@@ -8,7 +8,7 @@ from typing import Union, TypeAlias, Any, Optional, TypeVar, Type, Tuple, Callab
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 
-from src.groups.base.types import BaseValueTypes, BaseTypesInterface, BaseContainerTypes
+from src.groups.base.types import BaseValueTypes, BaseTypesInterface, BaseContainerTypes, BaseTypeInterface, BaseTypePool
 
 
 class TestBaseTypesInterface(unittest.TestCase):
@@ -180,3 +180,26 @@ class TestBaseContainerTypes(unittest.TestCase):
         self.assertFalse(self.base_container_types._is_container_type(BaseValueTypes))
         self.assertFalse(self.base_container_types._is_container_type(BaseContainerTypes))
         self.assertFalse(self.base_container_types._is_container_type(BaseTypesInterface))
+
+    def test_base_type_interface_init(self):
+        Integer = BaseTypeInterface(
+            aliases=("Integer", "integer", "INTEGER", "Int", "int", "INT", "IntType", "int_type", "INT_TYPE"),
+            super_type="__RESERVED_SYSTEM_INT__",
+            type_class=int,
+            type_var=TypeVar("Integer", bound=int),
+            constraints=int
+        )
+        self.assertEqual(Integer.__slots__, ("aliases", "super_type", "prefix", "suffix", "seperator", "type_class", "type_var", "constraints"))
+        self.assertEqual(Integer.aliases, ("Integer", "integer", "INTEGER", "Int", "int", "INT", "IntType", "int_type", "INT_TYPE"))
+
+        self.assertFalse(hasattr(Integer, "__weakref__"))
+        self.assertFalse(hasattr(Integer, "__dict__"))
+
+        self.assertFalse(Integer.is_container)
+
+        self.assertEqual(repr(Integer), "BaseTypeInterface(aliases=('Integer', 'integer', 'INTEGER', 'Int', 'int', 'INT', 'IntType', 'int_type', 'INT_TYPE'), super_type='__RESERVED_SYSTEM_INT__', prefix=None, suffix=None, seperator=None, type_class=<class 'int'>, type_var=~Integer, constraints=<class 'int'>)")
+
+        self.assertEqual(Integer._hash_repr(), "5d463d84c647283d08dbda810934980d7c139bcb9ef2d50e49723a10a1eb63fa")
+
+    def test_base_type_pool(self)
+        self.assertEqual(BaseTypePool.__slots__, ("Integer", "FloatingPoint", "Boolean", "String", "Bytes", "Number", "Text", "Dictionary", "List", "Tuple", "Set", "FrozenSet", "Named", "Linear"))
