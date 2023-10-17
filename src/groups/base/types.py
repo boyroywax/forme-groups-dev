@@ -149,7 +149,7 @@ class BaseTypeInterface(BaseInterface, ABC):
     
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class SystemTypePool(BaseInterface):
+class BaseTypes_(BaseInterface):
     Integer: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Integer"), "integer", "INTEGER",
@@ -285,13 +285,13 @@ class SystemTypePool(BaseInterface):
         constraints=frozenset
     ))
 
-    def all(self, type_: Optional[str] = None) -> type | TypeAlias:
+    def all(self, type_: Optional[str] = None, ) -> type | TypeAlias:
         """All the system types
 
         Returns:
             type | TypeAlias: All the system types
         """
-        assert type_ in ["value", "container"] or type_ is None
+        assert type_ in ["value", "container", "linear", "named", "text", "number"] or type_ is None
 
         match (type_):
             case ("value"):
@@ -302,6 +302,17 @@ class SystemTypePool(BaseInterface):
                     self.String.type_class,
                     self.Bytes.type_class,
                 ]
+            case ("text"):
+                return Union[
+                    self.String.type_class,
+                    self.Bytes.type_class,
+                    self.Boolean.type_class,
+                ]
+            case ("number"):
+                return Union[
+                    self.Integer.type_class,
+                    self.FloatingPoint.type_class
+                ]
             case ("container"):
                 return Union[
                     self.Dictionary.type_class,
@@ -310,6 +321,15 @@ class SystemTypePool(BaseInterface):
                     self.Set.type_class,
                     self.FrozenSet.type_class
                 ]
+            case ("linear"):
+                return Union[
+                    self.List.type_class,
+                    self.Tuple.type_class,
+                    self.Set.type_class,
+                    self.FrozenSet.type_class
+                ]
+            case ("named"):
+                return self.Dictionary.type_class
             case _:
                 return Union[
                     self.Integer.type_class,
@@ -331,6 +351,14 @@ class SystemTypePool(BaseInterface):
             base_type: BaseTypeInterface = getattr(self, slot)
             system_types += (base_type,)
         return system_types
+
+    @property
+    def value_types(self) -> type | TypeAlias:
+        return self.all("value")
+    
+    @property
+    def container_types(self) -> type | TypeAlias:
+        return self.all("container")
     
     @property
     def aliases(self) -> tuple[str, ...]:
@@ -464,174 +492,184 @@ class BaseTypesInterface(BaseInterface, ABC):
                     return type_
 
 
-@define(frozen=True, slots=True, weakref_slot=False)
-class BaseValueTypes(BaseTypesInterface):
-    """Holds the base value types for the Group Base Value Types"""
-    integer: TypeAlias = int
-    floating_point: TypeAlias = float
-    boolean: TypeAlias = bool
-    string: TypeAlias = str
-    bytes_: TypeAlias = bytes
-    number: TypeAlias = int | float
-    text: TypeAlias = str | bytes | bool | None
-    # _all: TypeAlias = field(default=int | float | str | bytes | bool | None)
+# @define(frozen=True, slots=True, weakref_slot=False)
+# class BaseValueTypes(BaseTypesInterface):
+#     """Holds the base value types for the Group Base Value Types"""
+#     integer: TypeAlias = int
+#     floating_point: TypeAlias = float
+#     boolean: TypeAlias = bool
+#     string: TypeAlias = str
+#     bytes_: TypeAlias = bytes
+#     number: TypeAlias = int | float
+#     text: TypeAlias = str | bytes | bool | None
+#     # _all: TypeAlias = field(default=int | float | str | bytes | bool | None)
 
-    @property
-    def all(self) -> TypeAlias:
-        return Union[self.number, self.text]
+#     @property
+#     def all(self) -> TypeAlias:
+#         return Union[self.number, self.text]
 
-    @property
-    def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-        """The aliases for the base value types
+#     @property
+#     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
+#         """The aliases for the base value types
 
-        Returns:
-            dict[str, tuple[str]]: The aliases for the base value types
-        """
-        aliases: dict = {
-            self.integer: (
-                str("Integer"), "integer", "INTEGER",
-                str("Int"), str("int"), "INT",
-                "IntegerType", "integer_type", "INTEGER_TYPE",
-                "IntType", "int_type", "INT_TYPE"
-            ),
-            self.floating_point: (
-                str("FloatingPoint"), "floating_point", "FLOATING_POINT",
-                str("Float"), str("float"), "FLOAT",
-                "FloatingPointType", "floating_point_type", "FLOATING_POINT_TYPE",
-                "FloatType", "float_type", "FLOAT_TYPE"
-            ),
-            self.boolean: (
-                str("Boolean"), "boolean", "BOOLEAN",
-                str("Bool"), str("bool"), "BOOL",
-                "BooleanType", "boolean_type", "BOOLEAN_TYPE",
-                "BoolType", "bool_type", "BOOL_TYPE"
-            ),
-            self.string: (
-                str("String"), "string", "STRING",
-                str("Str"), str("str"), "STR",
-                "StringType", "string_type", "STRING_TYPE",
-                "StrType", "str_type", "STR_TYPE"
-            ),
-            self.bytes_: (
-                str("Bytes"), "bytes", "BYTES",
-                "BytesType", "bytes_type", "BYTES_TYPE"
-            ),
-            self.number: (
-                str("Number"), "number", "NUMBER",
-                "NumberType", "number_type", "NUMBER_TYPE"
-            ),
-            self.text: (
-                str("Text"), "text", "TEXT",
-                "TextType", "text_type", "TEXT_TYPE"
-            ),
-            self.all: (
-                str("BaseValueTypes"), "base_value_types", "BASE_VALUE_TYPES",
-                str("BaseValueType"), "base_value_type", "BASE_VALUE_TYPE"
-            )
-        }
-        return aliases
+#         Returns:
+#             dict[str, tuple[str]]: The aliases for the base value types
+#         """
+#         aliases: dict = {
+#             self.integer: (
+#                 str("Integer"), "integer", "INTEGER",
+#                 str("Int"), str("int"), "INT",
+#                 "IntegerType", "integer_type", "INTEGER_TYPE",
+#                 "IntType", "int_type", "INT_TYPE"
+#             ),
+#             self.floating_point: (
+#                 str("FloatingPoint"), "floating_point", "FLOATING_POINT",
+#                 str("Float"), str("float"), "FLOAT",
+#                 "FloatingPointType", "floating_point_type", "FLOATING_POINT_TYPE",
+#                 "FloatType", "float_type", "FLOAT_TYPE"
+#             ),
+#             self.boolean: (
+#                 str("Boolean"), "boolean", "BOOLEAN",
+#                 str("Bool"), str("bool"), "BOOL",
+#                 "BooleanType", "boolean_type", "BOOLEAN_TYPE",
+#                 "BoolType", "bool_type", "BOOL_TYPE"
+#             ),
+#             self.string: (
+#                 str("String"), "string", "STRING",
+#                 str("Str"), str("str"), "STR",
+#                 "StringType", "string_type", "STRING_TYPE",
+#                 "StrType", "str_type", "STR_TYPE"
+#             ),
+#             self.bytes_: (
+#                 str("Bytes"), "bytes", "BYTES",
+#                 "BytesType", "bytes_type", "BYTES_TYPE"
+#             ),
+#             self.number: (
+#                 str("Number"), "number", "NUMBER",
+#                 "NumberType", "number_type", "NUMBER_TYPE"
+#             ),
+#             self.text: (
+#                 str("Text"), "text", "TEXT",
+#                 "TextType", "text_type", "TEXT_TYPE"
+#             ),
+#             self.all: (
+#                 str("BaseValueTypes"), "base_value_types", "BASE_VALUE_TYPES",
+#                 str("BaseValueType"), "base_value_type", "BASE_VALUE_TYPE"
+#             )
+#         }
+#         return aliases
 
-    @staticmethod
-    def _verify_base_value_type(value: Any) -> bool:
-        """Verifies that a value is a base type
+#     @staticmethod
+#     def _verify_base_value_type(value: Any) -> bool:
+#         """Verifies that a value is a base type
 
-        Args:
-            value (Any): The value to verify
+#         Args:
+#             value (Any): The value to verify
 
-        Returns:
-            bool: Whether the value is a base type
-        """
-        if isinstance(value, BaseValueTypes().all):
-            return True
-        return False
-
-
-@define(frozen=True, slots=True, weakref_slot=False)
-class BaseContainerTypes(BaseTypesInterface):
-    """Holds the base container types for the Group Base Container Types"""
-    dictionary: TypeAlias = dict
-    list_: TypeAlias = list
-    tuple_: TypeAlias = tuple
-    set_: TypeAlias = set
-    frozenset_: TypeAlias = frozenset
-    named: TypeAlias = dictionary
-    linear: TypeAlias = list_ | tuple_ | set_ | frozenset_
-
-    @property
-    def all(self) -> Union[type,  TypeAlias]:
-        """The base container types"""
-        return Union[self.named, self.linear]
-
-    @property
-    def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-        aliases: dict[type | TypeAlias, tuple[str, ...]] = {
-            self.dictionary: (
-                str("Dictionary"), "dictionary", "DICTIONARY",
-                str("Dict"), str("dict"), "DICT",
-                # "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
-                "DictType", "dict_type", "DICT_TYPE"
-            ),
-            self.list_: (
-                str("List"), "list", "LIST",
-                "ListType", "list_type", "LIST_TYPE"
-            ),
-            self.tuple_: (
-                str("Tuple"), "tuple", "TUPLE",
-                "TupleType", "tuple_type", "TUPLE_TYPE"
-            ),
-            self.set_: (
-                str("Set"), "set", "SET",
-                "SetType", "set_type", "SET_TYPE"
-            ),
-            self.frozenset_: (
-                str("FrozenSet"), "frozenset", "FROZENSET",
-                "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
-            ),
-            # self.named: (
-            #     str("Named"), "named", "NAMED",
-            #     str("NamedContainer"), "named_container", "NAMED_CONTAINER",
-            #     "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"
-            # ),
-            self.linear: (
-                str("Linear"), "linear", "LINEAR",
-                str("LinearContainer"), "linear_container", "LINEAR_CONTAINER",
-                "LinearContainerType", "linear_container_type", "LINEAR_CONTAINER_TYPE"
-            ),
-            self.all: (
-                str("BaseContainer"), "base_container", "BASE_CONTAINER",
-                str("BaseContainerTypes"), "base_container_types", "BASE_CONTAINER_TYPES",
-                str("BaseContainerType"), "base_container_type", "BASE_CONTAINER_TYPE"
-            )
-        }
-        return aliases
-
-    @staticmethod
-    def _is_container_type(value: Any) -> bool:
-        """Verifies that a value is a base container type
-
-        Args:
-            value (Any): The value to verify
-
-        Returns:
-            bool: Whether the value is a base container type
-        """
-        return isinstance(value, BaseContainerTypes().all)
+#         Returns:
+#             bool: Whether the value is a base type
+#         """
+#         if isinstance(value, BaseValueTypes):
+#             return True
+#         return False
 
 
-AllBaseValueTypes = BaseValueTypes().all
-AllBaseContainerTypes = BaseContainerTypes().all
-LinearContainer = BaseContainerTypes().linear
-NamedContainer = BaseContainerTypes().named
+# @define(frozen=True, slots=True, weakref_slot=False)
+# class BaseContainerTypes(BaseTypesInterface):
+#     """Holds the base container types for the Group Base Container Types"""
+#     dictionary: TypeAlias = dict
+#     list_: TypeAlias = list
+#     tuple_: TypeAlias = tuple
+#     set_: TypeAlias = set
+#     frozenset_: TypeAlias = frozenset
+#     named: TypeAlias = dictionary
+#     linear: TypeAlias = list_ | tuple_ | set_ | frozenset_
+
+#     @property
+#     def all(self) -> Union[type,  TypeAlias]:
+#         """The base container types"""
+#         return Union[self.named, self.linear]
+
+#     @property
+#     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
+#         aliases: dict[type | TypeAlias, tuple[str, ...]] = {
+#             self.dictionary: (
+#                 str("Dictionary"), "dictionary", "DICTIONARY",
+#                 str("Dict"), str("dict"), "DICT",
+#                 # "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
+#                 "DictType", "dict_type", "DICT_TYPE"
+#             ),
+#             self.list_: (
+#                 str("List"), "list", "LIST",
+#                 "ListType", "list_type", "LIST_TYPE"
+#             ),
+#             self.tuple_: (
+#                 str("Tuple"), "tuple", "TUPLE",
+#                 "TupleType", "tuple_type", "TUPLE_TYPE"
+#             ),
+#             self.set_: (
+#                 str("Set"), "set", "SET",
+#                 "SetType", "set_type", "SET_TYPE"
+#             ),
+#             self.frozenset_: (
+#                 str("FrozenSet"), "frozenset", "FROZENSET",
+#                 "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
+#             ),
+#             # self.named: (
+#             #     str("Named"), "named", "NAMED",
+#             #     str("NamedContainer"), "named_container", "NAMED_CONTAINER",
+#             #     "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"
+#             # ),
+#             self.linear: (
+#                 str("Linear"), "linear", "LINEAR",
+#                 str("LinearContainer"), "linear_container", "LINEAR_CONTAINER",
+#                 "LinearContainerType", "linear_container_type", "LINEAR_CONTAINER_TYPE"
+#             ),
+#             self.all: (
+#                 str("BaseContainer"), "base_container", "BASE_CONTAINER",
+#                 str("BaseContainerTypes"), "base_container_types", "BASE_CONTAINER_TYPES",
+#                 str("BaseContainerType"), "base_container_type", "BASE_CONTAINER_TYPE"
+#             )
+#         }
+#         return aliases
+
+#     @staticmethod
+#     def _is_container_type(value: Any) -> bool:
+#         """Verifies that a value is a base container type
+
+#         Args:
+#             value (Any): The value to verify
+
+#         Returns:
+#             bool: Whether the value is a base container type
+#         """
+#         return isinstance(value, BaseContainerTypes)
+
+
+BaseTypes = BaseTypes_()
+BaseValueTypes = BaseTypes.all("value")
+BaseContainerTypes = BaseTypes.all("container")
+LinearContainer = BaseTypes.all("linear")
+NamedContainer = BaseTypes.all("named")
+Text = BaseTypes.all("text")
+Number = BaseTypes.all("number")
+
+
+
+AllBaseValueTypes = BaseValueTypes
+AllBaseContainerTypes = BaseContainerTypes
+# LinearContainer = 
+# NamedContainer = BaseContainerTypes().named
 BaseValueContainer = tuple[AllBaseValueTypes]
 
 # Base Object Types
 Object = object | None
-KeyValue = tuple[BaseValueTypes().all, BaseValueTypes().all]
-UnitTypes = BaseValueTypes().all | BaseContainerTypes().all | Object
-Text = BaseValueTypes().text
-TextSet = set[BaseValueTypes().text]
-TextOrContainer = BaseValueTypes().text | BaseContainerTypes().all
-TextContainersDict = dict[BaseValueTypes().text, BaseContainerTypes().all]
+KeyValue = tuple[BaseValueTypes, BaseValueTypes]
+UnitTypes = BaseValueTypes | BaseContainerTypes | Object
+# Text = BaseValueTypes().text
+TextSet = set[Text]
+TextOrContainer = Text | BaseContainerTypes
+TextContainersDict = dict[Text, BaseContainerTypes]
 
 # Base Schema Types
-BaseSchemaType = dict[BaseValueTypes().text, Any]
+BaseSchemaType = dict[Text, Any]

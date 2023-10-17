@@ -2,24 +2,21 @@ from attrs import define, field, validators
 from typing import Optional, TypeAlias, Type, override
 
 from .interface import BaseInterface
-from .types import BaseValueTypes, BaseContainerTypes, AllBaseValueTypes, LinearContainer, NamedContainer, AllBaseContainerTypes
+from .types import BaseValueTypes, BaseContainerTypes, AllBaseValueTypes, AllBaseContainerTypes
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
 from ..utils.converters import _base_container_type_converter, _base_container_converter
 from ..utils.checks import _contains_sub_container
 
-
-
-
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
 
     _items: tuple[BaseValue] = field(
-        validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes().all), iterable_validator=validators.instance_of(tuple)),
+        validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes), iterable_validator=validators.instance_of(tuple)),
         converter=_base_container_converter
     )
-    _type: Optional[Type[AllBaseContainerTypes] | str] = field(
+    _type: Optional[Type[BaseContainerTypes] | str] = field(
         validator=validators.instance_of(type | str),
         converter=_base_container_type_converter,
         default=tuple
@@ -40,7 +37,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
         return self._items
 
     @property
-    def type(self) -> Type[AllBaseContainerTypes | str]:
+    def type(self) -> Type[BaseContainerTypes | str]:
         """The type of the BaseContainer
 
         Returns:
@@ -54,11 +51,10 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
         return self._type.__name__ if isinstance(self._type, type) else self._type
 
     @staticmethod
-    def _unpack(item: AllBaseContainerTypes, type_: TypeAlias | type) -> AllBaseContainerTypes:
+    def _unpack(item: BaseContainerTypes, type_: TypeAlias | type) -> BaseContainerTypes:
         """
         Repackages the container
         """
-        base_container_types = BaseContainerTypes()
         type_from_alias: TypeAlias | type = base_container_types._get_type_from_alias(type_)
         match (str(type_from_alias)):
             case("<class 'list'>"):
@@ -70,8 +66,8 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
             case("<class 'frozenset'>"):
                 return frozenset({value.value for value in item})
             case("<class 'dict'>"):
-                keys: tuple[BaseValueTypes().all] = item[::2]
-                values: tuple[BaseValueTypes().all] = item[1::2]
+                keys: tuple[BaseValueTypes] = item[::2]
+                values: tuple[BaseValueTypes] = item[1::2]
                 return {key.value: value.value for key, value in zip(keys, values)}
 
     @override
@@ -90,7 +86,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
         """
         items: tuple = getattr(self, slot_name)
 
-        # if isinstance(items, BaseValue | BaseValueTypes().all):
+        # if isinstance(items, BaseValue | BaseValueTypes):
         #     yield items
 
         if isinstance(items, LinearContainer | BaseContainer):

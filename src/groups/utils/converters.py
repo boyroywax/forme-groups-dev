@@ -2,12 +2,12 @@ from ..base.types import BaseContainerTypes, BaseValueTypes
 from ..base import BaseValue
 
 from typing import TypeAlias
-from ..base.types import AllBaseContainerTypes, AllBaseValueTypes
+from ..base.types import AllBaseContainerTypes, AllBaseValueTypes, BaseTypes
 from ..base.exceptions import GroupBaseContainerException
 from .checks import _contains_sub_container, is_linear_container, is_named_container
 
 
-base_types: TypeAlias = BaseValueTypes().all | BaseContainerTypes().all
+base_types  = BaseTypes
 
 
 def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | set | frozenset |type) -> TypeAlias | type:
@@ -83,11 +83,11 @@ def _convert_value_to_type(item: base_types) -> TypeAlias | type:
     print(item)
 
 
-def _convert_container_to_value(item: base_types) -> BaseValueTypes().all:
+def _convert_container_to_value(item: base_types) -> BaseValueTypes:
     """
     Converts container to value
     """
-    item_to_return: BaseValueTypes().all = item
+    item_to_return: BaseValueTypes = item
     if isinstance(item, BaseContainerTypes().linear):
         print(Exception("Passed a container, but expected a value, returning the first value of the container"))
 
@@ -107,7 +107,7 @@ def _convert_container_to_value(item: base_types) -> BaseValueTypes().all:
     return item_to_return
 
 
-def _extract_base_values(item: BaseContainerTypes().all) -> tuple[BaseValue]:
+def _extract_base_values(item: BaseContainerTypes) -> tuple[BaseValue]:
     """
     Converts container to base values
     """
@@ -138,7 +138,7 @@ def _convert_container_to_type(item: base_types) -> TypeAlias | type:
     return type(item)
 
 
-def _convert_container_to_default(item: tuple[BaseContainerTypes().all], type_: TypeAlias | type) -> base_types:
+def _convert_container_to_default(item: tuple[BaseContainerTypes], type_: TypeAlias | type) -> base_types:
     match (str(type_)):
         case("<class 'list'>"):
             return [value.value for value in item]
@@ -149,6 +149,6 @@ def _convert_container_to_default(item: tuple[BaseContainerTypes().all], type_: 
         case("<class 'frozenset'>"):
             return frozenset({value.value for value in item})
         case("<class 'dict'>"):
-            keys: tuple[BaseValueTypes().all] = item[::2]
-            values: tuple[BaseValueTypes().all] = item[1::2]
+            keys: tuple[BaseValueTypes] = item[::2]
+            values: tuple[BaseValueTypes] = item[1::2]
             return {key.value: value.value for key, value in zip(keys, values)}

@@ -3,7 +3,7 @@ from typing import TypeAlias, override, Any, Union
 from attrs import define, field
 
 
-from .types import BaseValueTypes, AllBaseValueTypes
+from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, AllBaseValueTypes, AllBaseContainerTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
@@ -68,7 +68,7 @@ class BaseValue[T: (int, float,  str, bool, None)](BaseInterface):
         return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> AllBaseValueTypes:
+    def _peek_value(value: 'BaseValue') -> BaseValueTypes:
         """Peeks the value of a BaseValue
 
         Args:
@@ -87,7 +87,7 @@ class BaseValue[T: (int, float,  str, bool, None)](BaseInterface):
     
     @staticmethod
     def _force_type(
-        value: Union["BaseValue", AllBaseValueTypes],
+        value: Union["BaseValue", BaseValueTypes],
         type_alias: str
     ) -> 'BaseValue':
         """Forces a value to a type
