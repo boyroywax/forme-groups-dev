@@ -182,6 +182,7 @@ class TestBaseContainerTypes(unittest.TestCase):
         self.assertFalse(self.base_container_types._is_container_type(BaseTypesInterface))
 
     def test_base_type_interface_init(self):
+        self.maxDiff = None
         Integer = BaseTypeInterface(
             aliases=("Integer", "integer", "INTEGER", "Int", "int", "INT", "IntType", "int_type", "INT_TYPE"),
             super_type="__RESERVED_SYSTEM_INT__",
@@ -189,7 +190,7 @@ class TestBaseContainerTypes(unittest.TestCase):
             type_var=TypeVar("Integer", bound=int),
             constraints=int
         )
-        self.assertEqual(Integer.__slots__, ("aliases", "super_type", "prefix", "suffix", "seperator", "type_class", "type_var", "constraints"))
+        self.assertEqual(Integer.__slots__, ("aliases", "super_type", "prefix", "suffix", "separator", "type_class", "type_var", "constraints"))
         self.assertEqual(Integer.aliases, ("Integer", "integer", "INTEGER", "Int", "int", "INT", "IntType", "int_type", "INT_TYPE"))
 
         self.assertFalse(hasattr(Integer, "__weakref__"))
@@ -197,9 +198,31 @@ class TestBaseContainerTypes(unittest.TestCase):
 
         self.assertFalse(Integer.is_container)
 
-        self.assertEqual(repr(Integer), "BaseTypeInterface(aliases=('Integer', 'integer', 'INTEGER', 'Int', 'int', 'INT', 'IntType', 'int_type', 'INT_TYPE'), super_type='__RESERVED_SYSTEM_INT__', prefix=None, suffix=None, seperator=None, type_class=<class 'int'>, type_var=~Integer, constraints=<class 'int'>)")
+        self.assertEqual(repr(Integer), "BaseTypeInterface(aliases=('Integer', 'integer', 'INTEGER', 'Int', 'int', 'INT', 'IntType', 'int_type', 'INT_TYPE'), super_type='__RESERVED_SYSTEM_INT__', prefix=None, suffix=None, separator=None, type_class=<class 'int'>, type_var=~Integer, constraints=<class 'int'>)")
 
-        self.assertEqual(Integer._hash_repr(), "5d463d84c647283d08dbda810934980d7c139bcb9ef2d50e49723a10a1eb63fa")
+        self.assertEqual(Integer._hash_repr(), "2ed75541630ac14c09df9b1f8a29182f373e080faf12136f6f54ee97ec7a9f4d")
 
     def test_system_type_pool(self):
-        self.assertEqual(SystemTypePool.__slots__, ("Integer", "FloatingPoint", "Boolean", "String", "Bytes", "Dictionary", "List", "Tuple", "Set", "FrozenSet"))
+        system_pool = SystemTypePool()
+        self.assertEqual(system_pool.__slots__, ("Integer", "FloatingPoint", "Boolean", "String", "Bytes", "Dictionary", "List", "Tuple", "Set", "FrozenSet"))
+
+    def test_system_type_pool_type_instance(self):
+        system_pool = SystemTypePool()
+        int_type = system_pool.Integer
+        self.assertEqual(int_type.__slots__, ("aliases", "super_type", "prefix", "suffix", "separator", "type_class", "type_var", "constraints"))
+        self.assertEqual(int_type.aliases, ("Integer", "integer", "INTEGER", "Int", "int", "INT", "IntegerType", "integer_type", "INTEGER_TYPE", "IntType", "int_type", "INT_TYPE"))
+        self.assertEqual(int_type.super_type, "__SYSTEM_RESERVED_INT__")
+        self.assertEqual(int_type.prefix, None)
+        self.assertEqual(int_type.suffix, None)
+        self.assertEqual(int_type.separator, None)
+        self.assertEqual(int_type.type_class, int)
+
+    def test_system_type_pool_type_instance_repr(self):
+        int_type = SystemTypePool().Integer
+        self.assertEqual(repr(int_type), "BaseTypeInterface(aliases=('Integer', 'integer', 'INTEGER', 'Int', 'int', 'INT', 'IntegerType', 'integer_type', 'INTEGER_TYPE', 'IntType', 'int_type', 'INT_TYPE'), super_type='__SYSTEM_RESERVED_INT__', prefix=None, suffix=None, separator=None, type_class=<class 'int'>, type_var=~Integer, constraints=<class 'int'>)")
+
+    def test_system_type_pool_already_exists(self):
+        system_pool = SystemTypePool()
+        self.assertTrue(system_pool._already_exists("aliases", "Integer"))
+        self.assertTrue(system_pool._already_exists("aliases", "integer"))
+        self.assertTrue(system_pool._already_exists("super_type", "__SYSTEM_RESERVED_INT__"))

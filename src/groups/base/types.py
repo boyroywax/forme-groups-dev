@@ -28,7 +28,7 @@ class BaseTypeInterface(BaseInterface, ABC):
         default=None
     )
 
-    seperator: Optional[str] = field(
+    separator: Optional[str] = field(
         validator=validators.optional(validators.instance_of(str)),
         default=None
     )
@@ -57,6 +57,37 @@ class BaseTypeInterface(BaseInterface, ABC):
         """
         if self.prefix is not None:
             return True
+        
+        return False
+    
+    @property
+    def separators(self) -> Tuple[str, ...]:
+        """The separators for the base type
+
+        Returns:
+            Tuple[str]: The separators for the base type
+        """
+        if self.separator is not None:
+            return (self.separator,)
+        return tuple(f" {self.separator}", f"{self.separator} ", f" {self.separator} ", f"{self.separator}")
+        
+    def _contains(self, property: str, query: str) -> bool:
+        assert property in self.__slots__
+
+        match(property):
+            case("aliases"):
+                if query in self.aliases:
+                    return True
+            case("super_type"):
+                if query in self.super_type:
+                    return True
+            case("separator"):
+                if query in self.separators:
+                    return True
+            case _:
+                if query == getattr(self, property):
+                    return True
+        return False
 
     def _contains_alias(self, alias: str) -> bool:
         """Checks if type contains an alias
@@ -82,8 +113,8 @@ class BaseTypeInterface(BaseInterface, ABC):
         if self.prefix is None and self.suffix is not None:
             raise GroupBaseTypeException(f"Prefix cannot be None if suffix is not None: {self.prefix}")
         
-        if self.prefix is not None and self.suffix is None and self.seperator is not None:
-            raise GroupBaseTypeException(f"Seperator cannot be used if prefix is not None and suffix is None: {self.seperator}")
+        if self.prefix is not None and self.suffix is None and self.separator is not None:
+            raise GroupBaseTypeException(f"Seperator cannot be used if prefix is not None and suffix is None: {self.separator}")
         
     def _type_to_string(self, type_: TypeAlias | type) -> str:
         """Converts a type to a string
@@ -104,9 +135,9 @@ class BaseTypeInterface(BaseInterface, ABC):
         return self._aliases[0]
     
 
-@define(slots=True, weakref_slot=False)
+@define(frozen=True, slots=True, weakref_slot=False)
 class SystemTypePool(BaseInterface):
-    Integer = field(default=BaseTypeInterface(
+    Integer: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Integer"), "integer", "INTEGER",
             str("Int"), str("int"), "INT",
@@ -119,7 +150,7 @@ class SystemTypePool(BaseInterface):
         constraints=int
     ))
 
-    FloatingPoint = field(default=BaseTypeInterface(
+    FloatingPoint: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("FloatingPoint"), "floating_point", "FLOATING_POINT",
             str("Float"), str("float"), "FLOAT",
@@ -132,7 +163,7 @@ class SystemTypePool(BaseInterface):
         constraints=float
     ))
 
-    Boolean = field(default=BaseTypeInterface(
+    Boolean: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Boolean"), "boolean", "BOOLEAN",
             str("Bool"), str("bool"), "BOOL",
@@ -145,7 +176,7 @@ class SystemTypePool(BaseInterface):
         constraints=bool
     ))
 
-    String = field(default=BaseTypeInterface(
+    String: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("String"), "string", "STRING",
             str("Str"), str("str"), "STR",
@@ -158,7 +189,7 @@ class SystemTypePool(BaseInterface):
         constraints=str
     ))
 
-    Bytes = field(default=BaseTypeInterface(
+    Bytes: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Bytes"), "bytes", "BYTES",
             "BytesType", "bytes_type", "BYTES_TYPE"
@@ -169,7 +200,7 @@ class SystemTypePool(BaseInterface):
         constraints=bytes
     ))
 
-    Dictionary = field(default=BaseTypeInterface(
+    Dictionary: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Dictionary"), "dictionary", "DICTIONARY",
             str("Dict"), str("dict"), "DICT",
@@ -179,13 +210,13 @@ class SystemTypePool(BaseInterface):
         super_type="__SYSTEM_RESERVED_DICT__",
         prefix="{",
         suffix="}",
-        seperator=",",
+        separator=",",
         type_class=dict,
         type_var=TypeVar('Dictionary', bound=dict),
         constraints=dict
     ))
 
-    List = field(default=BaseTypeInterface(
+    List: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("List"), "list", "LIST",
             "ListType", "list_type", "LIST_TYPE"
@@ -193,13 +224,13 @@ class SystemTypePool(BaseInterface):
         super_type="__SYSTEM_RESERVED_LIST__",
         prefix="[",
         suffix="]",
-        seperator=",",
+        separator=",",
         type_class=list,
         type_var=TypeVar('List', bound=list),
         constraints=list
     ))
 
-    Tuple = field(default=BaseTypeInterface(
+    Tuple: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Tuple"), "tuple", "TUPLE",
             "TupleType", "tuple_type", "TUPLE_TYPE"
@@ -207,13 +238,13 @@ class SystemTypePool(BaseInterface):
         super_type="__SYSTEM_RESERVED_TUPLE__",
         prefix="(",
         suffix=")",
-        seperator=",",
+        separator=",",
         type_class=tuple,
         type_var=TypeVar('Tuple', bound=tuple),
         constraints=tuple
     ))
 
-    Set = field(default=BaseTypeInterface(
+    Set: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Set"), "set", "SET",
             "SetType", "set_type", "SET_TYPE"
@@ -221,13 +252,13 @@ class SystemTypePool(BaseInterface):
         super_type="__SYSTEM_RESERVED_SET__",
         prefix="{",
         suffix="}",
-        seperator=",",
+        separator=",",
         type_class=set,
         type_var=TypeVar('Set', bound=set),
         constraints=set
     ))
 
-    FrozenSet = field(default=BaseTypeInterface(
+    FrozenSet: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("FrozenSet"), "frozenset", "FROZENSET",
             "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
@@ -235,11 +266,35 @@ class SystemTypePool(BaseInterface):
         super_type="__SYSTEM_RESERVED_FROZENSET__",
         prefix="{",
         suffix="}",
-        seperator=",",
+        separator=",",
         type_class=frozenset,
         type_var=TypeVar('FrozenSet', bound=frozenset),
         constraints=frozenset
     ))
+
+    @property
+    def all(self) -> tuple[BaseTypeInterface, ...]:
+        system_types: Tuple[BaseTypeInterface, ...] = ()
+        for slot in self.__slots__:
+            base_type: BaseTypeInterface = getattr(self, slot)
+            system_types += (base_type,)
+        return system_types
+    
+    @property
+    def aliases(self) -> tuple[str, ...]:
+        aliases: tuple[str, ...] = ()
+        for base_type in self.all:
+            aliases += base_type.aliases
+        return aliases
+
+    def _already_exists(self, property: str, query: str) -> bool:
+        """Checks if a property of a base type already exists
+        """
+
+        for base_type in self.all:
+            if base_type._contains(property, query):
+                return True
+        return False
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseTypesInterface(BaseInterface, ABC):
