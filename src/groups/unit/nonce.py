@@ -1,7 +1,6 @@
 from attrs import define, field, validators
 from typing import Optional, TypeAlias, Type, override
 
-
 from ..base.types import LinearContainer, NamedContainer, AllBaseContainerTypes
 from ..base.interface import BaseInterface
 from ..base.value import BaseValue
