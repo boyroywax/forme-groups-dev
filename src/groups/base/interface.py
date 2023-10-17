@@ -311,7 +311,7 @@ class BaseInterface(ABC):
         elif not self._check_for_none(public_hash) and not self._check_for_none(private_hash):
             merkle_tree = MerkleTree(hashed_data=(public_hash, private_hash))
 
-        print(merkle_tree.leaves)
+        # print(merkle_tree.leaves)
         return merkle_tree
 
     def _verify_item_in_hash_package(self, item: str) -> bool:

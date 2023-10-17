@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from attrs import define, field, validators
 from enum import Enum
-from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override
+from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override, overload
 
 from .interface import BaseInterface
 from .exceptions import GroupBaseTypeException
+from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -45,6 +46,11 @@ class BaseTypeInterface(BaseInterface, ABC):
 
     constraints: Optional[Union[type, TypeAlias]] = field(
         validator=validators.optional(validators.instance_of(type | TypeAlias)),
+        default=None
+    )
+
+    _encryption_key: Optional[bytes] = field(
+        validator=validators.optional(validators.instance_of(bytes)),
         default=None
     )
 
@@ -96,7 +102,7 @@ class BaseTypeInterface(BaseInterface, ABC):
                     return True
         return False
 
-    def _contains_alias(self, alias: str, exclude: tuple[str, ...]) -> bool:
+    def _contains_alias(self, alias: str, exclude: Optional[tuple[str, ...]] = None) -> bool:
         """Checks if type contains an alias
 
         Args:
@@ -136,6 +142,10 @@ class BaseTypeInterface(BaseInterface, ABC):
     @override
     def __str__(self) -> str:
         return self._aliases[0]
+    
+    @override
+    def __repr__(self) -> str:
+        return super().__repr_private__(False)
     
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -275,8 +285,47 @@ class SystemTypePool(BaseInterface):
         constraints=frozenset
     ))
 
+    def all(self, type_: Optional[str] = None) -> type | TypeAlias:
+        """All the system types
+
+        Returns:
+            type | TypeAlias: All the system types
+        """
+        assert type_ in ["value", "container"] or type_ is None
+
+        match (type_):
+            case ("value"):
+                return Union[
+                    self.Integer.type_class,
+                    self.FloatingPoint.type_class,
+                    self.Boolean.type_class,
+                    self.String.type_class,
+                    self.Bytes.type_class,
+                ]
+            case ("container"):
+                return Union[
+                    self.Dictionary.type_class,
+                    self.List.type_class,
+                    self.Tuple.type_class,
+                    self.Set.type_class,
+                    self.FrozenSet.type_class
+                ]
+            case _:
+                return Union[
+                    self.Integer.type_class,
+                    self.FloatingPoint.type_class,
+                    self.Boolean.type_class,
+                    self.String.type_class,
+                    self.Bytes.type_class,
+                    self.Dictionary.type_class,
+                    self.List.type_class,
+                    self.Tuple.type_class,
+                    self.Set.type_class,
+                    self.FrozenSet.type_class
+                ]
+
     @property
-    def all(self) -> tuple[BaseTypeInterface, ...]:
+    def all_base_types(self) -> tuple[BaseTypeInterface, ...]:
         system_types: Tuple[BaseTypeInterface, ...] = ()
         for slot in self.__slots__:
             base_type: BaseTypeInterface = getattr(self, slot)
@@ -286,14 +335,14 @@ class SystemTypePool(BaseInterface):
     @property
     def aliases(self) -> tuple[str, ...]:
         aliases: tuple[str, ...] = ()
-        for base_type in self.all:
+        for base_type in self.all_base_types:
             aliases += base_type.aliases
         return aliases
 
     def _already_exists(self, property: str, query_value: str) -> bool:
         """Checks if a property of a base type already exists
         """
-        for base_type in self.all:
+        for base_type in self.all_base_types:
             if base_type._contains(property, query_value):
                 return True
         return False
@@ -301,14 +350,23 @@ class SystemTypePool(BaseInterface):
     def _validate_types(self) -> bool:
         """Validates the types of the base types
         """
-        for base_type in self.all:
+        for base_type in self.all_base_types:
+
+            # Check for errors in the base type
             base_type._check_for_errors()
 
-            for base_type_ in self.all:
+            # Check if certain properties of the base type already exist
+            # Base Types cannot share the same aliases ("int" and "set" are excluded from throwing an error, as they clash with FloatingPoint and FrozenSet)
+            # Base Types cannot share the same type_class
+            for base_type_ in self.all_base_types:
                 if base_type is not base_type_:
+                    # Check that the type_class is not already used
                     if base_type._type_to_string(base_type.type_class) == base_type_._type_to_string(base_type_.type_class):
                         raise GroupBaseTypeException(f"Type {base_type.type_class} is already used by {base_type_}")
+                    
+                    # Check that the aliases are not already used
                     for alias in base_type.aliases:
+                        # system reserved types "int" and "set" are excluded from throwing an error
                         if base_type_._contains_alias(alias, exclude=("int", "INT", str("Set"), str("set"), "SET")):
                             raise GroupBaseTypeException(f"Alias {alias} is already used by {base_type_}")
         return True
@@ -316,7 +374,7 @@ class SystemTypePool(BaseInterface):
     def _get_type(self, property: str, query_value: str) -> BaseTypeInterface:
         """Gets a base type from a property
         """
-        for base_type in self.all:
+        for base_type in self.all_base_types:
             if base_type._contains(property, query_value):
                 return base_type
         raise GroupBaseTypeException(f"BaseType with {property} {query_value} does not exist")
@@ -325,6 +383,14 @@ class SystemTypePool(BaseInterface):
         """Gets a base type from an alias
         """
         return self._get_type("aliases", alias).type_class
+    
+    def _hash_types(self) -> MerkleTree:
+        """Hashes the types
+        """
+        hashed_types: tuple[str, ...] = ()
+        for base_type in self.all_base_types:
+            hashed_types += (base_type._hash_package().root(),)
+        return MerkleTree(hashed_data=hashed_types)
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseTypesInterface(BaseInterface, ABC):

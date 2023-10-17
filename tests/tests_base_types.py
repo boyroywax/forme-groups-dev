@@ -190,7 +190,7 @@ class TestBaseContainerTypes(unittest.TestCase):
             type_var=TypeVar("Integer", bound=int),
             constraints=int
         )
-        self.assertEqual(Integer.__slots__, ("aliases", "super_type", "prefix", "suffix", "separator", "type_class", "type_var", "constraints"))
+        self.assertEqual(Integer.__slots__, ("aliases", "super_type", "prefix", "suffix", "separator", "type_class", "type_var", "constraints", "_encryption_key"))
         self.assertEqual(Integer.aliases, ("Integer", "integer", "INTEGER", "Int", "int", "INT", "IntType", "int_type", "INT_TYPE"))
 
         self.assertFalse(hasattr(Integer, "__weakref__"))
@@ -209,7 +209,7 @@ class TestBaseContainerTypes(unittest.TestCase):
     def test_system_type_pool_type_instance(self):
         system_pool = SystemTypePool()
         int_type = system_pool.Integer
-        self.assertEqual(int_type.__slots__, ("aliases", "super_type", "prefix", "suffix", "separator", "type_class", "type_var", "constraints"))
+        self.assertEqual(int_type.__slots__, ("aliases", "super_type", "prefix", "suffix", "separator", "type_class", "type_var", "constraints", "_encryption_key"))
         self.assertEqual(int_type.aliases, ("Integer", "integer", "INTEGER", "Int", "int", "INT", "IntegerType", "integer_type", "INTEGER_TYPE", "IntType", "int_type", "INT_TYPE"))
         self.assertEqual(int_type.super_type, "__SYSTEM_RESERVED_INT__")
         self.assertEqual(int_type.prefix, None)
@@ -252,3 +252,25 @@ class TestBaseContainerTypes(unittest.TestCase):
     def test_system_type_pool_validate_types(self):
         system_pool = SystemTypePool()
         self.assertTrue(system_pool._validate_types())
+
+    def test_system_type_pool_all(self):
+        system_pool = SystemTypePool()
+        self.assertEqual(system_pool.all(), int | float | bool | str | bytes | dict | list | tuple | set | frozenset)
+        self.assertEqual(system_pool.all(type_="value"), int | float | bool | str | bytes)
+
+    def test_system_type_pool_hash_public(self):
+        system_pool = SystemTypePool()
+        self.assertEqual(system_pool._hash_public_slots(), "0a8f54ea737cc48026bb0543423e017d15ff89b7f12e7936fb67aa570052496e")
+
+    def test_system_type_pool_hash_private(self):
+        system_pool = SystemTypePool()
+        self.assertEqual(system_pool._hash_private_slots(), None)
+
+    def test_system_type_pool_hash_repr(self):
+        system_pool = SystemTypePool()
+        self.assertEqual(system_pool._hash_repr(), "3ac2171a6957fa2ed0118e6dc40ade4450c4a076505b96c494a73ad47aa5ad4e")
+
+    def test_system_type_pool_repr(self):
+        self.maxDiff = None
+        system_pool = SystemTypePool()
+        self.assertEqual(repr(system_pool), "SystemTypePool(Integer=BaseTypeInterface(aliases=('Integer', 'integer', 'INTEGER', 'Int', 'int', 'INT', 'IntegerType', 'integer_type', 'INTEGER_TYPE', 'IntType', 'int_type', 'INT_TYPE'), super_type='__SYSTEM_RESERVED_INT__', prefix=None, suffix=None, separator=None, type_class=<class 'int'>, type_var=~Integer, constraints=<class 'int'>), FloatingPoint=BaseTypeInterface(aliases=('FloatingPoint', 'floating_point', 'FLOATING_POINT', 'Float', 'float', 'FLOAT', 'FloatingPointType', 'floating_point_type', 'FLOATING_POINT_TYPE', 'FloatType', 'float_type', 'FLOAT_TYPE'), super_type='__SYSTEM_RESERVED_FLOAT__', prefix=None, suffix=None, separator=None, type_class=<class 'float'>, type_var=~FloatingPoint, constraints=<class 'float'>), Boolean=BaseTypeInterface(aliases=('Boolean', 'boolean', 'BOOLEAN', 'Bool', 'bool', 'BOOL', 'BooleanType', 'boolean_type', 'BOOLEAN_TYPE', 'BoolType', 'bool_type', 'BOOL_TYPE'), super_type='__SYSTEM_RESERVED_BOOL__', prefix=None, suffix=None, separator=None, type_class=<class 'bool'>, type_var=~Boolean, constraints=<class 'bool'>), String=BaseTypeInterface(aliases=('String', 'string', 'STRING', 'Str', 'str', 'STR', 'StringType', 'string_type', 'STRING_TYPE', 'StrType', 'str_type', 'STR_TYPE'), super_type='__SYSTEM_RESERVED_STR__', prefix=None, suffix=None, separator=None, type_class=<class 'str'>, type_var=~String, constraints=<class 'str'>), Bytes=BaseTypeInterface(aliases=('Bytes', 'bytes', 'BYTES', 'BytesType', 'bytes_type', 'BYTES_TYPE'), super_type='__SYSTEM_RESERVED_BYTES__', prefix=None, suffix=None, separator=None, type_class=<class 'bytes'>, type_var=~Bytes, constraints=<class 'bytes'>), Dictionary=BaseTypeInterface(aliases=('Dictionary', 'dictionary', 'DICTIONARY', 'Dict', 'dict', 'DICT', 'DictType', 'dict_type', 'DICT_TYPE'), super_type='__SYSTEM_RESERVED_DICT__', prefix='{', suffix='}', separator=',', type_class=<class 'dict'>, type_var=~Dictionary, constraints=<class 'dict'>), List=BaseTypeInterface(aliases=('List', 'list', 'LIST', 'ListType', 'list_type', 'LIST_TYPE'), super_type='__SYSTEM_RESERVED_LIST__', prefix='[', suffix=']', separator=',', type_class=<class 'list'>, type_var=~List, constraints=<class 'list'>), Tuple=BaseTypeInterface(aliases=('Tuple', 'tuple', 'TUPLE', 'TupleType', 'tuple_type', 'TUPLE_TYPE'), super_type='__SYSTEM_RESERVED_TUPLE__', prefix='(', suffix=')', separator=',', type_class=<class 'tuple'>, type_var=~Tuple, constraints=<class 'tuple'>), Set=BaseTypeInterface(aliases=('Set', 'set', 'SET', 'SetType', 'set_type', 'SET_TYPE'), super_type='__SYSTEM_RESERVED_SET__', prefix='{', suffix='}', separator=',', type_class=<class 'set'>, type_var=~Set, constraints=<class 'set'>), FrozenSet=BaseTypeInterface(aliases=('FrozenSet', 'frozenset', 'FROZENSET', 'FrozenSetType', 'frozenset_type', 'FROZENSET_TYPE'), super_type='__SYSTEM_RESERVED_FROZENSET__', prefix='{', suffix='}', separator=',', type_class=<class 'frozenset'>, type_var=~FrozenSet, constraints=<class 'frozenset'>))")
