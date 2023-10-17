@@ -71,13 +71,20 @@ class BaseTypeInterface(BaseInterface, ABC):
             return (self.separator,)
         return tuple(f" {self.separator}", f"{self.separator} ", f" {self.separator} ", f"{self.separator}")
         
-    def _contains(self, property: str, query: str) -> bool:
+    def _contains(self, property: str, query: str, exclude: Optional[Tuple[str, ...]] = None) -> bool:
         assert property in self.__slots__
 
         match(property):
             case("aliases"):
                 if query in self.aliases:
                     return True
+                for alias in self.aliases:
+                    if exclude is not None:
+                        if self.aliases[0] in exclude:
+                            continue
+                    else:
+                        if alias.__contains__(query):
+                            raise GroupBaseTypeException(f"Alias {query} is a substring of {alias}, and should be removed")
             case("super_type"):
                 if query in self.super_type:
                     return True
@@ -89,7 +96,7 @@ class BaseTypeInterface(BaseInterface, ABC):
                     return True
         return False
 
-    def _contains_alias(self, alias: str) -> bool:
+    def _contains_alias(self, alias: str, exclude: tuple[str, ...]) -> bool:
         """Checks if type contains an alias
 
         Args:
@@ -98,13 +105,9 @@ class BaseTypeInterface(BaseInterface, ABC):
         Returns:
             bool: Whether the type contains an alias
         """
-        for alias_ in self.aliases:
-            if alias == alias_:
-                return True
-            if alias_.contains(alias):
-                raise GroupBaseTypeException(f"Alias {alias} is a substring of {alias_}, and should be removed")
-        
-    def _check_for_errors(self):
+        return self._contains("aliases", alias, exclude)
+            
+    def _check_for_errors(self) -> None:
         """Checks for errors in the base type"""
         if self.prefix is not None and self.suffix is not None:
             if self.prefix == self.suffix:
@@ -287,14 +290,41 @@ class SystemTypePool(BaseInterface):
             aliases += base_type.aliases
         return aliases
 
-    def _already_exists(self, property: str, query: str) -> bool:
+    def _already_exists(self, property: str, query_value: str) -> bool:
         """Checks if a property of a base type already exists
         """
-
         for base_type in self.all:
-            if base_type._contains(property, query):
+            if base_type._contains(property, query_value):
                 return True
         return False
+    
+    def _validate_types(self) -> bool:
+        """Validates the types of the base types
+        """
+        for base_type in self.all:
+            base_type._check_for_errors()
+
+            for base_type_ in self.all:
+                if base_type is not base_type_:
+                    if base_type._type_to_string(base_type.type_class) == base_type_._type_to_string(base_type_.type_class):
+                        raise GroupBaseTypeException(f"Type {base_type.type_class} is already used by {base_type_}")
+                    for alias in base_type.aliases:
+                        if base_type_._contains_alias(alias, exclude=("int", "INT", str("Set"), str("set"), "SET")):
+                            raise GroupBaseTypeException(f"Alias {alias} is already used by {base_type_}")
+        return True
+
+    def _get_type(self, property: str, query_value: str) -> BaseTypeInterface:
+        """Gets a base type from a property
+        """
+        for base_type in self.all:
+            if base_type._contains(property, query_value):
+                return base_type
+        raise GroupBaseTypeException(f"BaseType with {property} {query_value} does not exist")
+    
+    def _get_type_from_alias(self, alias: str) -> Type:
+        """Gets a base type from an alias
+        """
+        return self._get_type("aliases", alias).type_class
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseTypesInterface(BaseInterface, ABC):

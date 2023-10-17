@@ -9,7 +9,7 @@ sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 
 from src.groups.base.types import BaseValueTypes, BaseTypesInterface, BaseContainerTypes, BaseTypeInterface, SystemTypePool
-
+from src.groups.base.exceptions import GroupBaseTypeException
 
 class TestBaseTypesInterface(unittest.TestCase):
     def setUp(self):
@@ -226,3 +226,29 @@ class TestBaseContainerTypes(unittest.TestCase):
         self.assertTrue(system_pool._already_exists("aliases", "Integer"))
         self.assertTrue(system_pool._already_exists("aliases", "integer"))
         self.assertTrue(system_pool._already_exists("super_type", "__SYSTEM_RESERVED_INT__"))
+        self.assertRaises(GroupBaseTypeException, system_pool._already_exists, "aliases", "I")
+    
+    def test_system_type_pool_get_type(self):
+        system_pool = SystemTypePool()
+        self.assertEqual(system_pool._get_type("aliases", "Integer"), system_pool.Integer)
+        self.assertEqual(system_pool._get_type("aliases", "integer"), system_pool.Integer)
+        self.assertEqual(system_pool._get_type("super_type", "__SYSTEM_RESERVED_INT__"), system_pool.Integer)
+        self.assertRaises(GroupBaseTypeException, system_pool._get_type, "aliases", "I")
+
+    def test_system_type_pool_get_type_from_alias(self):
+        system_pool = SystemTypePool()
+        self.assertEqual(system_pool._get_type_from_alias("Integer"), system_pool.Integer.type_class)
+        self.assertEqual(system_pool._get_type_from_alias("integer"), system_pool.Integer.type_class)
+        self.assertEqual(system_pool._get_type_from_alias("INTEGER"), system_pool.Integer.type_class)
+        self.assertEqual(system_pool._get_type_from_alias("Int"), system_pool.Integer.type_class)
+        self.assertEqual(system_pool._get_type_from_alias("int"), system_pool.Integer.type_class)
+        self.assertEqual(system_pool._get_type_from_alias("INT"), system_pool.Integer.type_class)
+
+    def test_system_type_pool_get_type_from_alias_raises(self):
+        system_pool = SystemTypePool()
+        self.assertRaises(GroupBaseTypeException, system_pool._get_type_from_alias, "I")
+
+    
+    def test_system_type_pool_validate_types(self):
+        system_pool = SystemTypePool()
+        self.assertTrue(system_pool._validate_types())
