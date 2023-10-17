@@ -7,25 +7,6 @@ from .interface import BaseInterface
 from .exceptions import GroupBaseTypeException
 
 
-# @define(frozen=True, slots=True, weakref_slot=False)
-# class BaseTypeVars:
-#     Integer: TypeVar = TypeVar('Integer', bound=int)
-#     FloatingPoint = TypeVar('FloatingPoint', bound=float)
-#     Boolean = TypeVar('Boolean', bound=bool)
-#     String = TypeVar('String', bound=str)
-#     Bytes = TypeVar('Bytes', bound=bytes)
-#     Number = TypeVar('Number', bound=Union[int, float])
-#     Text = TypeVar('Text', bound=Union[str, bytes, bool, None])
-#     Dictionary = TypeVar('Dictionary', bound=dict)
-#     List = TypeVar('List', bound=list)
-#     Tuple = TypeVar('Tuple', bound=tuple)
-#     Set = TypeVar('Set', bound=set)
-#     FrozenSet = TypeVar('FrozenSet', bound=frozenset)
-#     Container = TypeVar('Containers', bound=Union[dict, list, tuple, set, frozenset])
-#     Value = TypeVar('Value', bound=Union[int, float, str, bool, None])
-#     Typing = TypeVar('Typing', TypeAlias, type)
-
-
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseTypeInterface(BaseInterface, ABC):
     aliases: Tuple[str, ...] = field(
@@ -53,7 +34,7 @@ class BaseTypeInterface(BaseInterface, ABC):
     )
 
     type_class: Optional[Callable] = field(
-        validator=validators.optional(validators.instance_of(type | Union[type | TypeAlias])),
+        validator=validators.optional(validators.instance_of(type | TypeAlias)),
         default=str
     )
 
@@ -123,9 +104,9 @@ class BaseTypeInterface(BaseInterface, ABC):
         return self._aliases[0]
     
 
-@define(frozen=True, slots=True, weakref_slot=False)
-class BaseTypePool(BaseInterface):
-    Integer = BaseTypeInterface(
+@define(slots=True, weakref_slot=False)
+class SystemTypePool(BaseInterface):
+    Integer = field(default=BaseTypeInterface(
         aliases=(
             str("Integer"), "integer", "INTEGER",
             str("Int"), str("int"), "INT",
@@ -136,9 +117,9 @@ class BaseTypePool(BaseInterface):
         type_class=int,
         type_var=TypeVar('Integer', bound=int),
         constraints=int
-    )
+    ))
 
-    FloatingPoint = BaseTypeInterface(
+    FloatingPoint = field(default=BaseTypeInterface(
         aliases=(
             str("FloatingPoint"), "floating_point", "FLOATING_POINT",
             str("Float"), str("float"), "FLOAT",
@@ -149,9 +130,9 @@ class BaseTypePool(BaseInterface):
         type_class=float,
         type_var=TypeVar('FloatingPoint', bound=float),
         constraints=float
-    )
+    ))
 
-    Boolean = BaseTypeInterface(
+    Boolean = field(default=BaseTypeInterface(
         aliases=(
             str("Boolean"), "boolean", "BOOLEAN",
             str("Bool"), str("bool"), "BOOL",
@@ -162,9 +143,9 @@ class BaseTypePool(BaseInterface):
         type_class=bool,
         type_var=TypeVar('Boolean', bound=bool),
         constraints=bool
-    )
+    ))
 
-    String = BaseTypeInterface(
+    String = field(default=BaseTypeInterface(
         aliases=(
             str("String"), "string", "STRING",
             str("Str"), str("str"), "STR",
@@ -175,9 +156,9 @@ class BaseTypePool(BaseInterface):
         type_class=str,
         type_var=TypeVar('String', bound=str),
         constraints=str
-    )
+    ))
 
-    Bytes_ = BaseTypeInterface(
+    Bytes = field(default=BaseTypeInterface(
         aliases=(
             str("Bytes"), "bytes", "BYTES",
             "BytesType", "bytes_type", "BYTES_TYPE"
@@ -186,32 +167,79 @@ class BaseTypePool(BaseInterface):
         type_class=bytes,
         type_var=TypeVar('Bytes', bound=bytes),
         constraints=bytes
-    )
+    ))
 
-    # Number = BaseTypeInterface(
-    #     aliases=(
-    #         str("Number"), "number", "NUMBER",
-    #         "NumberType", "number_type", "NUMBER_TYPE"
-    #     ),
-    #     super_type=None,
-    #     type_class=Union[int, float],
-    #     type_var=TypeVar('Number', bound=Union[int, float]),
-    #     constraints=Union[int, float]
-    # )
+    Dictionary = field(default=BaseTypeInterface(
+        aliases=(
+            str("Dictionary"), "dictionary", "DICTIONARY",
+            str("Dict"), str("dict"), "DICT",
+            # "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
+            "DictType", "dict_type", "DICT_TYPE"
+        ),
+        super_type="__SYSTEM_RESERVED_DICT__",
+        prefix="{",
+        suffix="}",
+        seperator=",",
+        type_class=dict,
+        type_var=TypeVar('Dictionary', bound=dict),
+        constraints=dict
+    ))
 
-    # Text = BaseTypeInterface(
-    #     aliases=(
-    #         str("Text"), "text", "TEXT",
-    #         "TextType", "text_type", "TEXT_TYPE"
-    #     ),
-    #     super_type=Union[str, bytes, bool, None],
-    #     type_class=Union[str, bytes, bool, None],
-    #     type_var=TypeVar('Text', bound=Union[str, bytes, bool, None]),
-    #     constraints=Union[str, bytes, bool, None]
-    # )
-        
-    
+    List = field(default=BaseTypeInterface(
+        aliases=(
+            str("List"), "list", "LIST",
+            "ListType", "list_type", "LIST_TYPE"
+        ),
+        super_type="__SYSTEM_RESERVED_LIST__",
+        prefix="[",
+        suffix="]",
+        seperator=",",
+        type_class=list,
+        type_var=TypeVar('List', bound=list),
+        constraints=list
+    ))
 
+    Tuple = field(default=BaseTypeInterface(
+        aliases=(
+            str("Tuple"), "tuple", "TUPLE",
+            "TupleType", "tuple_type", "TUPLE_TYPE"
+        ),
+        super_type="__SYSTEM_RESERVED_TUPLE__",
+        prefix="(",
+        suffix=")",
+        seperator=",",
+        type_class=tuple,
+        type_var=TypeVar('Tuple', bound=tuple),
+        constraints=tuple
+    ))
+
+    Set = field(default=BaseTypeInterface(
+        aliases=(
+            str("Set"), "set", "SET",
+            "SetType", "set_type", "SET_TYPE"
+        ),
+        super_type="__SYSTEM_RESERVED_SET__",
+        prefix="{",
+        suffix="}",
+        seperator=",",
+        type_class=set,
+        type_var=TypeVar('Set', bound=set),
+        constraints=set
+    ))
+
+    FrozenSet = field(default=BaseTypeInterface(
+        aliases=(
+            str("FrozenSet"), "frozenset", "FROZENSET",
+            "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
+        ),
+        super_type="__SYSTEM_RESERVED_FROZENSET__",
+        prefix="{",
+        suffix="}",
+        seperator=",",
+        type_class=frozenset,
+        type_var=TypeVar('FrozenSet', bound=frozenset),
+        constraints=frozenset
+    ))
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseTypesInterface(BaseInterface, ABC):
@@ -236,7 +264,7 @@ class BaseTypesInterface(BaseInterface, ABC):
         """
 
     @staticmethod
-    def _type_contains_alias(type_: tuple[str], alias: str) -> bool:
+    def _type_contains_alias(type_: tuple[str, ...], alias: str) -> bool:
         """Checks if type contains an alias
 
         Args:
@@ -298,7 +326,7 @@ class BaseValueTypes(BaseTypesInterface):
     # _all: TypeAlias = field(default=int | float | str | bytes | bool | None)
 
     @property
-    def all(self) -> BaseTypeVars.Container:
+    def all(self) -> TypeAlias:
         return Union[self.number, self.text]
 
     @property

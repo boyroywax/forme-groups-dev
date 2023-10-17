@@ -8,7 +8,7 @@ from typing import Union, TypeAlias, Any, Optional, TypeVar, Type, Tuple, Callab
 sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 
-from src.groups.base.types import BaseValueTypes, BaseTypesInterface, BaseContainerTypes, BaseTypeInterface, BaseTypePool
+from src.groups.base.types import BaseValueTypes, BaseTypesInterface, BaseContainerTypes, BaseTypeInterface, SystemTypePool
 
 
 class TestBaseTypesInterface(unittest.TestCase):
@@ -201,5 +201,5 @@ class TestBaseContainerTypes(unittest.TestCase):
 
         self.assertEqual(Integer._hash_repr(), "5d463d84c647283d08dbda810934980d7c139bcb9ef2d50e49723a10a1eb63fa")
 
-    def test_base_type_pool(self)
-        self.assertEqual(BaseTypePool.__slots__, ("Integer", "FloatingPoint", "Boolean", "String", "Bytes", "Number", "Text", "Dictionary", "List", "Tuple", "Set", "FrozenSet", "Named", "Linear"))
+    def test_system_type_pool(self):
+        self.assertEqual(SystemTypePool.__slots__, ("Integer", "FloatingPoint", "Boolean", "String", "Bytes", "Dictionary", "List", "Tuple", "Set", "FrozenSet"))

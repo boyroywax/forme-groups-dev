@@ -3,7 +3,7 @@ from typing import TypeAlias, override, Any, Union
 from attrs import define, field
 
 
-from .types import BaseValueTypes, AllBaseValueTypes, BaseTypeVars
+from .types import BaseValueTypes, AllBaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
@@ -25,7 +25,7 @@ def _base_value_validator(instance, attribute, value):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: BaseTypeVars.Value](BaseInterface):
+class BaseValue[T: (int, float,  str, bool, None)](BaseInterface):
 # class BaseValue(BaseInterface):
     """Base class for values
 
