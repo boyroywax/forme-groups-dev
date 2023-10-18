@@ -69,6 +69,8 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
                 keys: tuple[BaseValueTypes] = item[::2]
                 values: tuple[BaseValueTypes] = item[1::2]
                 return {key.value: value.value for key, value in zip(keys, values)}
+            case _:
+                raise GroupBaseContainerException(f"Expected a container, but received {type_}")
 
     @override
     def __repr__(self) -> str:

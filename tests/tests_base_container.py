@@ -62,7 +62,7 @@ class TestBaseContainer(unittest.TestCase):
         self.assertRaises(TypeError, BaseContainer, (1, 2, 3), 1)
 
     def test_init_with_improper_type2(self):
-        self.assertRaises(TypeError, BaseContainer, (1, 2, 3), "int")
+        self.assertRaises(GroupBaseContainerException, BaseContainer, (1, 2, 3), "int")
 
     def test_str_with_dict(self):
         container = BaseContainer({"a": 1, "b": 2, "c": 3}, "dictionary")

@@ -2,9 +2,9 @@ from ..base.types import BaseContainerTypes, BaseValueTypes
 from ..base import BaseValue
 
 from typing import TypeAlias
-from ..base.types import AllBaseContainerTypes, AllBaseValueTypes, BaseTypes
+from ..base.types import AllBaseContainerTypes, AllBaseValueTypes, BaseTypes, LinearContainer, NamedContainer, NamedContainer
 from ..base.exceptions import GroupBaseContainerException
-from .checks import _contains_sub_container, is_linear_container, is_named_container
+from .checks import _contains_sub_container, is_linear_container, is_named_container, is_any_container
 
 
 
@@ -34,8 +34,13 @@ def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBase
     type_from_alias: TypeAlias | type = None
     if isinstance(item, str) and len(item) > 0:
         type_from_alias = BaseTypes._get_type_from_alias(item)
-    elif isinstance(item, type):
+    elif isinstance(item, AllBaseContainerTypes):
         type_from_alias = item
+    
+    print(f'item: {item}, type_from_alias: {type_from_alias}')
+    if type_from_alias is not None and not is_any_container(type_from_alias):
+        raise GroupBaseContainerException(f"Expected a container type, but received {item}")
+
 
     return type_from_alias
 
@@ -48,10 +53,10 @@ def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
     exc_message = f"Expected a non-container, but received {type(item)}"
     # __UNIT__ = type(item)
 
-    if _contains_sub_container(item):
+    if _contains_sub_container(type(item)):
         raise GroupBaseContainerException(exc_message)
 
-    if is_linear_container(item):
+    if is_linear_container(type(item)):
         for item_ in item:
             if isinstance(item_, AllBaseContainerTypes):
                 raise GroupBaseContainerException(exc_message)
@@ -61,7 +66,7 @@ def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
             else:
                 base_values += tuple([BaseValue(item_)])
 
-    elif is_named_container(item):
+    elif is_named_container(type(item)):
         for key, value in item.items():
             if isinstance(value, AllBaseContainerTypes):
                 raise GroupBaseContainerException(exc_message)
@@ -84,7 +89,7 @@ def _convert_container_to_value(item: BaseTypes) -> BaseValueTypes:
     Converts container to value
     """
     item_to_return: BaseValueTypes = item
-    if isinstance(item, BaseContainerTypes().linear):
+    if isinstance(item, LinearContainer):
         print(Exception("Passed a container, but expected a value, returning the first value of the container"))
 
         if isinstance(item, list | tuple):
@@ -121,7 +126,7 @@ def _extract_base_values(item: BaseContainerTypes) -> tuple[BaseValue]:
             items = set(item)
             items_to_return = tuple([BaseValue(items.pop()) for _ in range(len(items))])
 
-    elif isinstance(item, BaseContainerTypes().named):
+    elif isinstance(item, NamedContainer):
         items_to_return: tuple[BaseValue] = tuple()
         for key, value in item.items():
             items_to_return += (BaseValue(key), BaseValue(value))
