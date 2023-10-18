@@ -10,6 +10,8 @@ from tests_base_container import TestBaseContainer
 from tests_base_schema import TestBaseSchema
 from tests_unit_nonce import TestUnitNonce
 from tests_unit_credential import TestCredential
+from tests_unit_data import TestData
+from tests_unit_owner import TestOwner
 
 
 def main():
@@ -30,6 +32,8 @@ def main():
     # Group Unit tests
     test_suite.addTest(loader.loadTestsFromTestCase(TestUnitNonce))
     test_suite.addTest(loader.loadTestsFromTestCase(TestCredential))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestData))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestOwner))
 
     # Run the test suite
     runner = unittest.TextTestRunner()
