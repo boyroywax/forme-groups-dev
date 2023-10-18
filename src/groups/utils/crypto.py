@@ -13,8 +13,16 @@ class MerkleTree:
     """A Merkle Tree object.
     """
 
-    leaves: tuple[str, ...] = field(default=[], validator=validators.instance_of(tuple))
-    levels: tuple[tuple[str, ...]] = field(default=[], validator=validators.instance_of(tuple))
+    leaves: tuple[str, ...] = field(
+        default=[],
+        validator=validators.deep_iterable(validators.instance_of(str),
+        iterable_validator=validators.instance_of(tuple)))
+    
+    levels: tuple[tuple[str, ...]] = field(
+        default=[],
+        validator=validators.deep_iterable(validators.deep_iterable(validators.instance_of(str),
+        iterable_validator=validators.instance_of(tuple)),
+        iterable_validator=validators.instance_of(tuple)))
 
     def __init__(self, hashed_data: tuple[str, ...] = ()) -> None:
         self.leaves = hashed_data
