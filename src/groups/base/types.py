@@ -149,7 +149,7 @@ class BaseTypeInterface(BaseInterface, ABC):
     
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseTypes_(BaseInterface):
+class _BaseTypes(BaseInterface):
     Integer: BaseTypeInterface = field(default=BaseTypeInterface(
         aliases=(
             str("Integer"), "integer", "INTEGER",
@@ -301,6 +301,7 @@ class BaseTypes_(BaseInterface):
                     self.Boolean.type_class,
                     self.String.type_class,
                     self.Bytes.type_class,
+                    None
                 ]
             case ("text"):
                 return Union[
@@ -341,7 +342,8 @@ class BaseTypes_(BaseInterface):
                     self.List.type_class,
                     self.Tuple.type_class,
                     self.Set.type_class,
-                    self.FrozenSet.type_class
+                    self.FrozenSet.type_class,
+                    None
                 ]
 
     @property
@@ -420,76 +422,76 @@ class BaseTypes_(BaseInterface):
             hashed_types += (base_type._hash_package().root(),)
         return MerkleTree(hashed_data=hashed_types)
 
-@define(frozen=True, slots=True, weakref_slot=False)
-class BaseTypesInterface(BaseInterface, ABC):
-    """Base interface for all Base Type classes"""
+# @define(frozen=True, slots=True, weakref_slot=False)
+# class BaseTypesInterface(BaseInterface, ABC):
+#     """Base interface for all Base Type classes"""
     
-    @property
-    @abstractmethod
-    def all(self) -> Union[type, TypeAlias]:
-        """The base types
+#     @property
+#     @abstractmethod
+#     def all(self) -> Union[type, TypeAlias]:
+#         """The base types
 
-        Returns:
-            type | TypeAlias: The base types
-        """
+#         Returns:
+#             type | TypeAlias: The base types
+#         """
 
-    @property
-    @abstractmethod
-    def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-        """The aliases for the base types
+#     @property
+#     @abstractmethod
+#     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
+#         """The aliases for the base types
 
-        Returns:
-            dict[str, tuple[str]]: The aliases for the base types
-        """
+#         Returns:
+#             dict[str, tuple[str]]: The aliases for the base types
+#         """
 
-    @staticmethod
-    def _type_contains_alias(type_: tuple[str, ...], alias: str) -> bool:
-        """Checks if type contains an alias
+#     @staticmethod
+#     def _type_contains_alias(type_: tuple[str, ...], alias: str) -> bool:
+#         """Checks if type contains an alias
 
-        Args:
-            type_ (str): The type to check
+#         Args:
+#             type_ (str): The type to check
 
-        Returns:
-            bool: Whether the type contains an alias
-        """
-        for alias_ in type_:
-            if alias == alias_:
-                return True
-            if alias_.contains(alias):
-                raise GroupBaseTypeException(f"Alias {alias} is a substring of {alias_}, and should be removed")
+#         Returns:
+#             bool: Whether the type contains an alias
+#         """
+#         for alias_ in type_:
+#             if alias == alias_:
+#                 return True
+#             if alias_.contains(alias):
+#                 raise GroupBaseTypeException(f"Alias {alias} is a substring of {alias_}, and should be removed")
 
-    def _contains_alias(self, item: Any) -> bool:
-        """Checks if item is a base value type
+#     def _contains_alias(self, item: Any) -> bool:
+#         """Checks if item is a base value type
 
-        Args:
-            item (Any): The item to check
+#         Args:
+#             item (Any): The item to check
 
-        Returns:
-            bool: Whether the item is a base value type
-        """
-        for types in self.aliases.values():
-            # for alias in types:
-            #     if item == alias:
-            return item in types.values()
-                    # return True
+#         Returns:
+#             bool: Whether the item is a base value type
+#         """
+#         for types in self.aliases.values():
+#             # for alias in types:
+#             #     if item == alias:
+#             return item in types.values()
+#                     # return True
 
-        return False
+#         return False
 
-    def _get_type_from_alias(self, alias: str) -> type:
-        """Gets the type from an alias
+#     def _get_type_from_alias(self, alias: str) -> type:
+#         """Gets the type from an alias
 
-        Args:
-            alias (str): The alias to get the type from
+#         Args:
+#             alias (str): The alias to get the type from
 
-        Returns:
-            BaseValueTypes.all: The type from the alias
-        """
-        for type_, aliases in self.aliases.items():
-            # print(type_, aliases)
-            for alias_ in aliases:
-                if alias == alias_:
-                    # print(type_)
-                    return type_
+#         Returns:
+#             BaseValueTypes.all: The type from the alias
+#         """
+#         for type_, aliases in self.aliases.items():
+#             # print(type_, aliases)
+#             for alias_ in aliases:
+#                 if alias == alias_:
+#                     # print(type_)
+#                     return type_
 
 
 # @define(frozen=True, slots=True, weakref_slot=False)
@@ -646,7 +648,7 @@ class BaseTypesInterface(BaseInterface, ABC):
 #         return isinstance(value, BaseContainerTypes)
 
 
-BaseTypes = BaseTypes_()
+BaseTypes = _BaseTypes()
 BaseValueTypes = BaseTypes.all("value")
 BaseContainerTypes = BaseTypes.all("container")
 LinearContainer = BaseTypes.all("linear")

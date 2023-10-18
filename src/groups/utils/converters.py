@@ -7,19 +7,16 @@ from ..base.exceptions import GroupBaseContainerException
 from .checks import _contains_sub_container, is_linear_container, is_named_container
 
 
-base_types  = BaseTypes
-
 
 def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | set | frozenset |type) -> TypeAlias | type:
     """
     Converter function for _value field
     """
-    base_container_types = BaseContainerTypes()
-    base_value_types = BaseValueTypes()
+    # base_value_types = BaseValueTypes()
     type_from_alias: TypeAlias | type = None
     if isinstance(item, str) and len(item) > 0:
-        type_from_value_alias = base_value_types._get_type_from_alias(item)
-        type_from_container_alias = base_container_types._get_type_from_alias(item)
+        type_from_value_alias = BaseTypes._get_type_from_alias(item)
+        type_from_container_alias = BaseTypes._get_type_from_alias(item)
         assert type_from_value_alias is not None or type_from_container_alias is not None, f"Expected a type, but received {item}"
         type_from_alias = type_from_value_alias if type_from_value_alias is not None else type_from_container_alias
     elif isinstance(item, type):
@@ -34,10 +31,9 @@ def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBase
     """
     Converter function for _type field
     """
-    base_container_types = BaseContainerTypes()
     type_from_alias: TypeAlias | type = None
     if isinstance(item, str) and len(item) > 0:
-        type_from_alias = base_container_types._get_type_from_alias(item)
+        type_from_alias = BaseTypes._get_type_from_alias(item)
     elif isinstance(item, type):
         type_from_alias = item
 
@@ -79,11 +75,11 @@ def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
     
     return base_values
 
-def _convert_value_to_type(item: base_types) -> TypeAlias | type:
+def _convert_value_to_type(item: BaseTypes) -> TypeAlias | type:
     print(item)
 
 
-def _convert_container_to_value(item: base_types) -> BaseValueTypes:
+def _convert_container_to_value(item: BaseTypes) -> BaseValueTypes:
     """
     Converts container to value
     """
@@ -134,11 +130,11 @@ def _extract_base_values(item: BaseContainerTypes) -> tuple[BaseValue]:
     return items_to_return
 
 
-def _convert_container_to_type(item: base_types) -> TypeAlias | type:
+def _convert_container_to_type(item: BaseTypes) -> TypeAlias | type:
     return type(item)
 
 
-def _convert_container_to_default(item: tuple[BaseContainerTypes], type_: TypeAlias | type) -> base_types:
+def _convert_container_to_default(item: tuple[BaseContainerTypes], type_: TypeAlias | type) -> BaseTypes:
     match (str(type_)):
         case("<class 'list'>"):
             return [value.value for value in item]

@@ -2,7 +2,7 @@ from attrs import define, field, validators
 from typing import Optional, TypeAlias, Type, override
 
 from .interface import BaseInterface
-from .types import BaseValueTypes, BaseContainerTypes, AllBaseValueTypes, AllBaseContainerTypes
+from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, LinearContainer, NamedContainer
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
@@ -55,7 +55,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
         """
         Repackages the container
         """
-        type_from_alias: TypeAlias | type = base_container_types._get_type_from_alias(type_)
+        type_from_alias: TypeAlias | type = BaseTypes._get_type_from_alias(type_)
         match (str(type_from_alias)):
             case("<class 'list'>"):
                 return [value.value for value in item]

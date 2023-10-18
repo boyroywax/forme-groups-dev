@@ -134,7 +134,7 @@ class BaseValue[T: (int, float,  str, bool, None)](BaseInterface):
                 case "<class 'bytes'>" | "bytes":
                     if isinstance(value, str):
                         forced_value = bytes(value.encode())
-                    elif isinstance(value, BaseValueTypes().integer):
+                    elif isinstance(value, int):
                         forced_value = value.to_bytes()
                     elif isinstance(value, float):
                         forced_value = struct.pack('f', value)
