@@ -308,6 +308,7 @@ class _BaseTypes(BaseInterface):
                     self.String.type_class,
                     self.Bytes.type_class,
                     self.Boolean.type_class,
+                    None
                 ]
             case ("number"):
                 return Union[

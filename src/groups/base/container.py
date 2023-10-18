@@ -19,7 +19,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
     _type: Optional[Type[BaseContainerTypes] | str] = field(
         validator=validators.instance_of(type | str),
         converter=_base_container_type_converter,
-        default=tuple
+        default="tuple"
     )
 
     @property

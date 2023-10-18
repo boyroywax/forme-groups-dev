@@ -8,7 +8,7 @@ def is_linear_container(item: AllBaseContainerTypes) -> bool:
     """
     Checks if item is a linear container
     """
-    return isinstance(item.__class__, LinearContainer)
+    return isinstance(item, LinearContainer)
 
 
 def is_named_container(item: AllBaseContainerTypes) -> bool:
@@ -22,6 +22,8 @@ def is_any_container(item: AllBaseContainerTypes) -> bool:
     """
     Checks if item is any container
     """
+    if item is None:
+        return False
     return is_linear_container(item) or is_named_container(item)
 
 
