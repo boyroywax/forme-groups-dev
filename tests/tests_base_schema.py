@@ -6,6 +6,7 @@ sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
 
 from src.groups.base.schema import BaseSchema, SchemaEntry
 from src.groups.base.container import BaseContainer
+from src.groups.base.exceptions import GroupBaseTypeException
 
 
 class TestBaseSchema(unittest.TestCase):
@@ -49,4 +50,4 @@ class TestBaseSchema(unittest.TestCase):
         self.assertRaises(TypeError, BaseSchema, (self.schema_entry_one, "string"))
 
     def test_init_with_improper_schema_entry(self):
-        self.assertRaises(AssertionError, SchemaEntry, "name", "bad_type")
+        self.assertRaises(GroupBaseTypeException, SchemaEntry, "name", "bad_type")

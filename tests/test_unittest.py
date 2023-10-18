@@ -23,10 +23,10 @@ def main():
     # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainerTypes))
     test_suite.addTest(loader.loadTestsFromTestCase(TestBaseValue))
     test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
 
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestUnitNonce))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestUnitNonce))
 
     # Run the test suite
     runner = unittest.TextTestRunner()
