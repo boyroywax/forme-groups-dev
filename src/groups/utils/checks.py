@@ -29,14 +29,14 @@ def _contains_sub_container(item: AllBaseContainerTypes) -> bool:
     """
     Checks if container contains a sub container
     """
-    assert is_any_container(type(item)), f"Expected a container, but received a non-container {type(item)}"
+    assert is_any_container(item), f"Expected a container, but received a non-container {item}"
 
-    if is_linear_container(type(item)):
+    if is_linear_container(item):
         for value in item:
-            return is_any_container(type(value))
+            return is_any_container(value)
 
-    elif is_named_container(type(item)):
+    elif is_named_container(item):
         for value in item.values():
-            return is_any_container(type(value))
+            return is_any_container(value)
 
     return False

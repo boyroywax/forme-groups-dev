@@ -17,12 +17,13 @@ def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | 
     if isinstance(item, str) and len(item) > 0:
         type_from_value_alias = BaseTypes._get_type_from_alias(item)
         type_from_container_alias = BaseTypes._get_type_from_alias(item)
+        print(f'{type_from_value_alias=}, {type_from_container_alias=}')
         assert type_from_value_alias is not None or type_from_container_alias is not None, f"Expected a type, but received {item}"
         type_from_alias = type_from_value_alias if type_from_value_alias is not None else type_from_container_alias
     elif isinstance(item, type):
         type_from_alias = item
     elif isinstance(item, (int, float, bytes, dict, list, tuple, set, frozenset)):
-        type_from_alias = type(item)
+        type_from_alias = item.__class__
 
     return type_from_alias
 
@@ -35,10 +36,10 @@ def _base_container_type_converter(item: AllBaseContainerTypes | str) -> AllBase
     if isinstance(item, str) and len(item) > 0:
         type_from_alias = BaseTypes._get_type_from_alias(item)
     elif isinstance(item, AllBaseContainerTypes):
-        type_from_alias = item
+        type_from_alias = type(item)
     
     print(f'item: {item}, type_from_alias: {type_from_alias}')
-    if type_from_alias is not None and not is_any_container(type_from_alias):
+    if not isinstance(item, type_from_alias):
         raise GroupBaseContainerException(f"Expected a container type, but received {item}")
 
 
@@ -53,8 +54,8 @@ def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
     exc_message = f"Expected a non-container, but received {type(item)}"
     # __UNIT__ = type(item)
 
-    if _contains_sub_container(type(item)):
-        raise GroupBaseContainerException(exc_message)
+    # if _contains_sub_container(type(item)):
+    #     raise GroupBaseContainerException(exc_message)
 
     if is_linear_container(type(item)):
         for item_ in item:
@@ -75,8 +76,8 @@ def _base_container_converter(item: AllBaseContainerTypes) -> tuple[BaseValue]:
                 base_values += tuple([BaseValue(key), value])
             else:
                 base_values += tuple([BaseValue(key), BaseValue(value)])
-    else:
-        raise GroupBaseContainerException(f"Expected a container, but received a non-container {type(item)}")
+    # else:
+    #     raise GroupBaseContainerException(f"Expected a container, but received a non-container {type(item)}")
     
     return base_values
 
