@@ -8,7 +8,7 @@ from src.groups.utils.crypto import MerkleTree
 from src.groups.base.value import BaseValue
 from src.groups.base.exceptions import GroupBaseValueException
 
-__RANGE__ = 1000
+__RANGE__ = 10000
 
 class TestBaseValue(unittest.TestCase):
     def test_init_with_int(self):
