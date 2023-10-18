@@ -7,7 +7,6 @@ from src.groups.utils.crypto import MerkleTree
 
 class TestMerkleTree(unittest.TestCase):
     def test_init(self):
-        print(sys.path)
         mt = MerkleTree()
         self.assertEqual(mt.root(), None)
         self.assertEqual(mt.leaves, ())
@@ -48,13 +47,9 @@ class TestMerkleTree(unittest.TestCase):
         hash_test_func2 = MerkleTree._hash_func("test2")
         hash_test_func3 = MerkleTree._hash_func("test3")
         hashed_items_part1 = MerkleTree._hash_items(hash_test_func, hash_test_func2)
-        print(f'hashed item part 1: {hashed_items_part1}')
         hashed_items_part2 = MerkleTree._hash_items(hash_test_func3)
-        print(f'hashed item part 2: {hashed_items_part2}')
         hashed_items = MerkleTree._hash_items(hashed_items_part1, hashed_items_part2)
-        print(f'hashed items: {hashed_items}')
         hashed_level = MerkleTree.hash_level((hash_test_func, hash_test_func2, hash_test_func3))
-        print(f'hashed level: {hashed_level}')
         self.assertEqual(hashed_level, (hashed_items_part1, hashed_items_part2))
 
     def test_hash_level_even(self):

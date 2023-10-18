@@ -125,7 +125,6 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_hash(self):
         value = BaseValue(1)
-        print(repr(value))
         self.assertEqual(value._hash_repr(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
 
     def test_base_value_hash_with_different_value(self):
