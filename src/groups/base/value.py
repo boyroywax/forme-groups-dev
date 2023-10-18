@@ -1,9 +1,9 @@
 import struct
-from typing import TypeAlias, override, Any, Union
+from typing import TypeAlias, override, Any, Union, Generic, TypeVar
 from attrs import define, field
 
 
-from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, AllBaseValueTypes, AllBaseContainerTypes
+from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, AllBaseValueTypesTuple, AllBaseValueTypes, AllBaseContainerTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
@@ -24,9 +24,12 @@ def _base_value_validator(instance, attribute, value):
     if not isinstance(value, AllBaseValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
+# base_type_vars = TypeVar("base_type_vars", int, float, str, bytes, bool, None)
+
+
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseValue[T: (int, float,  str, bool, None)](BaseInterface):
-# class BaseValue(BaseInterface):
+class BaseValue(BaseInterface):
+# class BaseValue(BaseInterface, Generic[base_type_vars]):
     """Base class for values
 
     Args:
@@ -40,12 +43,11 @@ class BaseValue[T: (int, float,  str, bool, None)](BaseInterface):
         >>> value
         BaseValue(value=1, type=int)
     """
-    # _value: T = field(validator=_base_value_validator)
-    _value: T = field(validator=_base_value_validator)
+    _value: AllBaseValueTypes = field(validator=_base_value_validator)
 
     @property
-    def value(self) -> T:
-    # def value(self) -> AllBaseValueTypes:
+    # def value(self) -> T:
+    def value(self) -> AllBaseValueTypes:
         """The single base value held by the BaseValue Class
 
         Returns:
@@ -56,15 +58,15 @@ class BaseValue[T: (int, float,  str, bool, None)](BaseInterface):
             >>> value.value
             1
         """
-
         return self._value
     
     @value.getter
-    def value(self) -> T:
+    def value(self) -> AllBaseValueTypes:
     # def value(self) -> AllBaseValueTypes:
         """The single base value held by the BaseValue Class
         """
-        # print(T.__constraints__, self._value, type(self._value))
+        # print(base_type_vars.__constraints__, self._value, type(self._value))
+        # print(f'{repr(T)}=')
         return self._value
 
     @staticmethod

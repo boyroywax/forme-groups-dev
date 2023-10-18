@@ -334,7 +334,7 @@ class TestBaseValue(unittest.TestCase):
         self.assertEqual(value._hash_repr(), '5176a0db25fa8911b84f16b90d6c02d56d0c983122bc26fd137713aa0ede123f')
         self.assertEqual(value._hash_package().root(), "e3b86cc738e1a9efa32e5f4761f3382236f7200abc8811f671a33074c93f9ec2")
         self.assertEqual(value._hash_package().levels, (('3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd',), ('e3b86cc738e1a9efa32e5f4761f3382236f7200abc8811f671a33074c93f9ec2', ),))
-        print(value._hash_package().leaves)
+        # print(value._hash_package().leaves)
 
     def test_hash_public_init_n_base_values(self):
         for i in range(__RANGE__):
@@ -401,4 +401,3 @@ class TestBaseValue(unittest.TestCase):
             random_value = random.choice(values)
             value = BaseValue(random_value)
             self.assertEqual(value._hash_repr(), MerkleTree._hash_func(repr(value)))
-

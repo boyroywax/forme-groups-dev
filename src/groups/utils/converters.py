@@ -17,7 +17,7 @@ def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | 
     if isinstance(item, str) and len(item) > 0:
         type_from_value_alias = BaseTypes._get_type_from_alias(item)
         type_from_container_alias = BaseTypes._get_type_from_alias(item)
-        print(f'{type_from_value_alias=}, {type_from_container_alias=}')
+        # print(f'{type_from_value_alias=}, {type_from_container_alias=}')
         assert type_from_value_alias is not None or type_from_container_alias is not None, f"Expected a type, but received {item}"
         type_from_alias = type_from_value_alias if type_from_value_alias is not None else type_from_container_alias
     elif isinstance(item, type):
@@ -36,14 +36,14 @@ def _base_container_type_converter(item: AllBaseContainerTypes | str | type) -> 
     if isinstance(item, str) and len(item) > 0:
         type_from_alias = BaseTypes._get_type_from_alias(item)
 
-    print(f'{type_from_alias=}')
+    # print(f'{type_from_alias=}')
 
     if type_from_alias is None or isinstance(type_from_alias(), BaseValueTypes):
         raise GroupBaseContainerException(f"Expected a container type, but received {item}")
     # elif isinstance(item, AllBaseContainerTypes):
     #     type_from_alias = type(item)
     
-    print(f'item: {item}, type_from_alias: {type_from_alias}')
+    # print(f'item: {item}, type_from_alias: {type_from_alias}')
     # if not isinstance(item, type_from_alias):
     #     raise GroupBaseContainerException(f"Expected a container type, but received {item}")
 

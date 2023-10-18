@@ -285,16 +285,23 @@ class _BaseTypes(BaseInterface):
         constraints=frozenset
     ))
 
-    def all(self, type_: Optional[str] = None, ) -> type | TypeAlias:
+    def all(self, type_: Optional[str] = None, format_: Optional[str] = None) -> type | TypeAlias | tuple:
         """All the system types
 
         Returns:
             type | TypeAlias: All the system types
         """
         assert type_ in ["value", "container", "linear", "named", "text", "number"] or type_ is None
+        assert format_ in ["tuple", "union"] or format_ is None
 
-        match (type_):
-            case ("value"):
+        if type_ is None:
+            type_ = "all"
+
+        if format_ is None:
+            format_ = "union"
+
+        match (type_, format_):
+            case ("value", "union"):
                 return Union[
                     self.Integer.type_class,
                     self.FloatingPoint.type_class,
@@ -303,19 +310,40 @@ class _BaseTypes(BaseInterface):
                     self.Bytes.type_class,
                     None
                 ]
-            case ("text"):
+            case ("value", "tuple"):
+                return (
+                    self.Integer.type_class,
+                    self.FloatingPoint.type_class,
+                    self.Boolean.type_class,
+                    self.String.type_class,
+                    self.Bytes.type_class,
+                    None,
+                )
+            case ("text", "union"):
                 return Union[
                     self.String.type_class,
                     self.Bytes.type_class,
                     self.Boolean.type_class,
                     None
                 ]
-            case ("number"):
+            case ("text", "tuple"):
+                return (
+                    self.String.type_class,
+                    self.Bytes.type_class,
+                    self.Boolean.type_class,
+                    None,
+                )
+            case ("number", "union"):
                 return Union[
                     self.Integer.type_class,
                     self.FloatingPoint.type_class
                 ]
-            case ("container"):
+            case ("number", "tuple"):
+                return (
+                    self.Integer.type_class,
+                    self.FloatingPoint.type_class,
+                )
+            case ("container", "union"):
                 return Union[
                     self.Dictionary.type_class,
                     self.List.type_class,
@@ -323,16 +351,33 @@ class _BaseTypes(BaseInterface):
                     self.Set.type_class,
                     self.FrozenSet.type_class
                 ]
-            case ("linear"):
+            case ("container", "tuple"):
+                return (
+                    self.Dictionary.type_class,
+                    self.List.type_class,
+                    self.Tuple.type_class,
+                    self.Set.type_class,
+                    self.FrozenSet.type_class,
+                )
+            case ("linear", "union"):
                 return Union[
                     self.List.type_class,
                     self.Tuple.type_class,
                     self.Set.type_class,
                     self.FrozenSet.type_class
                 ]
-            case ("named"):
+            case ("linear", "tuple"):
+                return (
+                    self.List.type_class,
+                    self.Tuple.type_class,
+                    self.Set.type_class,
+                    self.FrozenSet.type_class,
+                )
+            case ("named", "union"):
                 return self.Dictionary.type_class
-            case _:
+            case ("named", "tuple"):
+                return (self.Dictionary.type_class, )
+            case ("all", "union"):
                 return Union[
                     self.Integer.type_class,
                     self.FloatingPoint.type_class,
@@ -346,6 +391,20 @@ class _BaseTypes(BaseInterface):
                     self.FrozenSet.type_class,
                     None
                 ]
+            case ("all", "tuple"):
+                return (
+                    self.Integer.type_class,
+                    self.FloatingPoint.type_class,
+                    self.Boolean.type_class,
+                    self.String.type_class,
+                    self.Bytes.type_class,
+                    self.Dictionary.type_class,
+                    self.List.type_class,
+                    self.Tuple.type_class,
+                    self.Set.type_class,
+                    self.FrozenSet.type_class,
+                    None,
+                )
 
     @property
     def all_base_types(self) -> tuple[BaseTypeInterface, ...]:
@@ -423,253 +482,25 @@ class _BaseTypes(BaseInterface):
             hashed_types += (base_type._hash_package().root(),)
         return MerkleTree(hashed_data=hashed_types)
 
-# @define(frozen=True, slots=True, weakref_slot=False)
-# class BaseTypesInterface(BaseInterface, ABC):
-#     """Base interface for all Base Type classes"""
-    
-#     @property
-#     @abstractmethod
-#     def all(self) -> Union[type, TypeAlias]:
-#         """The base types
-
-#         Returns:
-#             type | TypeAlias: The base types
-#         """
-
-#     @property
-#     @abstractmethod
-#     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-#         """The aliases for the base types
-
-#         Returns:
-#             dict[str, tuple[str]]: The aliases for the base types
-#         """
-
-#     @staticmethod
-#     def _type_contains_alias(type_: tuple[str, ...], alias: str) -> bool:
-#         """Checks if type contains an alias
-
-#         Args:
-#             type_ (str): The type to check
-
-#         Returns:
-#             bool: Whether the type contains an alias
-#         """
-#         for alias_ in type_:
-#             if alias == alias_:
-#                 return True
-#             if alias_.contains(alias):
-#                 raise GroupBaseTypeException(f"Alias {alias} is a substring of {alias_}, and should be removed")
-
-#     def _contains_alias(self, item: Any) -> bool:
-#         """Checks if item is a base value type
-
-#         Args:
-#             item (Any): The item to check
-
-#         Returns:
-#             bool: Whether the item is a base value type
-#         """
-#         for types in self.aliases.values():
-#             # for alias in types:
-#             #     if item == alias:
-#             return item in types.values()
-#                     # return True
-
-#         return False
-
-#     def _get_type_from_alias(self, alias: str) -> type:
-#         """Gets the type from an alias
-
-#         Args:
-#             alias (str): The alias to get the type from
-
-#         Returns:
-#             BaseValueTypes.all: The type from the alias
-#         """
-#         for type_, aliases in self.aliases.items():
-#             # print(type_, aliases)
-#             for alias_ in aliases:
-#                 if alias == alias_:
-#                     # print(type_)
-#                     return type_
-
-
-# @define(frozen=True, slots=True, weakref_slot=False)
-# class BaseValueTypes(BaseTypesInterface):
-#     """Holds the base value types for the Group Base Value Types"""
-#     integer: TypeAlias = int
-#     floating_point: TypeAlias = float
-#     boolean: TypeAlias = bool
-#     string: TypeAlias = str
-#     bytes_: TypeAlias = bytes
-#     number: TypeAlias = int | float
-#     text: TypeAlias = str | bytes | bool | None
-#     # _all: TypeAlias = field(default=int | float | str | bytes | bool | None)
-
-#     @property
-#     def all(self) -> TypeAlias:
-#         return Union[self.number, self.text]
-
-#     @property
-#     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-#         """The aliases for the base value types
-
-#         Returns:
-#             dict[str, tuple[str]]: The aliases for the base value types
-#         """
-#         aliases: dict = {
-#             self.integer: (
-#                 str("Integer"), "integer", "INTEGER",
-#                 str("Int"), str("int"), "INT",
-#                 "IntegerType", "integer_type", "INTEGER_TYPE",
-#                 "IntType", "int_type", "INT_TYPE"
-#             ),
-#             self.floating_point: (
-#                 str("FloatingPoint"), "floating_point", "FLOATING_POINT",
-#                 str("Float"), str("float"), "FLOAT",
-#                 "FloatingPointType", "floating_point_type", "FLOATING_POINT_TYPE",
-#                 "FloatType", "float_type", "FLOAT_TYPE"
-#             ),
-#             self.boolean: (
-#                 str("Boolean"), "boolean", "BOOLEAN",
-#                 str("Bool"), str("bool"), "BOOL",
-#                 "BooleanType", "boolean_type", "BOOLEAN_TYPE",
-#                 "BoolType", "bool_type", "BOOL_TYPE"
-#             ),
-#             self.string: (
-#                 str("String"), "string", "STRING",
-#                 str("Str"), str("str"), "STR",
-#                 "StringType", "string_type", "STRING_TYPE",
-#                 "StrType", "str_type", "STR_TYPE"
-#             ),
-#             self.bytes_: (
-#                 str("Bytes"), "bytes", "BYTES",
-#                 "BytesType", "bytes_type", "BYTES_TYPE"
-#             ),
-#             self.number: (
-#                 str("Number"), "number", "NUMBER",
-#                 "NumberType", "number_type", "NUMBER_TYPE"
-#             ),
-#             self.text: (
-#                 str("Text"), "text", "TEXT",
-#                 "TextType", "text_type", "TEXT_TYPE"
-#             ),
-#             self.all: (
-#                 str("BaseValueTypes"), "base_value_types", "BASE_VALUE_TYPES",
-#                 str("BaseValueType"), "base_value_type", "BASE_VALUE_TYPE"
-#             )
-#         }
-#         return aliases
-
-#     @staticmethod
-#     def _verify_base_value_type(value: Any) -> bool:
-#         """Verifies that a value is a base type
-
-#         Args:
-#             value (Any): The value to verify
-
-#         Returns:
-#             bool: Whether the value is a base type
-#         """
-#         if isinstance(value, BaseValueTypes):
-#             return True
-#         return False
-
-
-# @define(frozen=True, slots=True, weakref_slot=False)
-# class BaseContainerTypes(BaseTypesInterface):
-#     """Holds the base container types for the Group Base Container Types"""
-#     dictionary: TypeAlias = dict
-#     list_: TypeAlias = list
-#     tuple_: TypeAlias = tuple
-#     set_: TypeAlias = set
-#     frozenset_: TypeAlias = frozenset
-#     named: TypeAlias = dictionary
-#     linear: TypeAlias = list_ | tuple_ | set_ | frozenset_
-
-#     @property
-#     def all(self) -> Union[type,  TypeAlias]:
-#         """The base container types"""
-#         return Union[self.named, self.linear]
-
-#     @property
-#     def aliases(self) -> dict[type | TypeAlias, tuple[str]]:
-#         aliases: dict[type | TypeAlias, tuple[str, ...]] = {
-#             self.dictionary: (
-#                 str("Dictionary"), "dictionary", "DICTIONARY",
-#                 str("Dict"), str("dict"), "DICT",
-#                 # "DictionaryType", "dictionary_type", "DICTIONARY_TYPE",
-#                 "DictType", "dict_type", "DICT_TYPE"
-#             ),
-#             self.list_: (
-#                 str("List"), "list", "LIST",
-#                 "ListType", "list_type", "LIST_TYPE"
-#             ),
-#             self.tuple_: (
-#                 str("Tuple"), "tuple", "TUPLE",
-#                 "TupleType", "tuple_type", "TUPLE_TYPE"
-#             ),
-#             self.set_: (
-#                 str("Set"), "set", "SET",
-#                 "SetType", "set_type", "SET_TYPE"
-#             ),
-#             self.frozenset_: (
-#                 str("FrozenSet"), "frozenset", "FROZENSET",
-#                 "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
-#             ),
-#             # self.named: (
-#             #     str("Named"), "named", "NAMED",
-#             #     str("NamedContainer"), "named_container", "NAMED_CONTAINER",
-#             #     "NamedContainerType", "named_container_type", "NAMED_CONTAINER_TYPE"
-#             # ),
-#             self.linear: (
-#                 str("Linear"), "linear", "LINEAR",
-#                 str("LinearContainer"), "linear_container", "LINEAR_CONTAINER",
-#                 "LinearContainerType", "linear_container_type", "LINEAR_CONTAINER_TYPE"
-#             ),
-#             self.all: (
-#                 str("BaseContainer"), "base_container", "BASE_CONTAINER",
-#                 str("BaseContainerTypes"), "base_container_types", "BASE_CONTAINER_TYPES",
-#                 str("BaseContainerType"), "base_container_type", "BASE_CONTAINER_TYPE"
-#             )
-#         }
-#         return aliases
-
-#     @staticmethod
-#     def _is_container_type(value: Any) -> bool:
-#         """Verifies that a value is a base container type
-
-#         Args:
-#             value (Any): The value to verify
-
-#         Returns:
-#             bool: Whether the value is a base container type
-#         """
-#         return isinstance(value, BaseContainerTypes)
-
 
 BaseTypes = _BaseTypes()
-BaseValueTypes = BaseTypes.all("value")
-BaseContainerTypes = BaseTypes.all("container")
-LinearContainer = BaseTypes.all("linear")
-NamedContainer = BaseTypes.all("named")
-Text = BaseTypes.all("text")
-Number = BaseTypes.all("number")
+BaseValueTypes: type | TypeAlias = BaseTypes.all("value")
+BaseContainerTypes: type | TypeAlias = BaseTypes.all("container")
+LinearContainer: type | TypeAlias = BaseTypes.all("linear")
+NamedContainer: type | TypeAlias = BaseTypes.all("named")
+Text: type | TypeAlias = BaseTypes.all("text")
+Number: type | TypeAlias = BaseTypes.all("number")
 
-
-
-AllBaseValueTypes = BaseValueTypes
-AllBaseContainerTypes = BaseContainerTypes
-# LinearContainer = 
-# NamedContainer = BaseContainerTypes().named
-BaseValueContainer = tuple[AllBaseValueTypes]
+AllBaseValueTypes: type | TypeAlias = BaseValueTypes
+AllBaseValueTypesTuple: Tuple[str, ...] = BaseTypes.all("value", "tuple")
+AllBaseContainerTypes: type | TypeAlias = BaseContainerTypes
+BaseValueContainer: Tuple[type | TypeAlias] = tuple[AllBaseValueTypes, ...]
 
 # Base Object Types
 Object = object | None
 KeyValue = tuple[BaseValueTypes, BaseValueTypes]
 UnitTypes = BaseValueTypes | BaseContainerTypes | Object
-# Text = BaseValueTypes().text
+
 TextSet = set[Text]
 TextOrContainer = Text | BaseContainerTypes
 TextContainersDict = dict[Text, BaseContainerTypes]
