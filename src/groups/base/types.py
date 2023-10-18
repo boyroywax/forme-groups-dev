@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from attrs import define, field, validators
-from enum import Enum
-from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override, overload
+from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override
 
 from .interface import BaseInterface
 from .exceptions import GroupBaseTypeException
@@ -483,6 +482,7 @@ class _BaseTypes(BaseInterface):
         return MerkleTree(hashed_data=hashed_types)
 
 
+# Base Type Categories
 BaseTypes = _BaseTypes()
 BaseValueTypes: type | TypeAlias = BaseTypes.all("value")
 BaseContainerTypes: type | TypeAlias = BaseTypes.all("container")
@@ -491,6 +491,7 @@ NamedContainer: type | TypeAlias = BaseTypes.all("named")
 Text: type | TypeAlias = BaseTypes.all("text")
 Number: type | TypeAlias = BaseTypes.all("number")
 
+# Additional Base Type Aliases
 AllBaseValueTypes: type | TypeAlias = BaseValueTypes
 AllBaseValueTypesTuple: Tuple[str, ...] = BaseTypes.all("value", "tuple")
 AllBaseContainerTypes: type | TypeAlias = BaseContainerTypes
@@ -501,6 +502,7 @@ Object = object | None
 KeyValue = tuple[BaseValueTypes, BaseValueTypes]
 UnitTypes = BaseValueTypes | BaseContainerTypes | Object
 
+# Base Text Types
 TextSet = set[Text]
 TextOrContainer = Text | BaseContainerTypes
 TextContainersDict = dict[Text, BaseContainerTypes]

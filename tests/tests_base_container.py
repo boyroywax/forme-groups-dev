@@ -1,9 +1,7 @@
 import unittest
 import sys
 
-sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
-
-
+sys.path.append("../forme-groups-python-3-12/")
 from src.groups.base.container import BaseContainer, _contains_sub_container
 from src.groups.base.value import BaseValue
 from src.groups.base.exceptions import GroupBaseContainerException

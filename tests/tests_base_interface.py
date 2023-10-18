@@ -1,13 +1,8 @@
 import unittest
 import sys
-import random
-
 from attrs import define
 
-
-sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
-
-
+sys.path.append("../forme-groups-python-3-12/")
 from src.groups.base.interface import BaseInterface
 
 

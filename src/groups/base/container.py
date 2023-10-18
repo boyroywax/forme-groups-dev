@@ -6,11 +6,62 @@ from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, LinearContaine
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
-from ..utils.converters import _base_container_type_converter, _base_container_converter
-from ..utils.checks import _contains_sub_container
+from ..utils.checks import _contains_sub_container, is_linear_container, is_named_container
+
+
+def _base_container_type_converter(item: BaseContainerTypes | str | type) -> BaseContainerTypes:
+    """
+    Converter function for _type field
+    """
+    type_from_alias: TypeAlias | type = None
+    if isinstance(item, str) and len(item) > 0:
+        type_from_alias = BaseTypes._get_type_from_alias(item)
+
+    if type_from_alias is None or isinstance(type_from_alias(), BaseValueTypes):
+        raise GroupBaseContainerException(f"Expected a container type, but received {item}")
+    elif isinstance(item, BaseContainerTypes):
+        type_from_alias = type(item)
+
+    return type_from_alias
+
+
+def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
+    """
+    Converter function for _items field
+    """
+    base_values: tuple = tuple()
+    exc_message = f"Expected a non-container, but received {type(item)}"
+
+    if _contains_sub_container(item):
+        raise GroupBaseContainerException(exc_message)
+
+    if is_linear_container(item):
+        for item_ in item:
+            if isinstance(item_, BaseContainerTypes):
+                raise GroupBaseContainerException(exc_message)
+
+            if isinstance(item_, BaseValue):
+                base_values += tuple([item_], )
+            else:
+                base_values += tuple([BaseValue(item_)])
+
+    elif is_named_container(item):
+        for key, value in item.items():
+            if isinstance(value, BaseContainerTypes):
+                raise GroupBaseContainerException(exc_message)
+
+            if isinstance(value, BaseValue):
+                base_values += tuple([BaseValue(key), value])
+            else:
+                base_values += tuple([BaseValue(key), BaseValue(value)])
+    else:
+        raise GroupBaseContainerException(f"Expected a container, but received a non-container {type(item)}")
+
+    return base_values
+
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
+class BaseContainer(BaseInterface):
 
     _items: tuple[BaseValue] = field(
         validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes), iterable_validator=validators.instance_of(tuple)),
@@ -79,7 +130,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
     @override
     def __str__(self) -> str:
         return str(self._unpack(item=self.items, type_=self.type))
-    
+
     def __iter_items__(self, slot_name: str = "_items"):
         """Returns an iterator over all slots.
 
@@ -113,7 +164,7 @@ class BaseContainer[T: (dict, list, tuple, set, frozenset)](BaseInterface):
             hashed_items = hashed_items + (item._hash().root(), )
 
         return MerkleTree(hashed_items)
-    
+
     def _hash(self) -> MerkleTree:
         return MerkleTree((self._hash_type(), self._hash_items().root(), ))
 

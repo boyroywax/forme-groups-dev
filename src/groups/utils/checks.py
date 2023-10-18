@@ -1,24 +1,21 @@
-from attrs import define, field, validators
-from typing import Optional, TypeAlias, Type, override
-
-from ..base.types import LinearContainer, NamedContainer, AllBaseContainerTypes
+from ..base.types import LinearContainer, NamedContainer, BaseContainerTypes
 
 
-def is_linear_container(item: AllBaseContainerTypes) -> bool:
+def is_linear_container(item: BaseContainerTypes) -> bool:
     """
     Checks if item is a linear container
     """
     return isinstance(item, LinearContainer)
 
 
-def is_named_container(item: AllBaseContainerTypes) -> bool:
+def is_named_container(item: BaseContainerTypes) -> bool:
     """
     Checks if item is a named container
     """
     return isinstance(item, NamedContainer)
 
 
-def is_any_container(item: AllBaseContainerTypes) -> bool:
+def is_any_container(item: BaseContainerTypes) -> bool:
     """
     Checks if item is any container
     """
@@ -27,7 +24,7 @@ def is_any_container(item: AllBaseContainerTypes) -> bool:
     return is_linear_container(item) or is_named_container(item)
 
 
-def _contains_sub_container(item: AllBaseContainerTypes) -> bool:
+def _contains_sub_container(item: BaseContainerTypes) -> bool:
     """
     Checks if container contains a sub container
     """

@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
+sys.path.append("../forme-groups-python-3-12/")
 
 from src.groups.unit.nonce import Nonce
 from src.groups.base.container import BaseContainer

@@ -3,7 +3,7 @@ import sys
 import random
 import uuid
 
-sys.path.append("/Users/j/Documents/Forme/code/forme-groups-python-3-12/")
+sys.path.append("../forme-groups-python-3-12/")
 from src.groups.utils.crypto import MerkleTree
 from src.groups.base.value import BaseValue
 from src.groups.base.exceptions import GroupBaseValueException

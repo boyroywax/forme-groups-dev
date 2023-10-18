@@ -5,21 +5,40 @@ The Schema declares the structure of the Group Unit Data.
 """
 
 from attrs import define, field, validators
-from typing import Any, TypeAlias, override, Type
+from typing import TypeAlias, override
 
 from .interface import BaseInterface
-from .types import BaseValueTypes, BaseContainerTypes, AllBaseValueTypes, AllBaseContainerTypes
-from .container import BaseContainer
-from .value import BaseValue
+from .types import BaseTypes, BaseContainerTypes
 from ..utils.crypto import MerkleTree
-from ..utils.converters import _base_type_converter
+
+
+def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | set | frozenset |type) -> TypeAlias | type:
+    """
+    Converter function for _value field
+    """
+    type_from_alias: TypeAlias | type = None
+    
+    if isinstance(item, str) and len(item) > 0:
+        type_from_value_alias = BaseTypes._get_type_from_alias(item)
+        type_from_container_alias = BaseTypes._get_type_from_alias(item)
+
+        assert (type_from_value_alias is not None or
+                type_from_container_alias is not None), f"Expected a type, but received {item}"
+        type_from_alias = type_from_value_alias if type_from_value_alias is not None else type_from_container_alias
+
+    elif isinstance(item, type):
+        type_from_alias = item
+
+    elif isinstance(item, BaseContainerTypes):
+        type_from_alias = item.__class__
+
+    return type_from_alias
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class SchemaEntry(BaseInterface):
     _key: str = field(validator=validators.instance_of(str))
     _value: str | type | TypeAlias = field(validator=validators.instance_of(str | type | TypeAlias), converter=_base_type_converter)
-
 
     @staticmethod
     def _str_value(value: str | type | TypeAlias) -> str:
@@ -32,7 +51,7 @@ class SchemaEntry(BaseInterface):
     @override
     def __repr__(self):
         return f"{self.__class__.__name__}(key={repr(self._key)}, value={self._str_value(self._value)})"
-    
+
     def _hash_key(self) -> str:
         return MerkleTree._hash_func(self._key)
 
@@ -41,17 +60,14 @@ class SchemaEntry(BaseInterface):
 
     def _hash(self) -> MerkleTree:    
         return MerkleTree((self._hash_key(), self._hash_value()))
-    
+
     def _verify_hash_key(self, key: str) -> bool:
         key_hash = MerkleTree._hash_func(key)
         return key_hash == self._hash_key()
-    
+
     def _verify_hash_value(self, value: str | type | TypeAlias) -> bool:
         value_hash = MerkleTree._hash_func(self._str_value(value))
         return value_hash == self._hash_value()
-    
-
-
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -96,7 +112,7 @@ class BaseSchema(BaseInterface):
     @override
     def __iter__(self):
         for entry in self.entries:
-           yield entry
+            yield entry
 
     @override
     def __repr__(self):

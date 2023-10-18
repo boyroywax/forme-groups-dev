@@ -1,9 +1,9 @@
 import struct
-from typing import TypeAlias, override, Any, Union, Generic, TypeVar
+from typing import override, Any, Union
 from attrs import define, field
 
 
-from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, AllBaseValueTypesTuple, AllBaseValueTypes, AllBaseContainerTypes
+from .types import BaseValueTypes, AllBaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
@@ -20,16 +20,12 @@ def _base_value_validator(instance, attribute, value):
     Raises:
         GroupBaseValueException: If the value is not a BaseValueTypes
     """
-    # print(f'{instance=}, {attribute=}, {value=}')
     if not isinstance(value, AllBaseValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
-
-# base_type_vars = TypeVar("base_type_vars", int, float, str, bytes, bool, None)
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseValue(BaseInterface):
-# class BaseValue(BaseInterface, Generic[base_type_vars]):
     """Base class for values
 
     Args:
@@ -46,7 +42,6 @@ class BaseValue(BaseInterface):
     _value: AllBaseValueTypes = field(validator=_base_value_validator)
 
     @property
-    # def value(self) -> T:
     def value(self) -> AllBaseValueTypes:
         """The single base value held by the BaseValue Class
 
@@ -62,11 +57,8 @@ class BaseValue(BaseInterface):
     
     @value.getter
     def value(self) -> AllBaseValueTypes:
-    # def value(self) -> AllBaseValueTypes:
         """The single base value held by the BaseValue Class
         """
-        # print(base_type_vars.__constraints__, self._value, type(self._value))
-        # print(f'{repr(T)}=')
         return self._value
 
     @staticmethod
@@ -204,7 +196,7 @@ class BaseValue(BaseInterface):
         # print(self._hash_value(), self._hash_type())
         return MerkleTree(hashed_data=(self._hash_value(), self._hash_type(), ))
 
-    def _verify_hash_value[T: str](self, hash_value: T) -> bool:
+    def _verify_hash_value(self, hash_value: str) -> bool:
         return self._hash_value() == hash_value
 
     def _verify_hash_type(self, hash_type: str) -> bool:

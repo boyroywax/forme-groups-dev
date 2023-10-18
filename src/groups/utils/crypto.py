@@ -1,22 +1,22 @@
 import hashlib
-from typing import TypeVar
 from attrs import define, field, validators
 
 
-
-def hash_sha256[T4: str](data: T4) -> T4:
-    return hashlib.sha256(data.encode()).hexdigest()
+def hash_sha256(data: str | bytes) -> str:
+    if isinstance(data, str):
+        data = data.encode()
+    return hashlib.sha256(data).hexdigest()
 
 
 @define(slots=True)
-class MerkleTree[T: tuple[str, ...]]:
+class MerkleTree:
     """A Merkle Tree object.
     """
 
     leaves: tuple[str, ...] = field(default=[], validator=validators.instance_of(tuple))
     levels: tuple[tuple[str, ...]] = field(default=[], validator=validators.instance_of(tuple))
 
-    def __init__(self, hashed_data: T = ()) -> None:
+    def __init__(self, hashed_data: tuple[str, ...] = ()) -> None:
         self.leaves = hashed_data
         self.levels = (self.leaves, )
         self.build()
@@ -34,13 +34,11 @@ class MerkleTree[T: tuple[str, ...]]:
             level = self.levels[-1]
 
     @staticmethod
-    def _hash_func[T0: str](data: T0) -> T0:
-        # assert T.__bound__ is str, f"T must be str, but received {T.__bound__}"
-
+    def _hash_func(data: str | bytes) -> str:
         return hash_sha256(data)
 
     @staticmethod
-    def _hash_items[T1: (str, None)](item1: T1 = None, item2: T1 = None) -> str:
+    def _hash_items(item1: str | bytes | None = None, item2: str | bytes | None = None) -> str:
         # assert ((type(item1) is str) or (type(item2) is None)), f"{type(item2)} must be str or None"
         if item1 is None:
             raise ValueError(f'item1 cannot be None, but received {T}')
@@ -50,8 +48,8 @@ class MerkleTree[T: tuple[str, ...]]:
 
         return MerkleTree._hash_func(item1 + item2)
 
-    @staticmethod    
-    def hash_level(level: T) -> T:
+    @staticmethod
+    def hash_level(level: tuple[str | bytes, ...]) -> tuple[str, ...]:
         hashed_level = ()
         for i in range(0, len(level), 2):
             if (i + 1) % 2 != 0 and i == len(level) - 1:
@@ -65,6 +63,7 @@ class MerkleTree[T: tuple[str, ...]]:
 
     def _find_levels_count(self) -> int:
         return len(self.levels)
+    
     def root(self) -> str | None:
         if self.levels[-1] is None or len(self.levels) == 0 or len(self.leaves) == 0:
             return None
