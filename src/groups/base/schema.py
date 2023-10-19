@@ -179,7 +179,7 @@ class BaseSchema(BaseInterface):
         Returns:
             str: The representation of the schema
         """
-        return f"{self.__class__.__name__}(entries={repr(entry for entry in self.entries)})"
+        return f"{self.__class__.__name__}(entries={repr(self.entries)})"
     
     def _hash_entries(self):
         hashed_entries: Tuple[str, ...] = ()

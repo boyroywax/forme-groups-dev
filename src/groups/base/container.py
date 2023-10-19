@@ -137,28 +137,48 @@ class BaseContainer(BaseInterface):
 
     @override
     def __repr__(self) -> str:
+        """Returns the representation of the BaseContainer
+
+        Returns:
+            str: The representation of the BaseContainer
+
+        Examples:
+            >>> container = BaseContainer((1, 2, 3))
+            >>> repr(container)
+            BaseContainer(items=(BaseValue(value=1, type=int), BaseValue(value=2, type=int), BaseValue(value=3, type=int)), type=tuple)
+        
+        """
         return f"BaseContainer(items={self.items}, type={self.type})"
 
     @override
     def __str__(self) -> str:
+        """Returns the string of the BaseContainer's items
+
+        Returns:
+            str: The string of the BaseContainer's items
+
+        Examples:
+            >>> container = BaseContainer((1, 2, 3))
+            >>> str(container)
+            '(1, 2, 3)'
+        """
         return str(self._unpack(item=self.items, type_=self.type))
 
     def __iter_items__(self, slot_name: str = "_items"):
-        """Returns an iterator over all slots.
+        """Returns an iterator over all items.
 
         Returns:
-            Iterator[str]: An iterator over all slots.
+            Iterator[str]: An iterator over all items.
         """
+        assert hasattr(self, slot_name), f"Expected a slot name, but received {slot_name}"
+
         items: tuple = getattr(self, slot_name)
 
-        # if isinstance(items, BaseValue | BaseValueTypes):
-        #     yield items
-
-        if isinstance(items, LinearContainer | BaseContainer):
+        if is_linear_container(items):
             for value in items:
                 yield value
 
-        elif isinstance(items, NamedContainer):
+        elif is_named_container(items):
             for key, value in items.items():
                 yield value
                 yield key

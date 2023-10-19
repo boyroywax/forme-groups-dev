@@ -28,6 +28,14 @@ class TestGroupUnit(unittest.TestCase):
         self.assertEqual(repr(self.group_unit.nonce), "Nonce(chain=BaseContainer(items=(BaseValue(value=0, type=int),), type=tuple))")
         self.assertEqual(str(self.group_unit.nonce), "0")
 
+        self.assertEqual(repr(self.group_unit.owner), "Owner(_owner=None)")
+        self.assertEqual(str(self.group_unit.owner), "")
+
+        self.assertEqual(repr(self.group_unit.credential), "Credential(_credential=None)")
+        self.assertEqual(str(self.group_unit.credential), "")
+
+        self.assertEqual(repr(self.group_unit.data), "Data(_entry=BaseContainer(items=(BaseValue(value=1, type=int),), type=tuple), _schema=BaseSchema(entries=(SchemaEntry(key='test', value=int),)))")
+
     def test_init_with_data(self):
         self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
         self.assertEqual(self.group_unit.data, self.data)
