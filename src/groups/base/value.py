@@ -7,6 +7,7 @@ from .types import BaseValueTypes, BaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
+from ..utils.converters import force_value_type
 
 
 def _base_value_validator(instance, attribute, value):
@@ -110,35 +111,9 @@ class BaseValue(BaseInterface):
 
         assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
 
-        base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_alias}")
+        # base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_alias}")
 
-        forced_value: Any = None
-        try:
-            match type_alias:
-                case "<class 'NoneType'>" | "NoneType" | "None":
-                    return BaseValue(None)
-                case "<class 'bool'>" | "bool" | "boolean":
-                    forced_value = bool(value)
-                case "<class 'int'>" | "int" | "integer":
-                    forced_value = int(value)
-                case "<class 'float'>" | "float":
-                    forced_value = float(value)
-                case "<class 'str'>" | "str" | "string":
-                    forced_value = str(value)
-                case "<class 'bytes'>" | "bytes":
-                    if isinstance(value, str):
-                        forced_value = bytes(value.encode())
-                    elif isinstance(value, int):
-                        forced_value = value.to_bytes()
-                    elif isinstance(value, float):
-                        forced_value = struct.pack('f', value)
-                    elif isinstance(value, bool):
-                        forced_value = struct.pack('?', value)
-                case _:
-                    raise base_exception
-
-        except Exception as e:
-            raise base_exception from e
+        forced_value: Any = force_value_type(value, type_alias)
 
         return BaseValue(forced_value)
 

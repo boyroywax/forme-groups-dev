@@ -166,7 +166,7 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_force_type_with_str(self):
         value = BaseValue("hello")
-        self.assertRaises(GroupBaseValueException, BaseValue._force_type, value, type(int).__name__)
+        self.assertRaises(TypeError, BaseValue._force_type, value, type(int).__name__)
 
     def test_base_value_force_type_with_int_one_is_true(self):
         value = BaseValue(1)
@@ -177,13 +177,13 @@ class TestBaseValue(unittest.TestCase):
         value = BaseValue(True)
         self.assertEqual(BaseValue._force_type(value, "int"), BaseValue(1))
 
-    def test_base_value_force_type_with_none_fails(self):
+    def test_base_value_force_type_with_none_is_none(self):
         value = BaseValue(None)
-        self.assertRaises(GroupBaseValueException, BaseValue._force_type, value, "int")
+        self.assertEqual(BaseValue._force_type(value, "NoneType"), BaseValue(None))
 
-    def test_base_value_force_type_with_bytes_fails(self):
+    def test_base_value_force_type_with_bytes_works(self):
         value = BaseValue(b"hello")
-        self.assertRaises(GroupBaseValueException, BaseValue._force_type, value, "int")
+        self.assertEqual(BaseValue._force_type(value, "bytes"), BaseValue(b"hello"))
 
     def test_base_value_force_type_with_float_to_int_whole_number(self):
         value = BaseValue(1.6)

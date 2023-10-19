@@ -83,7 +83,8 @@ def force_value_type(value: BaseValueTypes, type_alias: str) -> BaseValueTypes:
     assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
     assert isinstance(type_alias, str), f"Expected a string, but received {type(type_alias)}"
 
-    forced_value: Any = None
+    if value is None:
+        return None
 
     match type_alias:
         case "<class 'NoneType'>" | "NoneType" | "None":
@@ -100,5 +101,4 @@ def force_value_type(value: BaseValueTypes, type_alias: str) -> BaseValueTypes:
             return convert_to_bytes(value)
         case _:
             raise TypeError(f"Could not force value {value} to type {type_alias}")
-        
-    return forced_value
+
