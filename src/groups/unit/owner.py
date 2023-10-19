@@ -1,4 +1,5 @@
 from attrs import define, field, validators
+from typing import Optional
 
 from ..base.interface import BaseInterface
 from ..base.container import BaseContainer
@@ -9,9 +10,9 @@ class Owner(BaseInterface):
     """The Owner class holds the owner of the Group Unit
     """
 
-    _owner: BaseContainer = field(
-        validator=validators.instance_of(BaseContainer),
-    )
+    _owner: Optional[BaseContainer] = field(
+        validator=validators.optional(validators.instance_of(BaseContainer)),
+        default=None)
 
     @property
     def owner(self) -> BaseContainer:

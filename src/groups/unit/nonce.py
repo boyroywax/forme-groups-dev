@@ -41,7 +41,7 @@ class Nonce(BaseInterface):
 
     _chain: BaseContainer = field(
         validator=_validate_nonce_type,
-    )
+        default=BaseContainer((BaseValue(0),)))
 
     def _get_active(self) -> BaseValue:
         """Sets the active nonce

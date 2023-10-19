@@ -4,13 +4,25 @@ import sys
 sys.path.append("../forme-groups-python-3-12/")
 
 from src.groups.unit import GroupUnit
-from src.groups.unit.exceptions import GroupUnitException
+from src.groups.unit.nonce import Nonce
+from src.groups.unit.data import Data
+from src.groups.unit.credential import Credential
+from src.groups.unit.owner import Owner
+from src.groups.base.container import BaseContainer
+from src.groups.base.value import BaseValue
+from src.groups.base.schema import BaseSchema, SchemaEntry
 
 
 class TestGroupUnit(unittest.TestCase):
     def setUp(self):
-        pass
+        self.schema_entry = SchemaEntry("test", "int")
+        self.schema = BaseSchema((self.schema_entry, ))
+        self.base_container = BaseContainer((BaseValue(1), ), "tuple")
+        self.data = Data(self.base_container, self.schema)
+        self.nonce = Nonce()
+        self.credential = Credential()
+        self.owner = Owner()
 
     def test_init(self):
-        self.assertRaises(GroupUnitException, GroupUnit, "test")
+        self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
 
