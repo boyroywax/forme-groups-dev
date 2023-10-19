@@ -1,5 +1,6 @@
 import hashlib
-from attrs import define, field, validators
+from attrs import define, field, validators, Factory
+from typing import Tuple
 
 
 def hash_sha256(data: str | bytes) -> str:
@@ -14,17 +15,17 @@ class MerkleTree:
     """
 
     leaves: tuple[str, ...] = field(
-        default=(),
+        default=Factory(Tuple),
         validator=validators.deep_iterable(validators.instance_of(str),
-        iterable_validator=validators.instance_of(tuple)))
+        iterable_validator=validators.instance_of(Tuple)))
     
     levels: tuple[tuple[str, ...]] = field(
-        default=(),
+        default=Factory(Tuple),
         validator=validators.deep_iterable(validators.deep_iterable(validators.instance_of(str),
-        iterable_validator=validators.instance_of(tuple)),
-        iterable_validator=validators.instance_of(tuple)))
+        iterable_validator=validators.instance_of(Tuple)),
+        iterable_validator=validators.instance_of(Tuple)))
 
-    def __init__(self, hashed_data: tuple[str, ...] = ()) -> None:
+    def __init__(self, hashed_data: Tuple[str, ...] = ()) -> None:
         self.leaves = hashed_data
         self.levels = (self.leaves, )
         self.build()

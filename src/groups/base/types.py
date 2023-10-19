@@ -9,49 +9,54 @@ from ..utils.crypto import MerkleTree
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseType(BaseInterface):
+    """Base class for types
+    
+    Args:
+        aliases (Tuple[str, ...]): The aliases for the base type
+        super_type (Optional[Tuple[str, ...]]): The super type of the base type
+        prefix (Optional[str]): The prefix for the base type
+        suffix (Optional[str]): The suffix for the base type
+        separator (Optional[str]): The separator for the base type
+        type_class (Optional[Callable]): The type class for the base type
+        type_var (Optional[TypeVar]): The type var for the base type
+        constraints (Optional[Union[type, TypeAlias]]): The constraints for the base type
+        _encryption_key (Optional[bytes]): The encryption key for the base type
+    """
     aliases: Tuple[str, ...] = field(
-        validator=validators.deep_iterable(validators.instance_of(str), iterable_validator=validators.instance_of(tuple)),
-    )
+        validator=validators.deep_iterable(validators.instance_of(str),
+        iterable_validator=validators.instance_of(Tuple)))
 
     super_type: Optional[Tuple[str, ...]] = field(
-        validator=validators.optional(validators.instance_of(str | type)),
-        default=None
-    )
+        validator=validators.optional(validators.instance_of((str, type))),
+        default=None)
 
     prefix: Optional[str] = field(
         validator=validators.optional(validators.instance_of(str)),
-        default=None
-    )
+        default=None)
 
     suffix: Optional[str] = field(
         validator=validators.optional(validators.instance_of(str)),
-        default=None
-    )
+        default=None)
 
     separator: Optional[str] = field(
         validator=validators.optional(validators.instance_of(str)),
-        default=None
-    )
+        default=None)
 
     type_class: Optional[Callable] = field(
-        validator=validators.optional(validators.instance_of(type | TypeAlias)),
-        default=str
-    )
+        validator=validators.optional(validators.instance_of((type, TypeAlias))),
+        default=str)
 
     type_var: Optional[TypeVar] = field(
         validator=validators.optional(validators.instance_of(TypeVar)),
-        default=None
-    )
+        default=None)
 
-    constraints: Optional[Union[type, TypeAlias]] = field(
-        validator=validators.optional(validators.instance_of(type | TypeAlias)),
-        default=None
-    )
+    constraints: Optional[type | TypeAlias] = field(
+        validator=validators.optional(validators.instance_of((type, TypeAlias))),
+        default=None)
 
     _encryption_key: Optional[bytes] = field(
         validator=validators.optional(validators.instance_of(bytes)),
-        default=None
-    )
+        default=None)
 
     @property
     def is_container(self) -> bool:
@@ -101,7 +106,7 @@ class BaseType(BaseInterface):
                     return True
         return False
 
-    def _contains_alias(self, alias: str, exclude: Optional[tuple[str, ...]] = None) -> bool:
+    def _contains_alias(self, alias: str, exclude: Optional[Tuple[str, ...]] = None) -> bool:
         """Checks if type contains an alias
 
         Args:
@@ -309,7 +314,6 @@ class _BaseTypes(BaseInterface):
 
         match (type_, format_):
             case ("value", "union"):
-                # return self.Integer.type_class | self.FloatingPoint.type_class | self.Boolean.type_class | self.String.type_class | self.Bytes.type_class | None
                 return Union[
                     self.Integer.type_class,
                     self.FloatingPoint.type_class,
@@ -432,7 +436,7 @@ class _BaseTypes(BaseInterface):
     
     @property
     def aliases(self) -> tuple[str, ...]:
-        aliases: tuple[str, ...] = ()
+        aliases: Tuple[str, ...] = ()
         for base_type in self.all_base_types:
             aliases += base_type.aliases
         return aliases
@@ -485,7 +489,7 @@ class _BaseTypes(BaseInterface):
     def _hash_types(self) -> MerkleTree:
         """Hashes the types
         """
-        hashed_types: tuple[str, ...] = ()
+        hashed_types: Tuple[str, ...] = ()
         for base_type in self.all_base_types:
             hashed_types += (base_type._hash_package().root(),)
         return MerkleTree(hashed_data=hashed_types)
@@ -493,7 +497,6 @@ class _BaseTypes(BaseInterface):
 
 # Base Type Categories
 BaseTypes = _BaseTypes()
-# BaseValueTypes: type | TypeAlias = BaseTypes.all("value")
 BaseValueTypes = BaseTypes.all("value")
 BaseContainerTypes: type | TypeAlias = BaseTypes.all("container")
 LinearContainer: type | TypeAlias = BaseTypes.all("linear")
@@ -501,13 +504,13 @@ NamedContainer: type | TypeAlias = BaseTypes.all("named")
 Text: type | TypeAlias = BaseTypes.all("text")
 Number: type | TypeAlias = BaseTypes.all("number")
 
-# Additional Base Type Aliases
+# Base Type Aliases in Tuple Format
 BaseValueTypesTuple: Tuple[type | TypeAlias, ...] = BaseTypes.all("value", "tuple")
 BaseContainerTypesTuple: Tuple[type | TypeAlias, ...] = BaseTypes.all("container", "tuple")
 
 # Base Object Types
 Object = object | None
-KeyValue = tuple[BaseValueTypes, BaseValueTypes]
+KeyValue = Tuple[BaseValueTypes, BaseValueTypes]
 UnitTypes = BaseValueTypes | BaseContainerTypes | Object
 
 # Base Text Types
