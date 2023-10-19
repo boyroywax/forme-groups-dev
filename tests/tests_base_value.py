@@ -400,3 +400,17 @@ class TestBaseValue(unittest.TestCase):
             random_value = random.choice(values)
             value = BaseValue(random_value)
             self.assertEqual(value._hash_repr(), MerkleTree._hash_func(repr(value)))
+
+    def test_hash_int(self):
+        value = BaseValue(1)
+        self.assertEqual(value._hash_value(), "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b")
+        self.assertEqual(value._hash_type(), "6da88c34ba124c41f977db66a4fc5c1a951708d285c81bb0d47c3206f4c27ca8")
+        self.assertEqual(str(value._hash()), "5b1980a185761ca08c85b7ae8d9d98176814e6161f86df9bbc0b5ae4311ba46a")
+
+        value = BaseValue(2)
+        self.assertEqual(value._hash_value(), "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35")
+        self.assertEqual(value._hash_type(), "6da88c34ba124c41f977db66a4fc5c1a951708d285c81bb0d47c3206f4c27ca8")
+
+        value = BaseValue('1')
+        self.assertEqual(value._hash_value(), "9a7622b24ae73586214f453f44ed438ce5c63aa07c720c2ccc29ae5bd7ec5322")
+        self.assertEqual(value._hash_type(), "8c25cb3686462e9a86d2883c5688a22fe738b0bbc85f458d2d2b5f3f667c6d5a")

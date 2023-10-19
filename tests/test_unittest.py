@@ -2,6 +2,8 @@
 
 import unittest
 
+from tests_utils_checks import TestChecks
+from tests_utils_converters import TestConverters
 from tests_merkle_tree import TestMerkleTree
 from tests_base_interface import TestBaseInterface
 from tests_base_types import TestBaseTypes
@@ -20,6 +22,8 @@ def main():
     loader = unittest.TestLoader()
 
     # Utils tests
+    test_suite.addTest(loader.loadTestsFromTestCase(TestChecks))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestConverters))
     test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
 
     # Base tests

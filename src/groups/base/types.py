@@ -140,11 +140,19 @@ class BaseTypeInterface(BaseInterface, ABC):
         
     @override
     def __str__(self) -> str:
+        """Convert the first Alias to a string
+        
+        Returns:
+            str: The first alias
+        """
         return self._aliases[0]
     
     @override
     def __repr__(self) -> str:
-        return super().__repr_private__(False)
+        """Convert the first Alias to a string
+
+        """
+        return super().__repr_private__(include_underscored_slots=False)
     
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -284,7 +292,7 @@ class _BaseTypes(BaseInterface):
         constraints=frozenset
     ))
 
-    def all(self, type_: Optional[str] = None, format_: Optional[str] = None) -> type | TypeAlias | tuple:
+    def all(self, type_: Optional[str] = None, format_: Optional[str] = None) -> Union[type | TypeAlias, tuple[type | TypeAlias, ...]]:
         """All the system types
 
         Returns:
@@ -301,6 +309,7 @@ class _BaseTypes(BaseInterface):
 
         match (type_, format_):
             case ("value", "union"):
+                # return self.Integer.type_class | self.FloatingPoint.type_class | self.Boolean.type_class | self.String.type_class | self.Bytes.type_class | None
                 return Union[
                     self.Integer.type_class,
                     self.FloatingPoint.type_class,
@@ -484,7 +493,8 @@ class _BaseTypes(BaseInterface):
 
 # Base Type Categories
 BaseTypes = _BaseTypes()
-BaseValueTypes: type | TypeAlias = BaseTypes.all("value")
+# BaseValueTypes: type | TypeAlias = BaseTypes.all("value")
+BaseValueTypes = BaseTypes.all("value")
 BaseContainerTypes: type | TypeAlias = BaseTypes.all("container")
 LinearContainer: type | TypeAlias = BaseTypes.all("linear")
 NamedContainer: type | TypeAlias = BaseTypes.all("named")
@@ -492,10 +502,8 @@ Text: type | TypeAlias = BaseTypes.all("text")
 Number: type | TypeAlias = BaseTypes.all("number")
 
 # Additional Base Type Aliases
-AllBaseValueTypes: type | TypeAlias = BaseValueTypes
-AllBaseValueTypesTuple: Tuple[str, ...] = BaseTypes.all("value", "tuple")
-AllBaseContainerTypes: type | TypeAlias = BaseContainerTypes
-BaseValueContainer: Tuple[type | TypeAlias] = tuple[AllBaseValueTypes, ...]
+BaseValueTypesTuple: Tuple[type | TypeAlias, ...] = BaseTypes.all("value", "tuple")
+BaseContainerTypesTuple: Tuple[type | TypeAlias, ...] = BaseTypes.all("container", "tuple")
 
 # Base Object Types
 Object = object | None

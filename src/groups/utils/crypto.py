@@ -14,12 +14,12 @@ class MerkleTree:
     """
 
     leaves: tuple[str, ...] = field(
-        default=[],
+        default=(),
         validator=validators.deep_iterable(validators.instance_of(str),
         iterable_validator=validators.instance_of(tuple)))
     
     levels: tuple[tuple[str, ...]] = field(
-        default=[],
+        default=(),
         validator=validators.deep_iterable(validators.deep_iterable(validators.instance_of(str),
         iterable_validator=validators.instance_of(tuple)),
         iterable_validator=validators.instance_of(tuple)))

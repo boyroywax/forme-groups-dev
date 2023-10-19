@@ -3,7 +3,7 @@ from typing import override, Any, Union
 from attrs import define, field
 
 
-from .types import BaseValueTypes, AllBaseValueTypes
+from .types import BaseValueTypes, BaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
@@ -20,7 +20,7 @@ def _base_value_validator(instance, attribute, value):
     Raises:
         GroupBaseValueException: If the value is not a BaseValueTypes
     """
-    if not isinstance(value, AllBaseValueTypes):
+    if not isinstance(value, BaseValueTypes):
         raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
 
 
@@ -39,10 +39,10 @@ class BaseValue(BaseInterface):
         >>> value
         BaseValue(value=1, type=int)
     """
-    _value: AllBaseValueTypes = field(validator=_base_value_validator)
+    _value: BaseValueTypes = field(validator=_base_value_validator)
 
     @property
-    def value(self) -> AllBaseValueTypes:
+    def value(self) -> BaseValueTypes:
         """The single base value held by the BaseValue Class
 
         Returns:
@@ -56,7 +56,7 @@ class BaseValue(BaseInterface):
         return self._value
     
     @value.getter
-    def value(self) -> AllBaseValueTypes:
+    def value(self) -> BaseValueTypes:
         """The single base value held by the BaseValue Class
         """
         return self._value
@@ -108,11 +108,11 @@ class BaseValue(BaseInterface):
 
             value = value.value
 
-        assert isinstance(value, AllBaseValueTypes), f"Expected a value, but received {type(value)}"
-        forced_value: Any = None
+        assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
 
         base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_alias}")
 
+        forced_value: Any = None
         try:
             match type_alias:
                 case "<class 'NoneType'>" | "NoneType" | "None":
@@ -152,7 +152,6 @@ class BaseValue(BaseInterface):
             >>> value = BaseValue(1)
             >>> value.get_type_str()
             'int'
-
         """
         return type(self._value).__name__
 
@@ -167,7 +166,6 @@ class BaseValue(BaseInterface):
             >>> value = BaseValue(1)
             >>> str(value)
             '1'
-
         """
         return str(self._value)
 
@@ -182,25 +180,92 @@ class BaseValue(BaseInterface):
                 >>> value = BaseValue(1)
                 >>> repr(value)
                 BaseValue(value=1, type=int)
-
         """
         return f"{self.__class__.__name__}(value={repr(self.value)}, type={self.get_type_str()})"
 
     def _hash_value(self) -> str:
+        """Hashes the repr(value) of the BaseValue
+
+            Returns:
+                str: The hashed value
+
+            Examples:
+                >>> value = BaseValue(1)
+                >>> value._hash_value()
+                '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b'
+        """
         return MerkleTree._hash_func(repr(self.value))
 
     def _hash_type(self) -> str:
+        """Hashes the type of the BaseValue
+
+            Returns:
+                str: The hashed type
+
+            Examples:
+                >>> value = BaseValue(1)
+                >>> value._hash_type()
+                '6da88c34ba124c41f977db66a4fc5c1a951708d285c81bb0d47c3206f4c27ca8'
+        """
         return MerkleTree._hash_func(self.get_type_str())
 
     def _hash(self) -> MerkleTree:
-        # print(self._hash_value(), self._hash_type())
+        """Hashes the BaseValue by hashing the value and type separatly
+
+            Returns:
+                MerkleTree: The hashed BaseValue
+
+            Examples:
+                >>> value = BaseValue(1)
+                >>> value._hash()
+                MerkleTree(root='5b1980a185761ca08c85b7ae8d9d98176814e6161f86df9bbc0b5ae4311ba46a')
+        """
         return MerkleTree(hashed_data=(self._hash_value(), self._hash_type(), ))
 
     def _verify_hash_value(self, hash_value: str) -> bool:
+        """Verifies the hash value of the BaseValue
+
+            Args:
+                hash_value (str): The hash value to verify
+
+            Returns:
+                bool: Whether the hash value is valid
+
+            Examples:
+                >>> value = BaseValue(1)
+                >>> value._verify_hash_value('6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b')
+                True
+        """
         return self._hash_value() == hash_value
 
     def _verify_hash_type(self, hash_type: str) -> bool:
+        """Verifies the hash type of the BaseValue
+
+            Args:
+                hash_type (str): The hash type to verify
+
+            Returns:
+                bool: Whether the hash type is valid
+
+            Examples:
+                >>> value = BaseValue(1)
+                >>> value._verify_hash_type('6da88c34ba124c41f977db66a4fc5c1a951708d285c81bb0d47c3206f4c27ca8')
+                True
+        """
         return self._hash_type() == hash_type
 
     def _verify_hash(self, hash_: str) -> bool:
+        """Verifies the hash of the BaseValue
+
+            Args:
+                hash_ (str): The hash to verify
+
+            Returns:
+                bool: Whether the hash is valid
+
+            Examples:
+                >>> value = BaseValue(1)
+                >>> value._verify_hash('5b1980a185761ca08c85b7ae8d9d98176814e6161f86df9bbc0b5ae4311ba46a')
+                True
+        """
         return self._hash().root() == hash_
