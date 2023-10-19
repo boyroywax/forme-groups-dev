@@ -2,7 +2,7 @@ from attrs import define, field, validators
 from typing import Optional, TypeAlias, Type, override
 
 from .interface import BaseInterface
-from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, LinearContainer, NamedContainer
+from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, BaseContainerTypesTuple
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
@@ -17,7 +17,7 @@ def _base_container_type_converter(item: BaseContainerTypes | str | type) -> Bas
     if isinstance(item, str) and len(item) > 0:
         type_from_alias = BaseTypes._get_type_from_alias(item)
 
-    if type_from_alias is None or isinstance(type_from_alias(), BaseValueTypes):
+    if type_from_alias is None or type_from_alias not in BaseContainerTypesTuple:
         raise GroupBaseContainerException(f"Expected a container type, but received {item}")
     elif isinstance(item, BaseContainerTypes):
         type_from_alias = type(item)
@@ -31,11 +31,14 @@ def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
     """
     base_values: tuple = tuple()
     exc_message = f"Expected a non-container, but received {type(item)}"
+    
+    if isinstance(item, (str, int, float, bool)):
+        base_values += tuple([BaseValue(item)], )
 
-    if contains_sub_container(item):
+    elif contains_sub_container(item):
         raise GroupBaseContainerException(exc_message)
 
-    if is_linear_container(item):
+    elif is_linear_container(item):
         for item_ in item:
             if is_base_container_type(item_):
                 raise GroupBaseContainerException(exc_message)
@@ -119,6 +122,7 @@ class BaseContainer(BaseInterface):
         Repackages the container
         """
         type_from_alias: TypeAlias | type = BaseTypes._get_type_from_alias(type_)
+
         match (str(type_from_alias)):
             case("<class 'list'>"):
                 return [value.value for value in item]

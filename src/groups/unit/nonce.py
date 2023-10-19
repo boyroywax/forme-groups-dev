@@ -1,7 +1,8 @@
 from attrs import define, field
-from typing import override
+from typing import override, Optional
 
 from ..base.interface import BaseInterface
+from ..base.types import BaseTypes
 from ..base.value import BaseValue
 from ..base.container import BaseContainer
 from ..base.exceptions import GroupBaseException
@@ -25,12 +26,12 @@ def _validate_nonce_type(instance, attribute, value):
     if not isinstance(value, BaseContainer):
         raise GroupBaseException(f"Expected a BaseContainer, but received {type(value)}")
 
-    for itemm in value.items:
-        if not isinstance(itemm, BaseValue):
-            raise GroupBaseException(f"Expected a BaseValue, but received {type(itemm)}")
+    for item_ in value.items:
+        if not isinstance(item_, BaseValue):
+            raise GroupBaseException(f"Expected a BaseValue, but received {type(item_)}")
 
-        if not isinstance(itemm.value, int | str):
-            raise GroupBaseException(f"Expected a supported nonce type, but received {type(itemm.value)}")
+        if not isinstance(item_.value, int | str):
+            raise GroupBaseException(f"Expected a supported nonce type, but received {type(item_.value)}")
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -74,15 +75,26 @@ class Nonce(BaseInterface):
         """
         return Nonce(self._next_active_chain())
     
-    def _next_sub_nonce_chain(self) -> BaseContainer:
+    def _next_sub_nonce_chain(self, type_: type) -> BaseContainer:
         """Determines the next sub nonce chain
         """
-        return BaseContainer(self._chain.items + (BaseValue(0),))
+        match str(type_):
+            case "<class 'int'>":
+                return BaseContainer(self._chain.items + (BaseValue(0),))
+            case "<class 'str'>":
+                return BaseContainer(self._chain.items + (BaseValue('a'),))
+            case _:
+                raise NotImplementedError(f"Unsupported type {type_}")
     
-    def _next_sub_nonce(self) -> 'Nonce':
+    def _next_sub_nonce(self, type_alias: Optional[str] = None) -> 'Nonce':
         """Determines the next sub nonce
         """
-        return Nonce(self._next_sub_nonce_chain())
+        if type_alias is None:
+            type_alias: str = self._get_active().get_type_str()
+        
+        type_ = BaseTypes._get_type_from_alias(type_alias)
+            
+        return Nonce(self._next_sub_nonce_chain(type_))
 
     @property
     def nonce(self) -> BaseContainer:
