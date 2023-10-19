@@ -436,6 +436,11 @@ class _BaseTypes(BaseInterface):
     
     @property
     def aliases(self) -> tuple[str, ...]:
+        """All the aliases for the base types
+        
+        Returns:
+            tuple[str, ...]: All the aliases for the base types
+        """
         aliases: Tuple[str, ...] = ()
         for base_type in self.all_base_types:
             aliases += base_type.aliases
@@ -443,6 +448,17 @@ class _BaseTypes(BaseInterface):
 
     def _already_exists(self, property: str, query_value: str) -> bool:
         """Checks if a property of a base type already exists
+
+        Args:
+            property (str): The property to check
+            query_value (str): The value to check
+
+        Returns:
+            bool: Whether the property of a base type already exists
+
+        Examples:
+            >>> BaseTypes._already_exists("aliases", "int")
+            True
         """
         for base_type in self.all_base_types:
             if base_type._contains(property, query_value):

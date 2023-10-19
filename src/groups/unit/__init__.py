@@ -12,21 +12,17 @@ class GroupUnit(BaseInterface):
     """The Group Unit class holds the Group Unit data
     """
 
-    _nonce: Nonce = field(
-        validator=validators.instance_of(Nonce),
-    )
+    nonce: Nonce = field(
+        validator=validators.instance_of(Nonce))
 
-    _owner: Owner = field(
-        validator=validators.instance_of(Owner),
-    )
+    owner: Owner = field(
+        validator=validators.instance_of(Owner))
 
-    _credential: Credential = field(
-        validator=validators.instance_of(Credential),
-    )
+    credential: Credential = field(
+        validator=validators.instance_of(Credential))
 
-    _data: Data = field(
-        validator=validators.instance_of(Data),
-    )
+    data: Data = field(
+        validator=validators.instance_of(Data))
 
 
 __all__ = ["GroupUnit", "Credential", "Data", "Owner", "Nonce"]

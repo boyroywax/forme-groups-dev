@@ -11,13 +11,11 @@ from ..base.schema import BaseSchema
 class Data(BaseInterface):
 
     _entry: BaseContainer = field(
-        validator=validators.instance_of(BaseContainer),
-    )
+        validator=validators.instance_of(BaseContainer))
 
     _schema: Optional[BaseSchema] = field(
         validator=validators.optional(validators.instance_of(BaseSchema)),
-        default=None
-    )
+        default=None)
 
     @property
     def data(self) -> BaseContainer:

@@ -1,4 +1,4 @@
-from attrs import define, field, validators
+from attrs import define, field, validators, Factory
 from typing import Tuple, Optional
 
 from .unit import GroupUnit
@@ -25,7 +25,21 @@ class Pool:
     """The Pool class holds the Group Pool data
     """
     group_units: Optional[Tuple[Tuple[str, GroupUnit], ...]] = field(
-        default=None,
+        default=Factory(tuple[tuple()]),
         validator=validators.optional(validators.deep_iterable(validators.deep_iterable(_validate_group_unit_entry,
         iterable_validator=validators.instance_of(tuple)),
         iterable_validator=validators.instance_of(tuple))))
+    
+    def add_group_unit(self, group_unit: GroupUnit) -> None:
+        """Add a GroupUnit to the Pool
+
+        Args:
+            group_unit (GroupUnit): The GroupUnit to add to the Pool
+
+        Raises:
+            TypeError: If group_unit is not a GroupUnit
+        """
+        if not isinstance(group_unit, GroupUnit):
+            raise TypeError(f'Expected GroupUnit, got {type(group_unit)}')
+
+        self.group_units += (group_unit.group_id, group_unit)

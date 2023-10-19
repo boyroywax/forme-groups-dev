@@ -37,10 +37,22 @@ def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | 
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class SchemaEntry(BaseInterface):
+    """The SchemaEntry class holds the key-value pair of the schema
+
+    Args:
+        key (str): The key of the key-value pair
+        value (str | type | TypeAlias): The value of the key-value pair
+
+    Examples:
+        >>> entry = SchemaEntry(key='name', value=str)
+
+    Raises:
+        TypeError: If value is not a str, type or TypeAlias
+    """
     _key: str = field(validator=validators.instance_of(str))
 
     _value: str | type | TypeAlias = field(
-        validator=validators.instance_of(str | type | TypeAlias),
+        validator=validators.instance_of((str, type, TypeAlias)),
         converter=_base_type_converter)
 
     @staticmethod
@@ -56,9 +68,19 @@ class SchemaEntry(BaseInterface):
         return f"{self.__class__.__name__}(key={repr(self._key)}, value={self._str_value(self._value)})"
 
     def _hash_key(self) -> str:
+        """Hashes the key of the key-value pair
+
+        Returns:
+            str: The hashed key
+        """
         return MerkleTree._hash_func(self._key)
 
     def _hash_value(self) -> str:
+        """Hashes the value of the key-value pair
+
+        Returns:
+            str: The hashed value
+        """
         return MerkleTree._hash_func(self._str_value(self._value))
 
     def _hash(self) -> MerkleTree:    
@@ -75,16 +97,27 @@ class SchemaEntry(BaseInterface):
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseSchema(BaseInterface):
-    _entries: tuple[SchemaEntry, ...] = field(
+    """The Schema declares the structure of group data.
+
+    Args:
+        entries (Tuple[SchemaEntry, ...]): The entries held by the BaseSchema Class
+
+    Examples:
+        >>> schema = BaseSchema((SchemaEntry(key='name', value=str), SchemaEntry(key='age', value=int)))
+
+    Raises:
+        TypeError: If entries is not a Tuple of SchemaEntry
+    """
+    _entries: Tuple[SchemaEntry, ...] = field(
         validator=validators.deep_iterable(validators.instance_of(SchemaEntry),
-        iterable_validator=validators.instance_of(tuple)))
+        iterable_validator=validators.instance_of(Tuple)))
 
     @property
     def entries(self) -> Tuple[SchemaEntry, ...]:
         """The entries held by the BaseSchema Class
 
         Returns:
-            tuple[SchemaEntry]: The entries held by the BaseSchema Class
+            Tuple[SchemaEntry]: The entries held by the BaseSchema Class
 
         Examples:
             >>> schema = BaseSchema((SchemaEntry(key='name', value=str), SchemaEntry(key='age', value=int)))
@@ -114,11 +147,38 @@ class BaseSchema(BaseInterface):
     
     @override
     def __iter__(self):
+        """Iterates over the entries in the schema
+
+        Yields:
+            SchemaEntry: The entries in the schema
+        
+        Examples:
+            >>> schema = BaseSchema((SchemaEntry(key='name', value=str), SchemaEntry(key='age', value=int)))
+            >>> for entry in schema:
+            ...     print(entry)
+            key='name', value=str
+            key='age', value=int
+        """
         for entry in self.entries:
             yield entry
 
+
+    @override
+    def __str__(self):
+        """Returns the string representation schema's entries
+        
+        Returns:
+            str: The string representation of the schema's entries
+        """
+        return f"entries={', '.join(str(entry) for entry in self.entries)}"
+
     @override
     def __repr__(self):
+        """Returns the representation of the schema
+
+        Returns:
+            str: The representation of the schema
+        """
         return f"{self.__class__.__name__}(entries={repr(entry for entry in self.entries)})"
     
     def _hash_entries(self):
