@@ -17,6 +17,7 @@ from src.groups.base.schema import BaseSchema, SchemaEntry
 
 __RANGE__ = 1000
 
+
 class TestGroupUnit(unittest.TestCase):
     def setUp(self):
         self.schema_entry = SchemaEntry("test", "int")

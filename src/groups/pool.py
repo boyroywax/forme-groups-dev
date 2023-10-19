@@ -25,9 +25,23 @@ class Pool:
     """The Pool class holds the Group Pool data
     """
     group_units: Optional[Tuple[Tuple[str, GroupUnit], ...]] = field(
-        default=Factory(Tuple[Tuple[str, GroupUnit]], ...),
+        default=Factory(tuple),
         validator=validators.optional(validators.deep_iterable(_validate_group_unit_entry,
         iterable_validator=validators.instance_of(tuple))))
+    
+    def _quick_check_if_exists(self, package_hash: str) -> bool:
+        """Check if a GroupUnit exists in the Pool
+
+        Args:
+            package_hash (str): The package_hash of the GroupUnit to check if it exists in the Pool
+
+        Returns:
+            bool: True if the GroupUnit exists in the Pool, False otherwise
+        """
+        for item in self.group_units:
+            if item[0] == package_hash:
+                return True
+        return False
     
     def check_if_exists(self, group_unit: GroupUnit) -> bool:
         """Check if a GroupUnit exists in the Pool
@@ -38,12 +52,9 @@ class Pool:
         Returns:
             bool: True if the GroupUnit exists in the Pool, False otherwise
         """
-        package_hash = group_unit._hash_package().root()
+        package_hash: str = group_unit._hash_package().root()
 
-        for item in self.group_units:
-            if item[0] == package_hash:
-                return True
-        return False
+        return self._quick_check_if_exists(package_hash)
     
     def add_group_unit(self, group_unit: GroupUnit) -> None:
         """Add a GroupUnit to the Pool
@@ -57,7 +68,12 @@ class Pool:
         if not isinstance(group_unit, GroupUnit):
             raise TypeError(f'Expected GroupUnit, got {type(group_unit)}')
 
-        self.group_units += (group_unit._hash_package().root(), group_unit)
+        group_unit_hash: str = group_unit._hash_package().root()
+
+        if self._quick_check_if_exists(group_unit_hash):
+            raise ValueError(f'GroupUnit with package_hash {group_unit_hash} already exists in the Pool')
+
+        self.group_units += ((group_unit_hash, group_unit), )
 
     @override
     def __iter__(self):

@@ -68,3 +68,10 @@ class TestPool(unittest.TestCase):
 
         for item in group_units_hashed:
             self.assertTrue(pool.check_if_exists(item[1]))
+
+    def test_group_unit_add_group_unit(self):
+        self.pool = Pool()
+        self.pool.add_group_unit(self.group_unit)
+        self.assertEqual(self.pool.group_units, ((self.group_unit._hash_package().root(), self.group_unit), ))
+
+        self.assertRaises(TypeError, self.pool.add_group_unit, (self.group_unit._hash_package().root(), self.group_unit))
