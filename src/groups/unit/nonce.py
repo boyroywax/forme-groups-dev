@@ -129,8 +129,11 @@ class Nonce(BaseInterface):
     def _hash_nonce_str(self) -> str:
         return MerkleTree._hash_func(str(self))
     
-    def _hash(self) -> MerkleTree:
+    def _hash_nonce_units(self) -> tuple[str, ...]:
         nonce_units: tuple = ()
         for nonce_unit in self:
             nonce_units = nonce_units + (nonce_unit._hash().root(), )
-        return MerkleTree(nonce_units)
+        return nonce_units
+    
+    def _hash(self) -> MerkleTree:
+        return MerkleTree(self._hash_nonce_units())
