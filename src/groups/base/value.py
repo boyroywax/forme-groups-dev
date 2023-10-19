@@ -111,8 +111,6 @@ class BaseValue(BaseInterface):
 
         assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
 
-        # base_exception: GroupBaseValueException = GroupBaseValueException(f"Could not force value {value} to type {type_alias}")
-
         forced_value: Any = force_value_type(value, type_alias)
 
         return BaseValue(forced_value)

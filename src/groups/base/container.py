@@ -6,7 +6,7 @@ from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, LinearContaine
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
-from ..utils.checks import contains_sub_container, is_linear_container, is_named_container
+from ..utils.checks import contains_sub_container, is_linear_container, is_named_container, is_base_container_type
 
 
 def _base_container_type_converter(item: BaseContainerTypes | str | type) -> BaseContainerTypes:
@@ -37,7 +37,7 @@ def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
 
     if is_linear_container(item):
         for item_ in item:
-            if isinstance(item_, BaseContainerTypes):
+            if is_base_container_type(item_):
                 raise GroupBaseContainerException(exc_message)
 
             if isinstance(item_, BaseValue):
@@ -47,7 +47,7 @@ def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
 
     elif is_named_container(item):
         for key, value in item.items():
-            if isinstance(value, BaseContainerTypes):
+            if is_base_container_type(key) or is_base_container_type(value):
                 raise GroupBaseContainerException(exc_message)
 
             if isinstance(value, BaseValue):

@@ -1,10 +1,10 @@
 import struct
-from typing import Any, Optional, TypeVar, Union
+from typing import Any
 
-from ..base.types import BaseValueTypes, BaseValueTypesTuple
+from ..base.types import BaseValueTypes
 
 
-def convert_to_bytes(value: BaseValueTypes) -> bytes:
+def convert_to_bytes(value: Any) -> bytes:
     """Converts a value to bytes
 
     Args:
@@ -63,7 +63,7 @@ def convert_to_float(value: Any) -> float:
         return struct.unpack('f', value)[0]
     else:
         raise TypeError(f"Could not convert {value} to float")
-    
+
 
 def convert_to_bool(value: Any) -> bool:
     """Converts a value to bool

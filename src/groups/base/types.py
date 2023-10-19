@@ -8,13 +8,13 @@ from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseTypeInterface(BaseInterface, ABC):
+class BaseType(BaseInterface):
     aliases: Tuple[str, ...] = field(
         validator=validators.deep_iterable(validators.instance_of(str), iterable_validator=validators.instance_of(tuple)),
     )
 
     super_type: Optional[Tuple[str, ...]] = field(
-        validator=validators.optional(validators.instance_of(str | Union[type])),
+        validator=validators.optional(validators.instance_of(str | type)),
         default=None
     )
 
@@ -157,7 +157,7 @@ class BaseTypeInterface(BaseInterface, ABC):
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class _BaseTypes(BaseInterface):
-    Integer: BaseTypeInterface = field(default=BaseTypeInterface(
+    Integer: BaseType = field(default=BaseType(
         aliases=(
             str("Integer"), "integer", "INTEGER",
             str("Int"), str("int"), "INT",
@@ -170,7 +170,7 @@ class _BaseTypes(BaseInterface):
         constraints=int
     ))
 
-    FloatingPoint: BaseTypeInterface = field(default=BaseTypeInterface(
+    FloatingPoint: BaseType = field(default=BaseType(
         aliases=(
             str("FloatingPoint"), "floating_point", "FLOATING_POINT",
             str("Float"), str("float"), "FLOAT",
@@ -183,7 +183,7 @@ class _BaseTypes(BaseInterface):
         constraints=float
     ))
 
-    Boolean: BaseTypeInterface = field(default=BaseTypeInterface(
+    Boolean: BaseType = field(default=BaseType(
         aliases=(
             str("Boolean"), "boolean", "BOOLEAN",
             str("Bool"), str("bool"), "BOOL",
@@ -196,7 +196,7 @@ class _BaseTypes(BaseInterface):
         constraints=bool
     ))
 
-    String: BaseTypeInterface = field(default=BaseTypeInterface(
+    String: BaseType = field(default=BaseType(
         aliases=(
             str("String"), "string", "STRING",
             str("Str"), str("str"), "STR",
@@ -209,7 +209,7 @@ class _BaseTypes(BaseInterface):
         constraints=str
     ))
 
-    Bytes: BaseTypeInterface = field(default=BaseTypeInterface(
+    Bytes: BaseType = field(default=BaseType(
         aliases=(
             str("Bytes"), "bytes", "BYTES",
             "BytesType", "bytes_type", "BYTES_TYPE"
@@ -220,7 +220,7 @@ class _BaseTypes(BaseInterface):
         constraints=bytes
     ))
 
-    Dictionary: BaseTypeInterface = field(default=BaseTypeInterface(
+    Dictionary: BaseType = field(default=BaseType(
         aliases=(
             str("Dictionary"), "dictionary", "DICTIONARY",
             str("Dict"), str("dict"), "DICT",
@@ -236,7 +236,7 @@ class _BaseTypes(BaseInterface):
         constraints=dict
     ))
 
-    List: BaseTypeInterface = field(default=BaseTypeInterface(
+    List: BaseType = field(default=BaseType(
         aliases=(
             str("List"), "list", "LIST",
             "ListType", "list_type", "LIST_TYPE"
@@ -250,7 +250,7 @@ class _BaseTypes(BaseInterface):
         constraints=list
     ))
 
-    Tuple: BaseTypeInterface = field(default=BaseTypeInterface(
+    Tuple: BaseType = field(default=BaseType(
         aliases=(
             str("Tuple"), "tuple", "TUPLE",
             "TupleType", "tuple_type", "TUPLE_TYPE"
@@ -264,7 +264,7 @@ class _BaseTypes(BaseInterface):
         constraints=tuple
     ))
 
-    Set: BaseTypeInterface = field(default=BaseTypeInterface(
+    Set: BaseType = field(default=BaseType(
         aliases=(
             str("Set"), "set", "SET",
             "SetType", "set_type", "SET_TYPE"
@@ -278,7 +278,7 @@ class _BaseTypes(BaseInterface):
         constraints=set
     ))
 
-    FrozenSet: BaseTypeInterface = field(default=BaseTypeInterface(
+    FrozenSet: BaseType = field(default=BaseType(
         aliases=(
             str("FrozenSet"), "frozenset", "FROZENSET",
             "FrozenSetType", "frozenset_type", "FROZENSET_TYPE"
@@ -415,10 +415,10 @@ class _BaseTypes(BaseInterface):
                 )
 
     @property
-    def all_base_types(self) -> tuple[BaseTypeInterface, ...]:
-        system_types: Tuple[BaseTypeInterface, ...] = ()
+    def all_base_types(self) -> tuple[BaseType, ...]:
+        system_types: Tuple[BaseType, ...] = ()
         for slot in self.__slots__:
-            base_type: BaseTypeInterface = getattr(self, slot)
+            base_type: BaseType = getattr(self, slot)
             system_types += (base_type,)
         return system_types
 
@@ -469,7 +469,7 @@ class _BaseTypes(BaseInterface):
                             raise GroupBaseTypeException(f"Alias {alias} is already used by {base_type_}")
         return True
 
-    def _get_type(self, property: str, query_value: str) -> BaseTypeInterface:
+    def _get_type(self, property: str, query_value: str) -> BaseType:
         """Gets a base type from a property
         """
         for base_type in self.all_base_types:

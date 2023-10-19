@@ -5,7 +5,7 @@ The Schema declares the structure of the Group Unit Data.
 """
 
 from attrs import define, field, validators
-from typing import TypeAlias, override
+from typing import TypeAlias, override, Tuple
 
 from .interface import BaseInterface
 from .types import BaseTypes, BaseContainerTypes
@@ -38,7 +38,10 @@ def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | 
 @define(frozen=True, slots=True, weakref_slot=False)
 class SchemaEntry(BaseInterface):
     _key: str = field(validator=validators.instance_of(str))
-    _value: str | type | TypeAlias = field(validator=validators.instance_of(str | type | TypeAlias), converter=_base_type_converter)
+
+    _value: str | type | TypeAlias = field(
+        validator=validators.instance_of(str | type | TypeAlias),
+        converter=_base_type_converter)
 
     @staticmethod
     def _str_value(value: str | type | TypeAlias) -> str:
@@ -73,11 +76,11 @@ class SchemaEntry(BaseInterface):
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseSchema(BaseInterface):
     _entries: tuple[SchemaEntry, ...] = field(
-        validator=validators.deep_iterable(validators.instance_of(SchemaEntry), iterable_validator=validators.instance_of(tuple)),
-    )
+        validator=validators.deep_iterable(validators.instance_of(SchemaEntry),
+        iterable_validator=validators.instance_of(tuple)))
 
     @property
-    def entries(self) -> tuple[SchemaEntry, ...]:
+    def entries(self) -> Tuple[SchemaEntry, ...]:
         """The entries held by the BaseSchema Class
 
         Returns:
@@ -119,7 +122,7 @@ class BaseSchema(BaseInterface):
         return f"{self.__class__.__name__}(entries={repr(entry for entry in self.entries)})"
     
     def _hash_entries(self):
-        hashed_entries: tuple[str, ...] = ()
+        hashed_entries: Tuple[str, ...] = ()
         for entry in self.entries:
             hashed_entries.append(entry._hash.root())
             

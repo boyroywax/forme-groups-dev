@@ -26,14 +26,6 @@ class Pool:
     """
     group_units: Optional[Tuple[Tuple[str, GroupUnit], ...]] = field(
         default=None,
-        validator=validators.optional(
-            validators.deep_iterable(
-                validators.deep_iterable(
-                    _validate_group_unit_entry,
-                iterable_validator=validators.instance_of(tuple)
-            ),
-            iterable_validator=validators.instance_of(tuple))
-        )   
-    )
-
-    
+        validator=validators.optional(validators.deep_iterable(validators.deep_iterable(_validate_group_unit_entry,
+        iterable_validator=validators.instance_of(tuple)),
+        iterable_validator=validators.instance_of(tuple))))

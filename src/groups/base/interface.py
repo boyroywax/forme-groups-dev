@@ -100,8 +100,6 @@ NOTES:
             e. Finally, the public and private trees are hashed together into a tree representing the package.
 
 """
-
-from abc import ABC
 from attrs import define
 
 from .exceptions import GroupBaseException
@@ -109,7 +107,7 @@ from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseInterface(ABC):
+class BaseInterface:
     """
     Base interface for all classes
     """
