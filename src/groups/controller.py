@@ -21,4 +21,12 @@ class Controller:
         if pool is not None:
             self.pool = pool
 
-        self._active = pool.group_units[-1]
+        self._active = pool.group_units[-1][1]
+
+    @property
+    def active(self) -> GroupUnit | None:
+        return self._active
+    
+    @active.setter
+    def active(self, value: GroupUnit):
+        self._active = value

@@ -26,14 +26,14 @@ class TestPool(unittest.TestCase):
         self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
 
     def test_init(self):
-        self.pool = Pool(((self.group_unit._hash_package().root(), self.group_unit), ))
-        self.assertEqual(self.pool.group_units, ((self.group_unit._hash_package().root(), self.group_unit), ))
+        self.pool = Pool(((self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
+        self.assertEqual(self.pool.group_units, ((self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
 
     def test_init_with_bad_type(self):
         self.assertRaises(TypeError, Pool, (self.group_unit, ))
 
     def test_pool_check_if_exists(self):
-        self.pool = Pool(((self.group_unit._hash_package().root(), self.group_unit), ))
+        self.pool = Pool(((self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
         self.assertTrue(self.pool.check_if_exists(self.group_unit))
 
     def test_create_random_group_units(self):
@@ -60,18 +60,18 @@ class TestPool(unittest.TestCase):
             owner = Owner()
             group_units.append(GroupUnit(nonce, owner, credential, data))
             # group_unit_hashses.append(group_units[i]._hash_package().root())
-            group_units_hashed += ((group_units[i]._hash_package().root(), group_units[i]), )
+            group_units_hashed += ((group_units[i]._hash_package().root(), group_units[i].nonce._hash().root(), group_units[i]), )
 
         self.assertEqual(len(group_units), __RANGE__)
 
         pool = Pool(group_units_hashed)
 
         for item in group_units_hashed:
-            self.assertTrue(pool.check_if_exists(item[1]))
+            self.assertTrue(pool.check_if_exists(item[2]))
 
     def test_group_unit_add_group_unit(self):
         self.pool = Pool()
         self.pool.add_group_unit(self.group_unit)
-        self.assertEqual(self.pool.group_units, ((self.group_unit._hash_package().root(), self.group_unit), ))
+        self.assertEqual(self.pool.group_units, ((self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
 
-        self.assertRaises(TypeError, self.pool.add_group_unit, (self.group_unit._hash_package().root(), self.group_unit))
+        self.assertRaises(TypeError, self.pool.add_group_unit, (self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit))

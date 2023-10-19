@@ -98,5 +98,15 @@ class Nonce(BaseInterface):
         """
         return f'Nonce(chain={repr(self.nonce)})'
     
+    @override
+    def __iter__(self):
+        return iter(self._chain.items)
+    
     def _hash_nonce_str(self) -> str:
         return MerkleTree._hash_func(str(self))
+    
+    def _hash(self) -> MerkleTree:
+        nonce_units: tuple = ()
+        for nonce_unit in self:
+            nonce_units = nonce_units + (nonce_unit._hash().root(), )
+        return MerkleTree(nonce_units)

@@ -47,8 +47,6 @@ class TestGroupUnit(unittest.TestCase):
 
     def test_create_random_group_units(self):
         group_units = []
-        group_unit_hashses = []
-        groups_units_hashed = ()
         for i in range(__RANGE__):
             values = [
                 random.randint(0, 10000000000),
@@ -68,7 +66,5 @@ class TestGroupUnit(unittest.TestCase):
             credential = Credential()
             owner = Owner()
             group_units.append(GroupUnit(nonce, owner, credential, data))
-            # group_unit_hashses.append(group_units[i]._hash_package().root())
-            # group_units_hahsed += ((group_units[i]._hash_package().root(), group_units[i]), )
 
         self.assertEqual(len(group_units), __RANGE__)
