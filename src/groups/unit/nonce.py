@@ -36,7 +36,7 @@ def _validate_nonce_type(instance, attribute, value):
 @define(frozen=True, slots=True, weakref_slot=False)
 class Nonce(BaseInterface):
     """
-    The Nonce class holds the nonce of the Group Unit
+    The Nonce class holds the nonce chain of the Group Unit
     """
 
     _chain: BaseContainer = field(
@@ -73,6 +73,16 @@ class Nonce(BaseInterface):
         """Gets the next active nonce
         """
         return Nonce(self._next_active_chain())
+    
+    def _next_sub_nonce_chain(self) -> BaseContainer:
+        """Determines the next sub nonce chain
+        """
+        return BaseContainer(self._chain.items + (BaseValue(0),))
+    
+    def _next_sub_nonce(self) -> 'Nonce':
+        """Determines the next sub nonce
+        """
+        return Nonce(self._next_sub_nonce_chain())
 
     @property
     def nonce(self) -> BaseContainer:
@@ -100,6 +110,8 @@ class Nonce(BaseInterface):
     
     @override
     def __iter__(self):
+        """ Iterate through the nonce chain
+        """
         return iter(self._chain.items)
     
     def _hash_nonce_str(self) -> str:
