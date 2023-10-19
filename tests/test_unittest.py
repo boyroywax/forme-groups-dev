@@ -4,7 +4,7 @@ import unittest
 
 from tests_utils_checks import TestChecks
 from tests_utils_converters import TestConverters
-from tests_merkle_tree import TestMerkleTree
+from tests_utils_merkle_tree import TestMerkleTree
 from tests_base_interface import TestBaseInterface
 from tests_base_types import TestBaseTypes
 from tests_base_value import TestBaseValue

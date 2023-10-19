@@ -6,7 +6,7 @@ from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, LinearContaine
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
-from ..utils.checks import _contains_sub_container, is_linear_container, is_named_container
+from ..utils.checks import contains_sub_container, is_linear_container, is_named_container
 
 
 def _base_container_type_converter(item: BaseContainerTypes | str | type) -> BaseContainerTypes:
@@ -32,7 +32,7 @@ def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
     base_values: tuple = tuple()
     exc_message = f"Expected a non-container, but received {type(item)}"
 
-    if _contains_sub_container(item):
+    if contains_sub_container(item):
         raise GroupBaseContainerException(exc_message)
 
     if is_linear_container(item):

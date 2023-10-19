@@ -8,7 +8,7 @@ from src.groups.utils.checks import (
     is_base_value_type,
     is_linear_container,
     is_named_container,
-    _contains_sub_container
+    contains_sub_container
 )
 
 
@@ -83,27 +83,27 @@ class TestChecks(unittest.TestCase):
         self.assertTrue(is_named_container({}))
 
     def test_contains_sub_container(self):
-        self.assertTrue(_contains_sub_container({"key": ["value", "value2"]}))
+        self.assertTrue(contains_sub_container({"key": ["value", "value2"]}))
 
     def test_contains_sub_container_false(self):
-        self.assertFalse(_contains_sub_container([]))
-        self.assertFalse(_contains_sub_container(()))
-        self.assertFalse(_contains_sub_container(set()))
-        self.assertFalse(_contains_sub_container(frozenset()))
-        self.assertFalse(_contains_sub_container(1))
-        self.assertFalse(_contains_sub_container(1.0))
-        self.assertFalse(_contains_sub_container(True))
-        self.assertFalse(_contains_sub_container(False))
-        self.assertFalse(_contains_sub_container(""))
-        self.assertFalse(_contains_sub_container({"key": "value"}))
+        self.assertFalse(contains_sub_container([]))
+        self.assertFalse(contains_sub_container(()))
+        self.assertFalse(contains_sub_container(set()))
+        self.assertFalse(contains_sub_container(frozenset()))
+        self.assertFalse(contains_sub_container(1))
+        self.assertFalse(contains_sub_container(1.0))
+        self.assertFalse(contains_sub_container(True))
+        self.assertFalse(contains_sub_container(False))
+        self.assertFalse(contains_sub_container(""))
+        self.assertFalse(contains_sub_container({"key": "value"}))
 
     def test_contains_sub_container_true(self):
-        self.assertTrue(_contains_sub_container({"key": {"key": "value"}}))
-        self.assertTrue(_contains_sub_container({"key": {"key": {"key": "value"}}}))
-        self.assertTrue(_contains_sub_container({"key": {"key": {"key": {"key": "value"}}}}))
-        self.assertTrue(_contains_sub_container({"key": {"key": {"key": {"key": {"key": "value"}}}}}))
-        self.assertTrue(_contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}))
-        self.assertTrue(_contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}}))
-        self.assertTrue(_contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}}}))
-        self.assertTrue(_contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}}}}))
+        self.assertTrue(contains_sub_container({"key": {"key": "value"}}))
+        self.assertTrue(contains_sub_container({"key": {"key": {"key": "value"}}}))
+        self.assertTrue(contains_sub_container({"key": {"key": {"key": {"key": "value"}}}}))
+        self.assertTrue(contains_sub_container({"key": {"key": {"key": {"key": {"key": "value"}}}}}))
+        self.assertTrue(contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}))
+        self.assertTrue(contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}}))
+        self.assertTrue(contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}}}))
+        self.assertTrue(contains_sub_container({"key": {"key": {"key": {"key": {"key": {"key": {"key": {"key": {"key": "value"}}}}}}}}}))
 

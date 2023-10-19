@@ -33,7 +33,7 @@ def is_named_container(item: Any) -> bool:
     return isinstance(item, NamedContainer)
 
 
-def _contains_sub_container(item: Any) -> bool:
+def contains_sub_container(item: Any) -> bool:
     """
     Checks if container contains a sub container
     """

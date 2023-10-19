@@ -2,7 +2,7 @@ import unittest
 import sys
 
 sys.path.append("../forme-groups-python-3-12/")
-from src.groups.base.container import BaseContainer, _contains_sub_container
+from src.groups.base.container import BaseContainer, contains_sub_container
 from src.groups.base.value import BaseValue
 from src.groups.base.exceptions import GroupBaseContainerException
 
@@ -87,10 +87,10 @@ class TestBaseContainer(unittest.TestCase):
     
     def test_contains_sub_container(self):
         container = BaseContainer((1, 2, 3), "tuple")
-        self.assertFalse(_contains_sub_container(container.items))
+        self.assertFalse(contains_sub_container(container.items))
 
     def test_contains_sub_container2(self):
-        self.assertTrue(_contains_sub_container, (1, 2, [3, 4, 5]))
+        self.assertTrue(contains_sub_container, (1, 2, [3, 4, 5]))
 
     def test_creating_container_with_sub_container(self):
         self.assertRaises(GroupBaseContainerException, BaseContainer, (1, 2, [3, 4, 5]), "tuple")
