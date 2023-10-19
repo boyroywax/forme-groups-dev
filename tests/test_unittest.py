@@ -15,6 +15,7 @@ from tests_unit_credential import TestCredential
 from tests_unit_data import TestData
 from tests_unit_owner import TestOwner
 from tests_group_unit import TestGroupUnit
+from tests_pool import TestPool
 
 
 def main():
@@ -40,6 +41,9 @@ def main():
     test_suite.addTest(loader.loadTestsFromTestCase(TestData))
     test_suite.addTest(loader.loadTestsFromTestCase(TestOwner))
     test_suite.addTest(loader.loadTestsFromTestCase(TestGroupUnit))
+
+    # Pool tests
+    test_suite.addTest(loader.loadTestsFromTestCase(TestPool))
 
     # Run the test suite
     runner = unittest.TextTestRunner()

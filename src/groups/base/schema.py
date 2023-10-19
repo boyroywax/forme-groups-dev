@@ -83,14 +83,35 @@ class SchemaEntry(BaseInterface):
         """
         return MerkleTree._hash_func(self._str_value(self._value))
 
-    def _hash(self) -> MerkleTree:    
+    def _hash(self) -> MerkleTree:
+        """Hashes the key-value pair as leaves of a MerkleTree
+
+        Returns:
+            MerkleTree: The hashed key-value pair
+        """ 
         return MerkleTree((self._hash_key(), self._hash_value()))
 
     def _verify_hash_key(self, key: str) -> bool:
+        """Verifies the key of the key-value pair
+
+        Args:
+            key (str): The key to verify
+
+        Returns:
+            bool: True if the key is verified, False otherwise
+        """
         key_hash = MerkleTree._hash_func(key)
         return key_hash == self._hash_key()
 
     def _verify_hash_value(self, value: str | type | TypeAlias) -> bool:
+        """Verifies the value of the key-value pair
+
+        Args:
+            value (str | type | TypeAlias): The value to verify
+
+        Returns:
+            bool: True if the value is verified, False otherwise
+        """
         value_hash = MerkleTree._hash_func(self._str_value(value))
         return value_hash == self._hash_value()
 
@@ -162,7 +183,6 @@ class BaseSchema(BaseInterface):
         for entry in self.entries:
             yield entry
 
-
     @override
     def __str__(self):
         """Returns the string representation schema's entries
@@ -182,6 +202,16 @@ class BaseSchema(BaseInterface):
         return f"{self.__class__.__name__}(entries={repr(self.entries)})"
     
     def _hash_entries(self):
+        """Hashes the entries of the schema
+        
+        Returns:
+            MerkleTree: The hashed entries of the schema
+
+        Examples:
+            >>> schema = BaseSchema((SchemaEntry(key='name', value=str), SchemaEntry(key='age', value=int)))
+            >>> schema._hash_entries()
+            MerkleTree(hashed_data=('fbc595a11273e6f79f13f9210d7d60660c8ad127aa6b870b841c4b2a8ff75cb2', '5422c43fc239d7228d8aca8f9310bca3ce00cea3256adb0db595a2b1c211a7e4'))
+        """
         hashed_entries: Tuple[str, ...] = ()
         for entry in self.entries:
             hashed_entries.append(entry._hash.root())

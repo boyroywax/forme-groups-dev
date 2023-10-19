@@ -1,10 +1,10 @@
 from attrs import define, field, validators, Factory
-from typing import Tuple, Optional
+from typing import Tuple, Optional, override
 
 from .unit import GroupUnit
 
 
-def _validate_group_unit_entry(value: tuple[str, GroupUnit]) -> tuple[str, GroupUnit]:
+def _validate_group_unit_entry(instance, attr, value: tuple[str, GroupUnit]) -> tuple[str, GroupUnit]:
     if not isinstance(value, tuple):
         raise TypeError(f'Expected tuple, got {type(value)}')
 
@@ -25,11 +25,10 @@ class Pool:
     """The Pool class holds the Group Pool data
     """
     group_units: Optional[Tuple[Tuple[str, GroupUnit], ...]] = field(
-        default=Factory(tuple[tuple()]),
-        validator=validators.optional(validators.deep_iterable(validators.deep_iterable(_validate_group_unit_entry,
-        iterable_validator=validators.instance_of(tuple)),
+        default=Factory(tuple[tuple[str, GroupUnit]]),
+        validator=validators.optional(validators.deep_iterable(_validate_group_unit_entry,
         iterable_validator=validators.instance_of(tuple))))
-    
+
     def add_group_unit(self, group_unit: GroupUnit) -> None:
         """Add a GroupUnit to the Pool
 
@@ -42,4 +41,12 @@ class Pool:
         if not isinstance(group_unit, GroupUnit):
             raise TypeError(f'Expected GroupUnit, got {type(group_unit)}')
 
-        self.group_units += (group_unit.group_id, group_unit)
+        self.group_units += (group_unit._hash_package().root(), group_unit)
+
+    @override
+    def __iter__(self):
+        return iter(self.group_units)
+
+    @override
+    def __repr__(self):
+        return f'Pool(group_units={self.group_units})'

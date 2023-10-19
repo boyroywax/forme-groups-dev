@@ -40,6 +40,8 @@ class TestBaseSchema(unittest.TestCase):
     def test_schema_entry_hash_repr(self):
         self.assertEqual(repr(self.schema_entry_one._hash()), "MerkleTree(root=fbc595a11273e6f79f13f9210d7d60660c8ad127aa6b870b841c4b2a8ff75cb2)")
 
+    def test_schema_entry_hash_two(self):
+        self.assertEqual(self.schema_entry_two._hash().root(), '5422c43fc239d7228d8aca8f9310bca3ce00cea3256adb0db595a2b1c211a7e4')
 
     def test_init_with_schema_entry(self):
         self.assertEqual(self.schema_base_one._entries, (self.schema_entry_one, self.schema_entry_two))

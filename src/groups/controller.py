@@ -12,3 +12,13 @@ class Controller:
     pool: Pool = field(
         default=Factory(Pool),
         validator=validators.optional(validators.instance_of(Pool)))
+    
+    _active: Optional[GroupUnit] = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(GroupUnit)))
+
+    def __init__(self, pool: Optional[Pool] = None):
+        if pool is not None:
+            self.pool = pool
+
+        self._active = pool.group_units[-1]
