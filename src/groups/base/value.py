@@ -104,11 +104,11 @@ class BaseValue(BaseInterface):
             BaseValue(value=1, type=int)
         """
         if isinstance(value, BaseValue):
-            if value.get_type_str() == type_alias:
-                return value
-
             value = value.value
 
+        if value is None:
+            return BaseValue(None)
+        
         assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
 
         forced_value: Any = force_value_type(value, type_alias)

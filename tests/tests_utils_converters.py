@@ -2,8 +2,15 @@ import sys
 import unittest
 
 sys.path.append("../forme-groups-python-3-12/")
-from src.groups.utils.converters import convert_to_bytes, convert_to_int, convert_to_str, convert_to_bool, convert_to_float, force_value_type
-
+from src.groups.utils.converters import (
+    convert_to_bytes,
+    convert_to_int,
+    convert_to_str,
+    convert_to_bool,
+    convert_to_float,
+    force_value_type,
+    convert_tuple)
+from src.groups.base.value import BaseValue
 
 class TestConverters(unittest.TestCase):
     def test_convert_to_bytes(self):
@@ -80,23 +87,24 @@ class TestConverters(unittest.TestCase):
 
     def test_force_value_types(self):
         value = 1
-        self.assertEqual(force_value_type(value, "<class 'int'>"), 1)
+        self.assertEqual(force_value_type(value, "int"), 1)
+        self.assertEqual(force_value_type(value, "str"), "1")
+        self.assertEqual(force_value_type(value, "bytes"), b'\x01')
+        self.assertEqual(force_value_type(value, "bool"), True)
+        self.assertEqual(force_value_type(value, "float"), 1.0)
 
-        value = "1"
-        self.assertEqual(force_value_type(value, "<class 'int'>"), 1)
+    def test_force_value_types_bad_types(self):
+        value = {"test": 1}
+        self.assertRaises(AssertionError, force_value_type, value, "int")
+        self.assertRaises(AssertionError, force_value_type, value, "str")
+        self.assertRaises(AssertionError, force_value_type, value, "bytes")
+        self.assertRaises(AssertionError, force_value_type, value, "bool")
+        self.assertRaises(AssertionError, force_value_type, value, "float")
+    
 
-        value = 1.0
-        self.assertEqual(force_value_type(value, "<class 'int'>"), 1)
-
-        value = True
-        self.assertEqual(force_value_type(value, "<class 'int'>"), 1)
-
-        value = False
-        self.assertEqual(force_value_type(value, "<class 'int'>"), 0)
-
-        value = b'\x01'
-        self.assertEqual(force_value_type(value, "<class 'int'>"), 1)
-
+    def test_convert_tuple(self):
+        value = (1, 2, 3)
+        self.assertEqual(convert_tuple(value, type_alias="tuple"), (1, 2, 3))
 
 
 

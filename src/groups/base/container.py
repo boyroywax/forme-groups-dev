@@ -62,6 +62,17 @@ def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseContainer(BaseInterface):
+    """The BaseContainer class holds Base Values
+
+    Args:
+        items (tuple[BaseValue]): The items held by the BaseContainer Class
+        type (Type[BaseContainerTypes | str]): The type of the BaseContainer
+
+    Examples:
+        >>> container = BaseContainer((1, 2, 3))
+        >>> container
+        BaseContainer(items=(BaseValue(value=1, type=int), BaseValue(value=2, type=int), BaseValue(value=3, type=int)), type=tuple)
+    """
 
     _items: tuple[BaseValue] = field(
         validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes),
@@ -118,8 +129,8 @@ class BaseContainer(BaseInterface):
             case("<class 'frozenset'>"):
                 return frozenset({value.value for value in item})
             case("<class 'dict'>"):
-                keys: tuple[BaseValueTypes] = item[::2]
-                values: tuple[BaseValueTypes] = item[1::2]
+                keys: tuple[BaseValue] = item[::2]
+                values: tuple[BaseValue] = item[1::2]
                 return {key.value: value.value for key, value in zip(keys, values)}
             case _:
                 raise GroupBaseContainerException(f"Expected a container, but received {type_}")

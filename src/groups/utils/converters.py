@@ -1,7 +1,7 @@
 import struct
-from typing import Any
+from typing import Any, TypeAlias
 
-from ..base.types import BaseValueTypes
+from ..base.types import BaseTypes, BaseValueTypes, BaseContainerTypesTuple
 
 
 def convert_to_bytes(value: Any) -> bytes:
@@ -83,22 +83,58 @@ def force_value_type(value: BaseValueTypes, type_alias: str) -> BaseValueTypes:
     assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
     assert isinstance(type_alias, str), f"Expected a string, but received {type(type_alias)}"
 
-    if value is None:
+    if value is None or type_alias == "None":
         return None
 
-    match type_alias:
-        case "<class 'NoneType'>" | "NoneType" | "None":
+    type_from_alias: TypeAlias | type = BaseTypes._get_type_from_alias(type_alias)
+    assert isinstance(type_from_alias(), BaseValueTypes), f"Expected a value type, but received {type_alias}"
+
+    if isinstance(value, type_from_alias):
+        return value
+
+    match (str(type_from_alias)):
+        case "<class 'NoneType'>":
             return None
-        case "<class 'bool'>" | "bool" | "boolean":
+        case "<class 'bool'>":
             return convert_to_bool(value)
-        case "<class 'int'>" | "int" | "integer":
+        case "<class 'int'>":
             return convert_to_int(value)
-        case "<class 'float'>" | "float":
+        case "<class 'float'>":
             return convert_to_float(value)
-        case "<class 'str'>" | "str" | "string":
+        case "<class 'str'>":
             return convert_to_str(value)
-        case "<class 'bytes'>" | "bytes":
+        case "<class 'bytes'>":
             return convert_to_bytes(value)
         case _:
             raise TypeError(f"Could not force value {value} to type {type_alias}")
+
+
+def convert_tuple(container: tuple[Any, ...], type_alias: str):
+    """
+    Args:
+        container tuple(BaseValueTypes): The container to convert
+    """
+    exc_msg: str = f"Expected a container, but received {type(container)}"
+    assert isinstance(container, tuple), exc_msg
+    assert isinstance(type_alias, str), f"Expected a string, but received {type(type_alias)}"
+
+    type_from_alias: TypeAlias | type = BaseTypes._get_type_from_alias(type_alias)
+    assert type_from_alias in BaseContainerTypesTuple, exc_msg
+
+    match (str(type_from_alias)):
+        case("<class 'list'>"):
+            return [value for value in container]
+        case("<class 'tuple'>"):
+            return tuple([value for value in container])
+        case("<class 'set'>"):
+            return {value for value in container}
+        case("<class 'frozenset'>"):
+            return frozenset({value for value in container})
+        case("<class 'dict'>"):
+            keys: tuple[Any, ...] = container[::2]
+            values: tuple[Any, ...] = container[1::2]
+            return {key: value for key, value in zip(keys, values)}
+        case _:
+            raise TypeError(f"Expected a container, but received {type_alias}")
+
 

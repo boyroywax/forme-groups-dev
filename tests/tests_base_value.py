@@ -162,11 +162,11 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_force_type(self):
         value = BaseValue(1)
-        self.assertEqual(BaseValue._force_type(value, "<class 'str'>"), BaseValue("1"))
+        self.assertEqual(BaseValue._force_type(value, 'str'), BaseValue("1"))
 
     def test_base_value_force_type_with_str(self):
         value = BaseValue("hello")
-        self.assertRaises(TypeError, BaseValue._force_type, value, type(int).__name__)
+        self.assertRaises(ValueError, BaseValue._force_type, value, "int")
 
     def test_base_value_force_type_with_int_one_is_true(self):
         value = BaseValue(1)
@@ -179,7 +179,7 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_force_type_with_none_is_none(self):
         value = BaseValue(None)
-        self.assertEqual(BaseValue._force_type(value, "NoneType"), BaseValue(None))
+        self.assertEqual(BaseValue._force_type(value, "None"), BaseValue(None))
 
     def test_base_value_force_type_with_bytes_works(self):
         value = BaseValue(b"hello")
@@ -204,7 +204,7 @@ class TestBaseValue(unittest.TestCase):
 
     def test_base_value_force_type_with_float_to_none(self):
         value = BaseValue(1.6)
-        self.assertEqual(BaseValue._force_type(value, "NoneType"), BaseValue(None))
+        self.assertEqual(BaseValue._force_type(value, "None"), BaseValue(None))
 
     def test_base_value_init_with_dict(self):
         self.assertRaises(GroupBaseValueException, BaseValue, {"a": 1, "b": 2, "c": 3})
