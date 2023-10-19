@@ -25,10 +25,26 @@ class Pool:
     """The Pool class holds the Group Pool data
     """
     group_units: Optional[Tuple[Tuple[str, GroupUnit], ...]] = field(
-        default=Factory(tuple[tuple[str, GroupUnit]]),
+        default=Factory(Tuple[Tuple[str, GroupUnit]], ...),
         validator=validators.optional(validators.deep_iterable(_validate_group_unit_entry,
         iterable_validator=validators.instance_of(tuple))))
+    
+    def check_if_exists(self, group_unit: GroupUnit) -> bool:
+        """Check if a GroupUnit exists in the Pool
 
+        Args:
+            group_unit (GroupUnit): The GroupUnit to check if it exists in the Pool
+
+        Returns:
+            bool: True if the GroupUnit exists in the Pool, False otherwise
+        """
+        package_hash = group_unit._hash_package().root()
+
+        for item in self.group_units:
+            if item[0] == package_hash:
+                return True
+        return False
+    
     def add_group_unit(self, group_unit: GroupUnit) -> None:
         """Add a GroupUnit to the Pool
 
