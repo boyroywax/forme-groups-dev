@@ -12,7 +12,39 @@ from .types import BaseTypes, BaseContainerTypes
 from ..utils.crypto import MerkleTree
 
 
-def _base_type_converter(item: str | int | float | bytes | dict | list| tuple | set | frozenset |type) -> TypeAlias | type:
+def _validate_schema_entry_key(instance, attribute, value):
+    """Validates the argument is a str
+
+    Args:
+        instance (Any): The instance
+        attribute (Any): The attribute
+        value (Any): The value
+
+    Raises:
+        TypeError: If the value is not a str
+    """
+    if not isinstance(value, str):
+        raise TypeError(f"Expected a str, but received {type(value)}")
+
+    split_key: Tuple[str, ...] = value.split(' ')
+    if len(split_key) > 1:
+        raise TypeError(f"Expected a str without spaces, but received {value}")
+    
+    if len(split_key) == 1 and len(split_key[0]) == 0:
+        raise TypeError(f"Expected a str without spaces, but received {value}")
+    
+    if len(split_key) == 1 and len(split_key[0]) > 0:
+        if split_key[0] == '':
+            raise TypeError(f"Expected a non empty str, but received {value}")
+
+        if len(split_key[0]) > 256:
+            raise TypeError(f"Expected a str with length 256 or less, but received len={len(split_key[0])}), value={value}")
+        return split_key[0]
+    
+
+
+
+def _base_type_converter(item: str | type) -> TypeAlias | type:
     """
     Converter function for _value field
     """
@@ -49,10 +81,10 @@ class SchemaEntry(BaseInterface):
     Raises:
         TypeError: If value is not a str, type or TypeAlias
     """
-    _key: str = field(validator=validators.instance_of(str))
+    _key: str = field(validator=_validate_schema_entry_key)
 
     _value: str | type | TypeAlias = field(
-        validator=validators.instance_of((str, type, TypeAlias)),
+        validator=validators.instance_of((str, type)),
         converter=_base_type_converter)
 
     @staticmethod
@@ -116,6 +148,32 @@ class SchemaEntry(BaseInterface):
         return value_hash == self._hash_value()
 
 
+def _validate_schema_entries(instance, attribute, value):
+    """Validates the argument is a Tuple of SchemaEntry
+
+    Args:
+        instance (Any): The instance
+        attribute (Any): The attribute
+        value (Any): The value
+
+    Raises:
+        TypeError: If the value is not a Tuple of SchemaEntry
+    """
+    if not isinstance(value, Tuple):
+        raise TypeError(f"Expected a Tuple, but received {type(value)}")
+
+    for item in value:
+        if not isinstance(item, SchemaEntry):
+            raise TypeError(f"Expected a Tuple of SchemaEntry, but received {type(value)}")
+        if value.count(item._key) > 1:
+            raise TypeError(f"Expected a Tuple of unique SchemaEntry, but received {value}")
+        if len(item._key) == 0:
+            raise TypeError(f"Expected a Tuple of SchemaEntry with non-empty keys, but received {value}")
+        if len(item._key) > 256:
+            raise TypeError(f"Expected a Tuple of SchemaEntry with keys of length 256 or less, but received {value}m len={len(item._key)}")
+
+
+
 @define(frozen=True, slots=True, weakref_slot=False)
 class BaseSchema(BaseInterface):
     """The Schema declares the structure of group data.
@@ -130,8 +188,7 @@ class BaseSchema(BaseInterface):
         TypeError: If entries is not a Tuple of SchemaEntry
     """
     _entries: Tuple[SchemaEntry, ...] = field(
-        validator=validators.deep_iterable(validators.instance_of(SchemaEntry),
-        iterable_validator=validators.instance_of(Tuple)))
+        validator=_validate_schema_entries)
 
     @property
     def entries(self) -> Tuple[SchemaEntry, ...]:
@@ -190,7 +247,7 @@ class BaseSchema(BaseInterface):
         Returns:
             str: The string representation of the schema's entries
         """
-        return f"entries={', '.join(str(entry) for entry in self.entries)}"
+        return f"({'), ('.join(str(entry) for entry in self.entries)})"
 
     @override
     def __repr__(self):
@@ -214,6 +271,6 @@ class BaseSchema(BaseInterface):
         """
         hashed_entries: Tuple[str, ...] = ()
         for entry in self.entries:
-            hashed_entries.append(entry._hash.root())
+            hashed_entries.append(entry._hash().root())
             
         return MerkleTree(hashed_data=hashed_entries)

@@ -1,4 +1,5 @@
 import struct
+from functools import lru_cache
 from typing import override, Any, Union
 from attrs import define, field
 
@@ -156,6 +157,7 @@ class BaseValue(BaseInterface):
         """
         return f"{self.__class__.__name__}(value={repr(self.value)}, type={self.get_type_str()})"
 
+    # @lru_cache(maxsize=1)
     def _hash_value(self) -> str:
         """Hashes the repr(value) of the BaseValue
 
@@ -169,6 +171,7 @@ class BaseValue(BaseInterface):
         """
         return MerkleTree._hash_func(repr(self.value))
 
+    # @lru_cache(maxsize=1)
     def _hash_type(self) -> str:
         """Hashes the type of the BaseValue
 
@@ -182,6 +185,7 @@ class BaseValue(BaseInterface):
         """
         return MerkleTree._hash_func(self.get_type_str())
 
+    # @lru_cache(maxsize=1)
     def _hash(self) -> MerkleTree:
         """Hashes the BaseValue by hashing the value and type separatly
 

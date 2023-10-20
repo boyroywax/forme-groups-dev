@@ -1,4 +1,4 @@
-from attrs import define, field, Factory, validators
+from attrs import define, field, validators
 from typing import Optional
 
 from .unit import GroupUnit, Credential, Data, Owner, Nonce
@@ -9,8 +9,8 @@ from .pool import Pool
 class Controller:
     """The Manage class holds the Group Manage data
     """
-    pool: Pool = field(
-        default=Factory(Pool),
+    pool: Optional[Pool] = field(
+        default=None,
         validator=validators.optional(validators.instance_of(Pool)))
     
     _active: Optional[GroupUnit] = field(
