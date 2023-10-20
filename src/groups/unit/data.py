@@ -45,7 +45,3 @@ class Data(BaseInterface):
     
     def _num_entries(self) -> int:
         return len(self._entry.items)
-    
-
-    
-

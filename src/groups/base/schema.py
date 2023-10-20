@@ -292,6 +292,6 @@ class BaseSchema(BaseInterface):
         """
         hashed_entries: Tuple[str, ...] = ()
         for entry in self.entries:
-            hashed_entries.append(entry._hash().root())
+            hashed_entries += (entry._hash().root(), )
             
         return MerkleTree(hashed_data=hashed_entries)
