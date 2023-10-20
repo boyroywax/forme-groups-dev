@@ -146,7 +146,28 @@ class SchemaEntry(BaseInterface):
         """
         value_hash = MerkleTree._hash_func(self._str_value(value))
         return value_hash == self._hash_value()
+    
 
+def _key_is_duplicate(key: str, entries: Tuple[SchemaEntry, ...]) -> bool:
+    """Checks if the key is in the entries
+
+    Args:
+        key (str): The key to check
+        entries (Tuple[SchemaEntry, ...]): The entries to check
+
+    Returns:
+        bool: True if the key is in the entries, False otherwise
+    """
+    single_instance: bool = True
+    instance_count: int = 0
+
+    for entry in entries:
+        if entry._key == key:
+            instance_count += 1
+            if instance_count > 1:
+                single_instance = False
+                break
+    return not single_instance
 
 def _validate_schema_entries(instance, attribute, value):
     """Validates the argument is a Tuple of SchemaEntry
@@ -165,12 +186,12 @@ def _validate_schema_entries(instance, attribute, value):
     for item in value:
         if not isinstance(item, SchemaEntry):
             raise TypeError(f"Expected a Tuple of SchemaEntry, but received {type(value)}")
-        if value.count(item._key) > 1:
-            raise TypeError(f"Expected a Tuple of unique SchemaEntry, but received {value}")
-        if len(item._key) == 0:
-            raise TypeError(f"Expected a Tuple of SchemaEntry with non-empty keys, but received {value}")
-        if len(item._key) > 256:
-            raise TypeError(f"Expected a Tuple of SchemaEntry with keys of length 256 or less, but received {value}m len={len(item._key)}")
+        if _key_is_duplicate(item._key, value):
+            raise TypeError(f"Expected a Tuple of SchemaEntry with unique keys, but received {value}")
+        # if len(item._key) == 0:
+        #     raise TypeError(f"Expected a Tuple of SchemaEntry with non-empty keys, but received {value}")
+        # if len(item._key) > 256:
+        #     raise TypeError(f"Expected a Tuple of SchemaEntry with keys of length 256 or less, but received {value}m len={len(item._key)}")
 
 
 
