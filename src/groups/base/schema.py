@@ -26,7 +26,7 @@ def _validate_schema_entry_key(instance, attribute, value):
     if not isinstance(value, str):
         raise TypeError(f"Expected a str, but received {type(value)}")
 
-    split_key: Tuple[str, ...] = value.split(' ')
+    split_key: tuple[str, ...] = tuple(value.split(' '), )
     if len(split_key) > 1:
         raise TypeError(f"Expected a str without spaces, but received {value}")
     
@@ -46,7 +46,7 @@ def _base_type_converter(item: str | type) -> TypeAlias | type:
     """
     Converter function for _value field
     """
-    type_from_alias: TypeAlias | type = None
+    type_from_alias: TypeAlias | type | None = None
     
     if isinstance(item, str) and len(item) > 0:
         type_from_value_alias = BaseTypes._get_type_from_alias(item)
@@ -260,7 +260,7 @@ class BaseSchema(BaseInterface):
             yield entry
 
     @override
-    def __str__(self):
+    def __str__(self) -> str:
         """Returns the string representation schema's entries
         
         Returns:
@@ -269,7 +269,7 @@ class BaseSchema(BaseInterface):
         return f"({'), ('.join(str(entry) for entry in self.entries)})"
 
     @override
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Returns the representation of the schema
 
         Returns:
@@ -288,7 +288,7 @@ class BaseSchema(BaseInterface):
             >>> schema._hash_entries()
             MerkleTree(hashed_data=('fbc595a11273e6f79f13f9210d7d60660c8ad127aa6b870b841c4b2a8ff75cb2', '5422c43fc239d7228d8aca8f9310bca3ce00cea3256adb0db595a2b1c211a7e4'))
         """
-        hashed_entries: Tuple[str, ...] = ()
+        hashed_entries: Tuple[str | None, ...] = tuple()
         for entry in self.entries:
             hashed_entries += (entry._hash().root(), )
             
