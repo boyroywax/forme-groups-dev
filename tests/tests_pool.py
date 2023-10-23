@@ -36,6 +36,10 @@ class TestPool(unittest.TestCase):
         self.pool = Pool(((self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
         self.assertTrue(self.pool.check_if_exists(self.group_unit))
 
+    def test_pool_has_slots(self):
+        self.pool = Pool(((self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
+        self.assertEqual(self.pool.__slots__, ('group_units', ))
+
     def test_create_random_group_units(self):
         group_units = []
         group_unit_hashses = []

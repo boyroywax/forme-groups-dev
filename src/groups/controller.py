@@ -7,7 +7,10 @@ from .pool import Pool
 
 @define(slots=True, weakref_slot=False)
 class Controller:
-    """The Manage class holds the Group Manage data
+    """The Controller class holds a Pool of Group Units and is used to manage the Group Units
+
+    Args:
+        pool (Optional[Pool]): The Pool of Group Units
     """
     pool: Optional[Pool] = field(
         default=None,

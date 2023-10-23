@@ -96,10 +96,18 @@ class Pool:
 
         self.group_units += ((group_unit_hash, nonce_hash, group_unit), )
 
-    @override
     def __iter__(self):
+        """Iterate over the Group Units in the Pool
+        
+        Returns:
+            iter: An iterator over the Group Units in the Pool
+        """
         return iter(self.group_units)
 
-    @override
     def __repr__(self):
+        """Return the representation of the Pool
+
+        Returns:
+            str: The representation of the Pool
+        """
         return f'Pool(group_units={self.group_units})'
