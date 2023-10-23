@@ -38,11 +38,9 @@ def _validate_schema_entry_key(instance, attribute, value):
             raise TypeError(f"Expected a non empty str, but received {value}")
 
         if len(split_key[0]) > 256:
-            raise TypeError(f"Expected a str with length 256 or less, but received len={len(split_key[0])}), value={value}")
+            raise TypeError(f"Expected a str with length 256 or less, but received len={len(split_key[0])}, value={value}")
         return split_key[0]
     
-
-
 
 def _base_type_converter(item: str | type) -> TypeAlias | type:
     """

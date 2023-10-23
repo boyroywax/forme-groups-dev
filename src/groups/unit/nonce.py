@@ -116,7 +116,7 @@ class Nonce(BaseInterface):
 
     @override
     def __repr__(self) -> str:
-        """ The items of the nonce chain, seperator by __DEFAULT_NONCE_SEPERATOR__
+        """ The representation of the nonce chain
         """
         return f'Nonce(chain={repr(self.nonce)})'
     

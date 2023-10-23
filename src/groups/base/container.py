@@ -32,7 +32,7 @@ def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
     base_values: tuple = tuple()
     exc_message = f"Expected a non-container, but received {type(item)}"
     
-    if isinstance(item, (str, int, float, bool)):
+    if isinstance(item, (str, int, float, bool, bytes)):
         base_values += tuple([BaseValue(item)], )
 
     elif contains_sub_container(item):
@@ -78,12 +78,12 @@ class BaseContainer(BaseInterface):
     """
 
     _items: tuple[BaseValue] = field(
-        validator=validators.deep_iterable(validators.instance_of(BaseValue | BaseValueTypes),
+        validator=validators.deep_iterable(validators.instance_of((BaseValue, BaseValueTypes)),
         iterable_validator=validators.instance_of(tuple)),
         converter=_base_container_converter
     )
     _type: Optional[Type[BaseContainerTypes] | str] = field(
-        validator=validators.instance_of(type | str),
+        validator=validators.instance_of((type, str)),
         converter=_base_container_type_converter,
         default="tuple"
     )
@@ -103,7 +103,7 @@ class BaseContainer(BaseInterface):
         return self._items
 
     @property
-    def type(self) -> Type[BaseContainerTypes | str]:
+    def type(self) -> Type[BaseContainerTypes] | str:
         """The type of the BaseContainer
 
         Returns:
@@ -192,9 +192,19 @@ class BaseContainer(BaseInterface):
         yield from self.__iter_items__()
 
     def _hash_type(self) -> str:
+        """Hashes the type of the BaseContainer
+
+        Returns:
+            str: The hashed type of the BaseContainer
+        """
         return MerkleTree._hash_func(self.type)
 
     def _hash_items(self) -> MerkleTree:
+        """Hashes the items of the BaseContainer
+        
+        Returns:
+            MerkleTree: The hashed items of the BaseContainer
+        """
         hashed_items: tuple[str, ...] = ()
         for item in self.__iter_items__():
             hashed_items = hashed_items + (item._hash().root(), )
@@ -202,9 +212,22 @@ class BaseContainer(BaseInterface):
         return MerkleTree(hashed_items)
 
     def _hash(self) -> MerkleTree:
+        """Hashes the BaseContainer
+
+        Returns:
+            MerkleTree: The hashed BaseContainer
+        """
         return MerkleTree((self._hash_type(), self._hash_items().root(), ))
 
     def _verify_item(self, item: BaseValue) -> bool:
+        """Verifies the item of the BaseContainer
+
+        Args:
+            item (BaseValue): The item to verify
+
+        Returns:
+            bool: True if the item is verified, False otherwise
+        """
         assert isinstance(item, BaseValue), f"Expected a BaseValue, but received {type(item)}"
 
         leaf_hash: str | None = item._hash().root()
