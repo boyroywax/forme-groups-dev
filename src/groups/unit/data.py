@@ -74,13 +74,13 @@ class Data(BaseInterface):
         i: int = 0
         for type_ in Data._get_schema_of_data_entry(data_entry):
             if type_ != schema_.entries[0]._str_value(schema_.entries[i]._value):
-                print(f'Expected {type_} to be {schema_._str_value(schema_.entries[i]._value)}')
+                print(f'Expected {type_} to be {schema_.entries[0]._str_value(schema_.entries[i]._value)}')
                 raise TypeError(exc_msg)
             i += 1
         return True
     
     @classmethod
-    def _from_data(cls, data: BaseContainer, schema: Optional[BaseSchema] = None) -> 'Data':
+    def _from(cls, data: BaseContainer, schema: Optional[BaseSchema] = None) -> 'Data':
         """Creates a Data object from the given data and schema
 
         Args:
@@ -96,8 +96,3 @@ class Data(BaseInterface):
 
 
         return cls(entry=data, schema=schema)
-
-
-        
-
-        

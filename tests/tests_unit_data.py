@@ -14,7 +14,8 @@ class TestData(unittest.TestCase):
         self.container_mock = Mock(spec=BaseContainer)
         self.schema_mock = Mock(spec=BaseSchema)
         self.schema_real = BaseSchema((SchemaEntry("name", "string"), SchemaEntry("age", "integer")))
-        self.data_real = Data(BaseContainer((BaseValue("test_user"), BaseValue(31) ), "tuple"))
+        self.data_real = Data(BaseContainer((BaseValue("test_user"), BaseValue(31)), "tuple"))
+        self.data_bad = Data(BaseContainer((BaseValue(b'ccc'), BaseValue(31)), "tuple"))
 
     def test_data_creation(self):
         data = Data(self.container_mock)
@@ -26,7 +27,9 @@ class TestData(unittest.TestCase):
         self.assertEqual(data.schema, self.schema_mock)
 
     def test_data_creation_with_schema_real(self):
-        produced_data = Data._from_data(self.data_real.data, self.schema_real)
+        produced_data = Data._from(self.data_real.data, self.schema_real)
         print(produced_data)
         self.assertEqual(produced_data.data, self.data_real.data)
     
+    def test_data_creation_with_schema_real_bad(self):
+        self.assertRaises(TypeError, Data._from, self.data_bad.data, self.schema_real)
