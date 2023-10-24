@@ -57,7 +57,7 @@ class Pool:
         assert lookup in ('unit', 'nonce', 'all'), f'Expected lookup to be package_hash or nonce_hash, got {lookup}'
 
         for hash_item in hash_:
-            print(f'hash_item: {hash_item}')
+            # print(f'hash_item: {hash_item}')
             for item in iter(self):
                 if item[0] == hash_item and (lookup == 'unit' or lookup == 'all'):
                     return True
@@ -94,7 +94,7 @@ class Pool:
         group_unit_hash: str | None = group_unit._hash_package().root()
         nonce_hash: str | None = group_unit.nonce._hash().root()
 
-        print(f'group_unit_hash: {group_unit_hash}, nonce_hash: {nonce_hash}')
+        # print(f'group_unit_hash: {group_unit_hash}, nonce_hash: {nonce_hash}')
         assert group_unit_hash is not None, f'Expected group_unit_hash to be str, got {type(group_unit_hash)}'
         assert nonce_hash is not None, f'Expected nonce_hash to be str, got {type(nonce_hash)}'
 
@@ -155,7 +155,7 @@ class Pool:
         assert isinstance(nonce, Nonce), f'Expected nonce to be Nonce, got {type(nonce)}'
 
         base_values: tuple[BaseValue, ...] = tuple(nonce._chain.items[:1])
-        print(f'base_values: {base_values}')
+        # print(f'base_values: {base_values}')
 
         return Nonce(BaseContainer(base_values))
 

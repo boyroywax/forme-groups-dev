@@ -77,23 +77,23 @@ class Controller:
         schema_to_enforce: Optional[BaseSchema] = None
         next_nonce: Optional[Nonce] = None
 
-        print(f'is_sub_unit: {is_sub_unit}, super_unit_schema: {super_unit_schema}, super_unit_hash: {super_unit_hash}')
+        # print(f'is_sub_unit: {is_sub_unit}, super_unit_schema: {super_unit_schema}, super_unit_hash: {super_unit_hash}')
 
         if is_sub_unit is None or is_sub_unit is False:
             next_nonce = self.active.nonce._next_active_nonce()
         else:
             next_nonce = self.active.nonce._next_sub_nonce()
 
-        print(f'next_nonce: {next_nonce}')
-        print(f'active: {self.active}')
+        # print(f'next_nonce: {next_nonce}')
+        # print(f'active: {self.active}')
 
         predicted_super_nonce = self.pool._get_super_nonce(self.active.nonce)
         predicted_super_nonce_group_unit = self._get_group_unit_from_nonce(predicted_super_nonce)
         predicted_super_nonce_group_unit_schema = predicted_super_nonce_group_unit.data.schema
 
-        print(f'predicted_super_nonce: {predicted_super_nonce}')
-        print(f'predicted_super_nonce_group_unit: {predicted_super_nonce_group_unit}')
-        print(f'predicted_super_nonce_group_unit_schema: {predicted_super_nonce_group_unit_schema}')
+        # print(f'predicted_super_nonce: {predicted_super_nonce}')
+        # print(f'predicted_super_nonce_group_unit: {predicted_super_nonce_group_unit}')
+        # print(f'predicted_super_nonce_group_unit_schema: {predicted_super_nonce_group_unit_schema}')
 
         if super_unit_schema is None and super_unit_hash is None:
             schema_to_enforce = predicted_super_nonce_group_unit_schema
@@ -107,56 +107,10 @@ class Controller:
         if override_sub_unit:
             if super_unit_schema is not None and super_unit_hash is not None:
                 assert super_unit_schema == self._get_group_unit(super_unit_hash).data.schema, "Sub Unit schema must match super Unit schema"
-
-        # elif super_unit_hash is not None and super_unit_schema is None:
-        #     if self._get_group_unit(super_unit_hash).data.schema == self.active.data.schema:
-        #         schema_to_enforce = self._get_group_unit(super_unit_hash).data.schema
-
-        # elif super_unit_schema is not None and super_unit_hash is not None:
-        #     if super_unit_schema == self._get_group_unit(super_unit_hash).data.schema:
-        #         schema_to_enforce = super_unit_schema
-
-        # elif super_unit_schema is None and super_unit_hash is None:
-        #     schema_to_enforce =
-
-        # print(f'schema_to_enforce: {schema_to_enforce}'')
-
-
-        # if super_unit_schema is None and super_unit_hash is None:
-        #     schema_to_enforce = self.active.data.schema
-        # elif super_unit_schema is not None:
-        #     schema_to_enforce = super_unit_schema
-        # elif super_unit_hash is not None:
-        #     schema_to_enforce = self._get_group_unit(super_unit_hash).data.schema
-        # else:
-        #     raise Exception("Invalid Arguments")
-        
-
-        # if is_sub_unit is None or is_sub_unit is False:
-        #     nonce = self.active.nonce._next_active_nonce()
-        #     print(f'nonce: {nonce}')
-        #     print(f'active: {self.active}')
-        #     if super_unit_schema is not None:
-        #         schema_to_enforce = super_unit_schema
-        #     elif super_unit_hash is not None:
-        #         schema_to_enforce = self._get_group_unit(super_unit_hash).data.schema
-        #     else:
-        #         super_nonce = Nonce(BaseContainer((item for item in self.active.nonce._chain.items[:1]), ))
-        #         print(f'super_nonce: {super_nonce}')
-        #         schema_to_enforce = self._get_group_unit_from_nonce(super_nonce).data.schema
-                
-        # elif is_sub_unit:
-        #     nonce = self.active.nonce._next_sub_nonce()
-        #     if self.active.data.has_schema:
-        #         schema_to_enforce = self.active.data.schema
-        #         if super_unit_schema is not None:
-        #             assert super_unit_schema == schema_to_enforce, "Sub Unit schema must match super Unit schema"
-        #         elif super_unit_hash is not None:
-        #             assert self._get_group_unit(super_unit_hash).data.schema == schema_to_enforce, "Sub Unit schema must match super Unit schema"
-                
-        print(f'schema_to_enforce: {schema_to_enforce}')
+    
+        # print(f'schema_to_enforce: {schema_to_enforce}')
         new_data = Data._from(data.entry, data.schema, schema_to_enforce)
-        print(f'data: {new_data}')
+        # print(f'data: {new_data}')
         credential = Credential()
         owner = Owner()
         group_unit = GroupUnit(next_nonce, owner, credential, new_data)
