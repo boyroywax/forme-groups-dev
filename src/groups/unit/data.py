@@ -1,10 +1,34 @@
+from lib2to3.pytree import convert
 from attrs import define, field, validators
 from typing import Optional, Tuple
 
+from ..base.value import BaseValue
+from ..base.types import BaseContainerTypes, BaseValueTypes
 from ..base.interface import BaseInterface
 from ..base.container import BaseContainer
 from ..base.schema import BaseSchema
 
+
+def _convert_to_entry(item: BaseContainer | BaseValue | BaseContainerTypes | BaseValueTypes ) -> BaseContainer:
+    """Converts the given item to a BaseContainer
+
+    Args:
+        item (BaseContainer | tuple[BaseContainer, BaseSchema]): The item to convert
+
+    Returns:
+        BaseContainer: The converted item
+    """
+    if isinstance(item, BaseContainer):
+        return item
+    elif isinstance(item, BaseValue):
+        return BaseContainer((item,))
+    elif isinstance(item, BaseContainerTypes):
+        return BaseContainer(item)
+    elif isinstance(item, BaseValueTypes):
+        return BaseContainer((BaseValue(item),))
+    else:
+        raise TypeError(f"Expected a BaseContainer, but received {type(item)}")
+    
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class Data(BaseInterface):
@@ -25,7 +49,8 @@ class Data(BaseInterface):
     """
 
     entry: BaseContainer = field(
-        validator=validators.instance_of(BaseContainer))
+        validator=validators.instance_of(BaseContainer),
+        converter=_convert_to_entry)
 
     schema: Optional[BaseSchema] = field(
         validator=validators.optional(validators.instance_of(BaseSchema)),
@@ -72,7 +97,7 @@ class Data(BaseInterface):
         return True
     
     @classmethod
-    def _from(cls, data: BaseContainer, schema: Optional[BaseSchema] = None, schema_to_enforce: Optional[BaseSchema] = None) -> 'Data':
+    def _from(cls, entry: BaseContainer, schema: Optional[BaseSchema] = None, schema_to_enforce: Optional[BaseSchema] = None) -> 'Data':
         """Creates a Data object from the given data and schema
 
         Args:
@@ -88,6 +113,6 @@ class Data(BaseInterface):
         if schema_to_enforce is not None:
             assert isinstance(schema_to_enforce, BaseSchema), f"Expected a BaseSchema, but received {type(schema_to_enforce)}"
         
-            assert Data._check_if_data_entry_matches_schema(data, schema_to_enforce), f"Expected data to match schema, but received {data} and {schema}"
+            assert Data._check_if_data_entry_matches_schema(entry, schema_to_enforce), f"Expected data to match schema, but received {entry} and {schema}"
 
-        return cls(entry=data, schema=schema)
+        return cls(entry=entry, schema=schema)

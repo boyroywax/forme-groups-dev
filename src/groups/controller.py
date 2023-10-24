@@ -1,7 +1,7 @@
 from attrs import define, field, validators, Factory
 from typing import Optional
 
-from .base import BaseContainer
+from .base import BaseContainer, BaseSchema
 from .unit import GroupUnit, Credential, Data, Owner, Nonce
 from .pool import Pool
 
@@ -52,25 +52,45 @@ class Controller:
         """
         self.pool.add_group_unit(group_unit)
 
-    def _create_group_unit(self, data: Data, is_sub_unit: bool = False, super_unit_hash: Optional[str] = None) -> GroupUnit:
+    def _create_group_unit(
+        self,
+        data: Data,
+        is_sub_unit: Optional[bool] = None,
+        super_unit_schema: Optional[BaseSchema] = None,
+        super_unit_hash: Optional[str] = None
+    ) -> GroupUnit:
         """Creates a GroupUnit
 
         Args:
             data (Data): The Data of the GroupUnit
+            is_sub_unit (Optional[bool]): Whether the GroupUnit is a sub Unit. Defaults to None.
+            super_unit_schema (Optional[BaseSchema]): The Schema of the super Unit. Defaults to None.
+            super_unit_hash (Optional[str]): The hash of the super Unit. Defaults to None.
 
         Returns:
-            GroupUnit: The created GroupUnit
-        """
+            GroupUnit: The GroupUnit that was created
+
+        Notes:
+            If is_sub_unit is True, the super_unit_schema must be the same as the schema of the super Unit
+            If is_sub_unit is False, the super_unit_schema must be the same as the schema of the super Unit
+            If is_sub_unit is None, the super_unit_schema must be the same as the schema of the super Unit
+        """        
+        schema_to_enforce: Optional[BaseSchema] = None
+
         if is_sub_unit:
             nonce = self.active.nonce._next_sub_nonce()
             if self.active.data.has_schema:
                 schema_to_enforce = self.active.data.schema
-        else:
+                if super_unit_schema is not None:
+                    assert super_unit_schema == schema_to_enforce, "Sub Unit schema must match super Unit schema"
+    
+        elif not is_sub_unit:
             nonce = self.active.nonce._next_active_nonce()
-            if super_unit_hash is None:
-                schema_to_enforce = None
-            else:
+            if super_unit_schema is not None:
+                schema_to_enforce = super_unit_schema
+            elif super_unit_hash is not None:
                 schema_to_enforce = self._get_group_unit(super_unit_hash).data.schema
+
         data = Data._from(data.entry, data.schema, schema_to_enforce)
         credential = Credential()
         owner = Owner()
@@ -88,4 +108,15 @@ class Controller:
             GroupUnit: The GroupUnit from the Pool
         """
         return self.pool.get_group_unit(hash_)
+    
+    def _get_group_unit_from_nonce(self, nonce: Nonce) -> GroupUnit:
+        """Gets a GroupUnit from the Pool
+
+        Args:
+            nonce (Nonce): The nonce of the GroupUnit to get from the Pool
+
+        Returns:
+            GroupUnit: The GroupUnit from the Pool
+        """
+        return self._get_group_unit(nonce._hash().root())
 
