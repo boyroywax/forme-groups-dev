@@ -21,10 +21,10 @@ class TestController(unittest.TestCase):
         self.controller._create_group_unit(self.data_real)
 
     def test_controller_add_data(self):
-        self.assertEqual(self.controller.data, (self.data_real, ))
+        self.assertEqual(self.controller.active.data.entry, self.data_real.entry )
 
     def test_controller_add_data_bad(self):
-        self.assertRaises(TypeError, self.controller._create_group_unit, self.data_bad)
+        self.assertRaises(ValueError, self.controller._create_group_unit, self.data_bad)
 
     def test_controller_add_data_bad_two(self):
         self.assertRaises(TypeError, self.controller._create_group_unit, self.container_mock)

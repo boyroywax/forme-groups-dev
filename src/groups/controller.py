@@ -37,6 +37,7 @@ class Controller:
 
     @property
     def active(self) -> GroupUnit | None:
+        self._active = self.pool.group_units[-1][2]
         return self._active
     
     @active.setter
