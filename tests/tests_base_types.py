@@ -24,11 +24,11 @@ class TestBaseTypes(unittest.TestCase):
 
     def test_system_type_pool_hash_public(self):
 
-        self.assertEqual(self.system_pool._hash_public_slots(), "23d98887145a93576a9ab6dd0403311dcf6560b059bb35d9fe033ed2b22136c0")
+        self.assertEqual(self.system_pool._hash_public_slots().root(), "23d98887145a93576a9ab6dd0403311dcf6560b059bb35d9fe033ed2b22136c0")
 
     def test_system_type_pool_hash_private(self):
 
-        self.assertEqual(self.system_pool._hash_private_slots(), None)
+        self.assertEqual(self.system_pool._hash_private_slots().root(), None)
 
     def test_system_type_pool_hash_repr(self):
 
@@ -42,4 +42,4 @@ class TestBaseTypes(unittest.TestCase):
     def test_system_base_type_interface_hash_public(self):
 
         integer = self.system_pool.Integer
-        self.assertEqual(integer._hash_public_slots(), "e87c23c3af923f131a1f85996611d5a7a932832e04d83c2ad2ab831b572f2618")
+        self.assertEqual(integer._hash_public_slots().root(), "e87c23c3af923f131a1f85996611d5a7a932832e04d83c2ad2ab831b572f2618")

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='groups',
     version='0.0.1',
-    packages=find_packages('src', exclude=['*tests*']),
+    packages=find_packages('src', exclude=['*test*']),
     package_dir={'': 'src'},
     install_requires=[
         'uuid'

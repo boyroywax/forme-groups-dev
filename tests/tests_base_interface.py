@@ -80,10 +80,10 @@ class TestBaseInterface(unittest.TestCase):
         self.assertEqual(getattr(self.base_interface, "_private_test_property"), 2)
 
     def test_base_interface_hash_public(self):
-        self.assertEqual(self.base_interface._hash_public_slots(), "3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd")
+        self.assertEqual(self.base_interface._hash_public_slots().root(), "3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd")
 
     def test_base_interface_hash_private(self):
-        self.assertEqual(self.base_interface._hash_private_slots(), "32ee78186a3407f4f288673b1a7dca6154c294f435f444ee3ba054356a88a1e8")
+        self.assertEqual(self.base_interface._hash_private_slots().root(), "32ee78186a3407f4f288673b1a7dca6154c294f435f444ee3ba054356a88a1e8")
 
     def test_base_interface_hash_package(self):
         self.maxDiff = None
@@ -103,7 +103,7 @@ class TestBaseInterface(unittest.TestCase):
             'dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91',
             'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35'))
         
-        self.assertEqual(self.base_interface2._hash_public_slots(), '933c32b6ec12b7f41e028185cc2f347d3051c2561d70d48f62fb38f47c18a772')
-        self.assertEqual(self.base_interface2._hash_private_slots(), '32ee78186a3407f4f288673b1a7dca6154c294f435f444ee3ba054356a88a1e8')
+        self.assertEqual(self.base_interface2._hash_public_slots().root(), '933c32b6ec12b7f41e028185cc2f347d3051c2561d70d48f62fb38f47c18a772')
+        self.assertEqual(self.base_interface2._hash_private_slots().root(), '32ee78186a3407f4f288673b1a7dca6154c294f435f444ee3ba054356a88a1e8')
         self.assertEqual(self.base_interface2._hash_package().root(), 'a4ad9b7196e928dd5b02374a2ddea89260fafe65cc84378451c06fd96b02c4fc')
 

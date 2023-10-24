@@ -1,7 +1,7 @@
 from attrs import define, field, validators, Factory
 from typing import Optional
 
-from src.groups.base.value import BaseValue
+# from src.groups.base.value import BaseValue
 
 from .base import BaseContainer, BaseSchema
 from .unit import GroupUnit, Credential, Data, Owner, Nonce

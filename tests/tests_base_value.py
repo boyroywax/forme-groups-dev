@@ -348,7 +348,7 @@ class TestBaseValue(unittest.TestCase):
             ]
             random_value = random.choice(values)
             value = BaseValue(random_value)
-            self.assertEqual(value._hash_public_slots(), value._hash_public_slots())
+            self.assertEqual(value._hash_public_slots().root(), value._hash_public_slots().root())
 
     def test_hash_public_slot(self):
         for i in range(__RANGE__):
@@ -362,8 +362,8 @@ class TestBaseValue(unittest.TestCase):
             ]
             random_value = random.choice(values)
             value = BaseValue(random_value)
-            self.assertIsNone(value._hash_public_slots())
-            self.assertIsNotNone(value._hash_private_slots())
+            self.assertIsNone(value._hash_public_slots().root())
+            self.assertIsNotNone(value._hash_private_slots().root())
             self.assertEqual(str(value), str(random_value))
             self.assertEqual(repr(value), f"BaseValue(value={repr(random_value)}, type={type(random_value).__name__})")
             self.assertEqual(value._hash_repr(), MerkleTree._hash_func(repr(value)))
@@ -381,8 +381,8 @@ class TestBaseValue(unittest.TestCase):
             ]
             random_value = random.choice(values)
             value = BaseValue(random_value)
-            self.assertIsNone(value._hash_public_slots())
-            self.assertIsNotNone(value._hash_private_slots())
+            self.assertIsNone(value._hash_public_slots().root())
+            self.assertIsNotNone(value._hash_private_slots().root())
             self.assertEqual(str(value), str(random_value))
             self.assertEqual(repr(value), f"BaseValue(value={repr(random_value)}, type={type(random_value).__name__})")
             self.assertEqual(value._hash_repr(), MerkleTree._hash_func(repr(value)))

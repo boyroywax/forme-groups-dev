@@ -2,14 +2,14 @@ from abc import ABC
 from attrs import define, field, validators
 from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override
 
-# from .interface import BaseInterface
+from .interface import BaseInterface
 from .exceptions import GroupBaseTypeException
 from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-# class BaseType(BaseInterface):
-class BaseType:
+class BaseType(BaseInterface):
+# class BaseType:
     """Base class for types
     
     Args:
@@ -162,8 +162,8 @@ class BaseType:
     
 
 @define(frozen=True, slots=True, weakref_slot=False)
-# class _BaseTypes(BaseInterface):
-class _BaseTypes:
+class _BaseTypes(BaseInterface):
+# class _BaseTypes:
     Integer: BaseType = field(default=BaseType(
         aliases=(
             str("Integer"), "integer", "INTEGER",

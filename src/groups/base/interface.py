@@ -100,6 +100,7 @@ NOTES:
             e. Finally, the public and private trees are hashed together into a tree representing the package.
 
 """
+from abc import ABC
 from attrs import define
 
 from .exceptions import GroupBaseException
@@ -107,7 +108,7 @@ from ..utils.crypto import MerkleTree
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
-class BaseInterface:
+class BaseInterface(ABC):
     """
     Base interface for all classes
     """
@@ -260,23 +261,23 @@ class BaseInterface:
         """
         return MerkleTree(self._hash_slots(include_underscored_slots, private_only))
 
-    def _hash_public_slots(self) -> str:
+    def _hash_public_slots(self) -> MerkleTree:
         """Returns the hash of the full representation of the object.
 
         Returns:
             str: The hash of the representation of the object.
 
         """
-        return self._hash_tree(include_underscored_slots=False, private_only=False).root()
+        return self._hash_tree(include_underscored_slots=False, private_only=False)
 
-    def _hash_private_slots(self) -> str:
+    def _hash_private_slots(self) -> MerkleTree:
         """Returns the hash of the full representation of the object.
 
         Returns:
             str: The hash of the representation of the object.
 
         """
-        return self._hash_tree(include_underscored_slots=True, private_only=True).root()
+        return self._hash_tree(include_underscored_slots=True, private_only=True)
     
     def _check_for_none(self, item: str) -> bool:
         """Returns the hash of the full representation of the object.
@@ -294,8 +295,8 @@ class BaseInterface:
             str: The hash of the representation of the object.
 
         """
-        public_hash: str | None = self._hash_public_slots()
-        private_hash: str | None = self._hash_private_slots()
+        public_hash: str | None = self._hash_public_slots().root()
+        private_hash: str | None = self._hash_private_slots().root()
 
         if self._check_for_none(public_hash) and self._check_for_none(private_hash):
             raise GroupBaseException("Cannot hash a package with no public or private slots.")
