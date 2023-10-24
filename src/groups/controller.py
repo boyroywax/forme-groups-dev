@@ -81,8 +81,11 @@ class Controller:
 
         if is_sub_unit is None or is_sub_unit is False:
             next_nonce = self.active.nonce._next_active_nonce()
-        else:
+        elif is_sub_unit is True and override_sub_unit is False:
+            if self.active.data.schema is None:
+                raise AttributeError("Cannot create a sub Unit without a schema")
             next_nonce = self.active.nonce._next_sub_nonce()
+
 
         # print(f'next_nonce: {next_nonce}')
         # print(f'active: {self.active}')
@@ -101,8 +104,8 @@ class Controller:
         if super_unit_schema is not None and super_unit_hash is None:
             if super_unit_schema == predicted_super_nonce_group_unit_schema:
                 schema_to_enforce = super_unit_schema
-            else:
-                raise AttributeError("Invalid Arguments")
+            # else:
+            #     raise AttributeError("Invalid Arguments")
 
         if override_sub_unit:
             if super_unit_schema is not None and super_unit_hash is not None:
