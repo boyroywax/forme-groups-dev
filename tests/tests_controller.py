@@ -28,11 +28,10 @@ class TestController(unittest.TestCase):
         self.assertEqual(self.controller.active.data.entry, self.data_bad.entry)
 
     def test_controller_add_data_bad_with_schema(self):
-        self.assertRaises(AttributeError, self.controller._create_group_unit, self.data_bad, None, self.schema_real)
+        self.assertRaises(TypeError, self.controller._create_group_unit, self.data_bad, None, self.schema_real)
 
     def test_controller_add_data_with_schema(self):
-        self.controller._create_group_unit(self.data_real, self.schema_real)
-        self.assertEqual(self.controller.active.data.entry, self.data_real.entry)
+        self.assertRaises(ValueError, self.controller._create_group_unit, self.data_real, None, self.schema_real)
 
     def test_controller_add_data_nonce(self):
         self.assertEqual(self.controller.active.nonce._hash().root(), '3eff7c5314a5ed2d5d8fdad16bbc4851cd98b9861c950854246318c5576a37fd')

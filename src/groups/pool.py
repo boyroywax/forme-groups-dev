@@ -74,7 +74,7 @@ class Pool:
         Returns:
             bool: True if the GroupUnit exists in the Pool, False otherwise
         """
-        package_hash: str = group_unit._hash_package().root()
+        package_hash: str = group_unit.data._hash().root()
         nonce_hash: str = group_unit.nonce._hash().root()
 
         return self._check_if_hash_exists((package_hash, nonce_hash), lookup='all')

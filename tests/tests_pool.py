@@ -76,6 +76,6 @@ class TestPool(unittest.TestCase):
     def test_group_unit_add_group_unit(self):
         self.pool = Pool()
         self.pool.add_group_unit(self.group_unit)
-        self.assertEqual(self.pool.group_units, ((self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
+        self.assertEqual(self.pool.group_units, ((self.group_unit.data._hash().root(), self.group_unit.nonce._hash().root(), self.group_unit), ))
 
         self.assertRaises(TypeError, self.pool.add_group_unit, (self.group_unit._hash_package().root(), self.group_unit.nonce._hash().root(), self.group_unit))
