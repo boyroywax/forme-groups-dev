@@ -1,8 +1,15 @@
 from attrs import define, field, validators, Factory
 from typing import Optional
 
+from .base import BaseContainer
 from .unit import GroupUnit, Credential, Data, Owner, Nonce
 from .pool import Pool
+
+__DEFAULT_GROUP_UNIT__ = GroupUnit(
+    Nonce(BaseContainer((0, ), "tuple")),
+    Owner(),
+    Credential(),
+    Data(BaseContainer((0, ), "tuple")))
 
 
 @define(slots=True, weakref_slot=False)
@@ -13,20 +20,20 @@ class Controller:
         pool (Optional[Pool]): The Pool of Group Units
     """
     pool: Optional[Pool] = field(
-        default=Factory(Pool),
+        default=None,
         validator=validators.optional(validators.instance_of(Pool)))
     
     _active: Optional[GroupUnit] = field(
-        default=Factory(GroupUnit),
+        default=None,
         validator=validators.optional(validators.instance_of(GroupUnit)))
 
     def __init__(self, pool: Optional[Pool] = None):
         if pool is not None:
             self.pool = pool
         else:
-            self.pool = Pool()
+            self.pool = Pool(((__DEFAULT_GROUP_UNIT__._hash_package().root(), __DEFAULT_GROUP_UNIT__.nonce._hash().root(), __DEFAULT_GROUP_UNIT__),), )
 
-        self._active = pool.group_units[-1][1]
+        self._active = self.pool.group_units[-1][2]
 
     @property
     def active(self) -> GroupUnit | None:
