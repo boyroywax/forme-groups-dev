@@ -34,8 +34,8 @@ class Pool:
     Examples:
         >>> pool = Pool(group_units=(('package_hash', 'nonce_hash', GroupUnit()),))
     """
-    group_units: Optional[Tuple[Tuple[str, str, GroupUnit], ...]] = field(
-        default=Factory(tuple),
+    group_units: Tuple[Tuple[str, str, GroupUnit], ...] = field(
+        default=Factory(tuple[str, str, GroupUnit]),
         validator=validators.optional(validators.deep_iterable(_validate_group_unit_entry,
         iterable_validator=validators.instance_of(tuple))))
     
@@ -56,7 +56,8 @@ class Pool:
         assert lookup in ('unit', 'nonce', 'all'), f'Expected lookup to be package_hash or nonce_hash, got {lookup}'
 
         for hash_item in hash_:
-            for item in self.group_units:
+            print(f'hash_item: {hash_item}')
+            for item in iter(self):
                 if item[0] == hash_item and (lookup == 'unit' or lookup == 'all'):
                     return True
                 if item[1] == hash_item and (lookup == 'nonce' or lookup == 'all'):
@@ -129,7 +130,7 @@ class Pool:
         Returns:
             iter: An iterator over the Group Units in the Pool
         """
-        return iter(self.group_units)
+        return iter(self.group_units.__iter__())
 
     def __repr__(self):
         """Return the representation of the Pool

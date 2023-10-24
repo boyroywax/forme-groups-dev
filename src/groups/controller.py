@@ -39,10 +39,6 @@ class Controller:
     def active(self) -> GroupUnit | None:
         self._active = self.pool.group_units[-1][2]
         return self._active
-    
-    @active.setter
-    def active(self, value: GroupUnit):
-        self._active = value
 
     def _add_group_unit(self, group_unit: GroupUnit) -> None:
         """Adds a GroupUnit to the Pool
@@ -84,7 +80,7 @@ class Controller:
                 if super_unit_schema is not None:
                     assert super_unit_schema == schema_to_enforce, "Sub Unit schema must match super Unit schema"
     
-        elif not is_sub_unit:
+        elif not is_sub_unit or is_sub_unit is None:
             nonce = self.active.nonce._next_active_nonce()
             if super_unit_schema is not None:
                 schema_to_enforce = super_unit_schema
