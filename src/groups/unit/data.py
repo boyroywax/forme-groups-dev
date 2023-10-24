@@ -1,6 +1,8 @@
 from attrs import define, field, validators
 from typing import Optional, Tuple
 
+from src.groups.utils.crypto import MerkleTree
+
 from ..base.value import BaseValue
 from ..base.types import BaseContainerTypes, BaseValueTypes
 from ..base.interface import BaseInterface
@@ -115,3 +117,6 @@ class Data(BaseInterface):
             assert Data._check_if_data_entry_matches_schema(entry, schema_to_enforce), f"Expected data to match schema, but received {entry} and {schema}"
 
         return cls(entry=entry, schema=schema)
+    
+    def _hash(self) -> MerkleTree:
+        return self.entry._hash()

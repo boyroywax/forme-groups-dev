@@ -50,13 +50,21 @@ class Controller:
         """
         self.pool.add_group_unit(group_unit)
 
+    def _get_active_nonce(self) -> Nonce:
+        """Gets the active nonce
+
+        Returns:
+            Nonce: The active nonce
+        """
+        return self.active.nonce
+
     def _create_group_unit(
         self,
         data: Data,
         is_sub_unit: Optional[bool] = None,
         super_unit_schema: Optional[BaseSchema] = None,
         super_unit_hash: Optional[str] = None,
-        override_sub_unit: bool = False
+        override_nonce: Optional[Nonce] = None
     ) -> GroupUnit:
         """Creates a GroupUnit
 
@@ -65,52 +73,48 @@ class Controller:
             is_sub_unit (Optional[bool]): Whether the GroupUnit is a sub Unit. Defaults to None.
             super_unit_schema (Optional[BaseSchema]): The Schema of the super Unit. Defaults to None.
             super_unit_hash (Optional[str]): The hash of the super Unit. Defaults to None.
-
-        Returns:
-            GroupUnit: The GroupUnit that was created
-
-        Notes:
-            If is_sub_unit is True, the super_unit_schema must be the same as the schema of the super Unit
-            If is_sub_unit is False, the super_unit_schema must be the same as the schema of the super Unit
-            If is_sub_unit is None, the super_unit_schema must be the same as the schema of the super Unit
+            override_sub_unit (bool): Whether to override the sub Unit. Defaults to False.
         """
         schema_to_enforce: Optional[BaseSchema] = None
         next_nonce: Optional[Nonce] = None
 
-        # print(f'is_sub_unit: {is_sub_unit}, super_unit_schema: {super_unit_schema}, super_unit_hash: {super_unit_hash}')
-
         if is_sub_unit is None or is_sub_unit is False:
             next_nonce = self.active.nonce._next_active_nonce()
-        elif is_sub_unit is True and override_sub_unit is False:
+
+        elif is_sub_unit is True and override_nonce is None:
             if self.active.data.schema is None:
                 raise AttributeError("Cannot create a sub Unit without a schema")
             next_nonce = self.active.nonce._next_sub_nonce()
 
+        elif override_nonce is not None:
+            next_nonce = override_nonce
 
-        # print(f'next_nonce: {next_nonce}')
-        # print(f'active: {self.active}')
+        # print(f'is_sub_unit: {is_sub_unit}, super_unit_schema: {super_unit_schema}, super_unit_hash: {super_unit_hash}')
 
-        predicted_super_nonce = self.pool._get_super_nonce(self.active.nonce)
-        predicted_super_nonce_group_unit = self._get_group_unit_from_nonce(predicted_super_nonce)
-        predicted_super_nonce_group_unit_schema = predicted_super_nonce_group_unit.data.schema
+        # if is_sub_unit is None or is_sub_unit is False:
+        #     next_nonce = self.active.nonce._next_active_nonce()
+        # elif is_sub_unit is True and override_nonce is None:
+        #     if self.active.data.schema is None:
+        #         raise AttributeError("Cannot create a sub Unit without a schema")
+        #     next_nonce = self.active.nonce._next_sub_nonce()
+        # elif override_nonce is not None:
+        #     next_nonce = override_nonce
+        # elif super_unit_hash is not None or super_unit_schema is not None:
+        #     next_nonce = self.active.nonce._next_sub_nonce()
+        # predicted_super_nonce = self.pool._get_super_nonce(next_nonce)
+        # predicted_super_nonce_group_unit = self._get_group_unit_from_nonce(predicted_super_nonce)
+        # predicted_super_nonce_group_unit_schema = predicted_super_nonce_group_unit.data.schema
 
-        # print(f'predicted_super_nonce: {predicted_super_nonce}')
-        # print(f'predicted_super_nonce_group_unit: {predicted_super_nonce_group_unit}')
-        # print(f'predicted_super_nonce_group_unit_schema: {predicted_super_nonce_group_unit_schema}')
+        # if super_unit_schema is None and super_unit_hash is None:
+        #     schema_to_enforce = predicted_super_nonce_group_unit_schema
 
-        if super_unit_schema is None and super_unit_hash is None:
-            schema_to_enforce = predicted_super_nonce_group_unit_schema
-
-        if super_unit_schema is not None and super_unit_hash is None:
-            if super_unit_schema == predicted_super_nonce_group_unit_schema:
-                schema_to_enforce = super_unit_schema
-            # else:
-            #     raise AttributeError("Invalid Arguments")
-
-        if override_sub_unit:
-            if super_unit_schema is not None and super_unit_hash is not None:
-                assert super_unit_schema == self._get_group_unit(super_unit_hash).data.schema, "Sub Unit schema must match super Unit schema"
+        # if super_unit_schema is not None and super_unit_hash is None:
+        #     if super_unit_schema == predicted_super_nonce_group_unit_schema:
+        #         schema_to_enforce = super_unit_schema
+        # if super_unit_schema is not None and super_unit_hash is not None:
+        #     assert super_unit_schema == self._get_group_unit(super_unit_hash).data.schema, "Sub Unit schema must match super Unit schema"
     
+        schema_to_enforce = super_unit_schema
         # print(f'schema_to_enforce: {schema_to_enforce}')
         new_data = Data._from(data.entry, data.schema, schema_to_enforce)
         # print(f'data: {new_data}')

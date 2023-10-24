@@ -91,7 +91,7 @@ class Pool:
         if not isinstance(group_unit, GroupUnit):
             raise TypeError(f'Expected GroupUnit, got {type(group_unit)}')
 
-        group_unit_hash: str | None = group_unit._hash_package().root()
+        group_unit_hash: str | None = group_unit.data._hash().root()
         nonce_hash: str | None = group_unit.nonce._hash().root()
 
         # print(f'group_unit_hash: {group_unit_hash}, nonce_hash: {nonce_hash}')
@@ -154,7 +154,8 @@ class Pool:
         """
         assert isinstance(nonce, Nonce), f'Expected nonce to be Nonce, got {type(nonce)}'
 
-        base_values: tuple[BaseValue, ...] = tuple(nonce._chain.items[:1])
+        print(f'nonce: {nonce}')
+        base_values: tuple[BaseValue, ...] = tuple(nonce._chain.items[:-1])
         # print(f'base_values: {base_values}')
 
         return Nonce(BaseContainer(base_values))
