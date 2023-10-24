@@ -39,7 +39,7 @@ class TestGroupUnit(unittest.TestCase):
         self.assertEqual(repr(self.group_unit.credential), "Credential(_credential=None)")
         self.assertEqual(str(self.group_unit.credential), "")
 
-        self.assertEqual(repr(self.group_unit.data), "Data(_entry=BaseContainer(items=(BaseValue(value=1, type=int),), type=tuple), _schema=BaseSchema(entries=(SchemaEntry(key='test', value=int),)))")
+        self.assertEqual(repr(self.group_unit.data), "Data(entry=BaseContainer(items=(BaseValue(value=1, type=int),), type=tuple), schema=BaseSchema(entries=(SchemaEntry(key='test', value=int),)))")
 
     def test_init_with_data(self):
         self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)

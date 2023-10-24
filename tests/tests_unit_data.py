@@ -19,17 +19,27 @@ class TestData(unittest.TestCase):
 
     def test_data_creation(self):
         data = Data(self.container_mock)
-        self.assertEqual(data.data, self.container_mock)
+        self.assertEqual(data.entry, self.container_mock)
 
     def test_data_creation_with_schema(self):
         data = Data(self.container_mock, self.schema_mock)
-        self.assertEqual(data.data, self.container_mock)
+        self.assertEqual(data.entry, self.container_mock)
         self.assertEqual(data.schema, self.schema_mock)
 
     def test_data_creation_with_schema_real(self):
-        produced_data = Data._from(self.data_real.data, self.schema_real)
+        produced_data = Data._from(self.data_real.entry, self.schema_real)
         print(produced_data)
-        self.assertEqual(produced_data.data, self.data_real.data)
+        self.assertEqual(produced_data.entry, self.data_real.entry)
     
     def test_data_creation_with_schema_real_bad(self):
-        self.assertRaises(TypeError, Data._from, self.data_bad.data, self.schema_real)
+        self.assertRaises(TypeError, Data._from, self.data_bad.entry, self.schema_real)
+
+    def test_data_creation_with_schema_bad(self):
+        self.assertRaises(TypeError, Data, self.container_mock, self.container_mock)
+
+    def test_data_creation_with_no_schema(self):
+        data_no_schema = Data(self. data_real.entry)
+        self.assertEqual(data_no_schema.entry, self.data_real.entry)
+
+    def test_data_creation_str(self):
+        self.assertEqual(str(self.data_real), f"entry: ('test_user', 31), schema: None")

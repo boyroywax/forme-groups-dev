@@ -16,6 +16,7 @@ from tests_unit_data import TestData
 from tests_unit_owner import TestOwner
 from tests_group_unit import TestGroupUnit
 from tests_pool import TestPool
+from tests_controller import TestController
 
 
 def main():
@@ -44,6 +45,9 @@ def main():
 
     # Pool tests
     test_suite.addTest(loader.loadTestsFromTestCase(TestPool))
+
+    # Controller tests
+    test_suite.addTest(loader.loadTestsFromTestCase(TestController))
 
     # Run the test suite
     runner = unittest.TextTestRunner()

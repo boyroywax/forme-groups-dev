@@ -96,6 +96,30 @@ class Pool:
 
         self.group_units += ((group_unit_hash, nonce_hash, group_unit), )
 
+    def get_group_unit(self, hash_: str, lookup: str = "all") -> GroupUnit:
+        """Get a GroupUnit from the Pool
+
+        Args:
+            hash_ (str): The hash_ of the GroupUnit to get from the Pool
+            lookup (str, optional): The lookup method to use. Defaults to "all".
+
+        Returns:
+            GroupUnit: The GroupUnit from the Pool
+
+        Raises:
+            ValueError: If the GroupUnit does not exist in the Pool
+        """
+        assert isinstance(hash_, str), f'Expected hash_ to be str, got {type(hash_)}'
+
+        assert lookup in ('unit', 'nonce', 'all'), f'Expected lookup to be package_hash or nonce_hash, got {lookup}'
+
+        for item in self.group_units:
+            if item[0] == hash_ and (lookup == 'unit' or lookup == 'all'):
+                return item[2]
+            if item[1] == hash_ and (lookup == 'nonce' or lookup == 'all'):
+                return item[2]
+        raise ValueError(f'GroupUnit with hash_ {hash_} does not exist in the Pool')
+
     def __iter__(self):
         """Iterate over the Group Units in the Pool
         

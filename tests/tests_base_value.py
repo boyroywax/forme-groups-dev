@@ -10,6 +10,7 @@ from src.groups.base.exceptions import GroupBaseValueException
 
 __RANGE__ = 10000
 
+
 class TestBaseValue(unittest.TestCase):
     def test_init_with_int(self):
         value = BaseValue(1)

@@ -24,27 +24,19 @@ class Data(BaseInterface):
             TypeError: If schema is not a BaseSchema
     """
 
-    _entry: BaseContainer = field(
+    entry: BaseContainer = field(
         validator=validators.instance_of(BaseContainer))
 
-    _schema: Optional[BaseSchema] = field(
+    schema: Optional[BaseSchema] = field(
         validator=validators.optional(validators.instance_of(BaseSchema)),
         default=None)
-
-    @property
-    def data(self) -> BaseContainer:
-        return self._entry
-    
-    @property
-    def schema(self) -> Optional[BaseSchema]:
-        return self._schema
     
     @property
     def has_schema(self) -> bool:
-        return self._schema is not None
+        return self.schema is not None
     
     def _num_entries(self) -> int:
-        return len(self._entry.items)
+        return len(self.entry.items)
     
     @staticmethod
     def _get_schema_of_data_entry(data_entry: BaseContainer) -> Tuple[str, ...]:
@@ -93,6 +85,5 @@ class Data(BaseInterface):
         if schema is not None:
             assert isinstance(schema, BaseSchema), f"Expected a BaseSchema, but received {type(schema)}"
             assert Data._check_if_data_entry_matches_schema(data, schema), f"Expected data to match schema, but received {data} and {schema}"
-
 
         return cls(entry=data, schema=schema)

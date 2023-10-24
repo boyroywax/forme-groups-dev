@@ -186,11 +186,6 @@ def _validate_schema_entries(instance, attribute, value):
             raise TypeError(f"Expected a Tuple of SchemaEntry, but received {type(value)}")
         if _key_is_duplicate(item._key, value):
             raise TypeError(f"Expected a Tuple of SchemaEntry with unique keys, but received {value}")
-        # if len(item._key) == 0:
-        #     raise TypeError(f"Expected a Tuple of SchemaEntry with non-empty keys, but received {value}")
-        # if len(item._key) > 256:
-        #     raise TypeError(f"Expected a Tuple of SchemaEntry with keys of length 256 or less, but received {value}m len={len(item._key)}")
-
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
