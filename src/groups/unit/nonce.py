@@ -46,6 +46,7 @@ class Nonce(BaseInterface):
 
     def _get_active(self) -> BaseValue:
         """Sets the active nonce
+
         """
         return self._chain.items[-1]
 
@@ -127,7 +128,7 @@ class Nonce(BaseInterface):
         return iter(self._chain.items)
     
     def _hash_nonce_str(self) -> str:
-        return MerkleTree._hash_func(str(self))
+        return MerkleTree._hash_func(str(str(self)))
     
     def _hash_nonce_units(self) -> tuple[str, ...]:
         nonce_units: tuple = ()
@@ -136,4 +137,5 @@ class Nonce(BaseInterface):
         return nonce_units
     
     def _hash(self) -> MerkleTree:
-        return MerkleTree(self._hash_nonce_units())
+        # return MerkleTree(self._hash_nonce_units())
+        return MerkleTree((self._hash_nonce_str(),))

@@ -1,7 +1,8 @@
 from attrs import define, field, validators, Factory
 from typing import Tuple, Optional, override
 
-from .unit import GroupUnit
+from .base import BaseContainer, BaseSchema, BaseValue
+from .unit import GroupUnit, Nonce
 
 
 def _validate_group_unit_entry(instance, attr, value: tuple[str, str, GroupUnit]) -> tuple[str, str, GroupUnit]:
@@ -125,6 +126,39 @@ class Pool:
             if item[1] == hash_ and (lookup == 'nonce' or lookup == 'all'):
                 return item[2]
         raise ValueError(f'GroupUnit with hash_ {hash_} does not exist in the Pool')
+    
+    def _get_group_unit_from_nonce(self, nonce: Nonce) -> GroupUnit:
+        """Get a GroupUnit from the Pool
+
+        Args:
+            nonce (Nonce): The Nonce of the GroupUnit to get from the Pool
+
+        Returns:
+            GroupUnit: The GroupUnit from the Pool
+
+        Raises:
+            ValueError: If the GroupUnit does not exist in the Pool
+        """
+        assert isinstance(nonce, Nonce), f'Expected nonce to be Nonce, got {type(nonce)}'
+
+        return self.get_group_unit(nonce._hash().root(), lookup='nonce')
+    
+    def _get_super_nonce(self, nonce: Nonce) -> Nonce:
+        """Get the super Nonce of a Nonce
+
+        Args:
+            nonce (Nonce): The Nonce to get the super Nonce of
+
+        Returns:
+            Nonce: The super Nonce of the Nonce
+        """
+        assert isinstance(nonce, Nonce), f'Expected nonce to be Nonce, got {type(nonce)}'
+
+        base_values: tuple[BaseValue, ...] = tuple(nonce._chain.items[:1])
+        print(f'base_values: {base_values}')
+
+        return Nonce(BaseContainer(base_values))
+
 
     def __iter__(self):
         """Iterate over the Group Units in the Pool
