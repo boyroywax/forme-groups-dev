@@ -24,7 +24,8 @@ class TestController(unittest.TestCase):
         self.assertEqual(self.controller.active.data.entry, self.data_real.entry )
 
     def test_controller_add_data_bad(self):
-        self.assertRaises(ValueError, self.controller._create_group_unit, self.data_bad)
+        self.controller._create_group_unit(self.data_bad)
+        self.assertEqual(self.controller.active.data.entry, self.data_bad.entry)
 
     def test_controller_add_data_bad_two(self):
         self.assertRaises(TypeError, self.controller._create_group_unit, self.container_mock)
