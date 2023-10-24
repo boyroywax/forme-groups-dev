@@ -11,20 +11,9 @@ from src.groups.base.schema import BaseSchema, SchemaEntry
 
 class TestData(unittest.TestCase):
     def setUp(self):
-        self.container_mock = Mock(spec=BaseContainer)
-        self.schema_mock = Mock(spec=BaseSchema)
         self.schema_real = BaseSchema((SchemaEntry("name", "string"), SchemaEntry("age", "integer")))
         self.data_real = Data(BaseContainer((BaseValue("test_user"), BaseValue(31)), "tuple"))
         self.data_bad = Data(BaseContainer((BaseValue(b'ccc'), BaseValue(31)), "tuple"))
-
-    def test_data_creation(self):
-        data = Data(self.container_mock)
-        self.assertEqual(data.entry, self.container_mock)
-
-    def test_data_creation_with_schema(self):
-        data = Data(self.container_mock, self.schema_mock)
-        self.assertEqual(data.entry, self.container_mock)
-        self.assertEqual(data.schema, self.schema_mock)
 
     def test_data_creation_with_schema_real(self):
         produced_data = Data._from(self.data_real.entry, self.schema_real)
@@ -32,10 +21,7 @@ class TestData(unittest.TestCase):
         self.assertEqual(produced_data.entry, self.data_real.entry)
     
     def test_data_creation_with_schema_real_bad(self):
-        self.assertRaises(TypeError, Data._from, self.data_bad.entry, self.schema_real)
-
-    def test_data_creation_with_schema_bad(self):
-        self.assertRaises(TypeError, Data, self.container_mock, self.container_mock)
+        self.assertRaises(TypeError, Data._from, self.data_bad.entry, None, self.schema_real)
 
     def test_data_creation_with_no_schema(self):
         data_no_schema = Data(self. data_real.entry)

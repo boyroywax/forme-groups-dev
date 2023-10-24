@@ -52,7 +52,7 @@ class Controller:
         """
         self.pool.add_group_unit(group_unit)
 
-    def _create_group_unit(self, data: Data) -> GroupUnit:
+    def _create_group_unit(self, data: Data, is_sub_unit: bool = False, super_unit_hash: Optional[str] = None) -> GroupUnit:
         """Creates a GroupUnit
 
         Args:
@@ -61,7 +61,17 @@ class Controller:
         Returns:
             GroupUnit: The created GroupUnit
         """
-        nonce = self.active.nonce._next_active_nonce()
+        if is_sub_unit:
+            nonce = self.active.nonce._next_sub_nonce()
+            if self.active.data.has_schema:
+                schema_to_enforce = self.active.data.schema
+        else:
+            nonce = self.active.nonce._next_active_nonce()
+            if super_unit_hash is None:
+                schema_to_enforce = None
+            else:
+                schema_to_enforce = self._get_group_unit(super_unit_hash).data.schema
+        data = Data._from(data.entry, data.schema, schema_to_enforce)
         credential = Credential()
         owner = Owner()
         group_unit = GroupUnit(nonce, owner, credential, data)

@@ -88,8 +88,11 @@ class Pool:
         if not isinstance(group_unit, GroupUnit):
             raise TypeError(f'Expected GroupUnit, got {type(group_unit)}')
 
-        group_unit_hash: str = group_unit._hash_package().root()
-        nonce_hash: str = group_unit.nonce._hash().root()
+        group_unit_hash: str | None = group_unit._hash_package().root()
+        nonce_hash: str | None = group_unit.nonce._hash().root()
+
+        assert group_unit_hash is not None, f'Expected group_unit_hash to be str, got {type(group_unit_hash)}'
+        assert nonce_hash is not None, f'Expected nonce_hash to be str, got {type(nonce_hash)}'
 
         if self._check_if_hash_exists((group_unit_hash, nonce_hash), lookup='all'):
             raise ValueError(f'GroupUnit with package_hash {group_unit_hash} already exists in the Pool')

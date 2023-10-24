@@ -72,7 +72,7 @@ class Data(BaseInterface):
         return True
     
     @classmethod
-    def _from(cls, data: BaseContainer, schema: Optional[BaseSchema] = None) -> 'Data':
+    def _from(cls, data: BaseContainer, schema: Optional[BaseSchema] = None, schema_to_enforce: Optional[BaseSchema] = None) -> 'Data':
         """Creates a Data object from the given data and schema
 
         Args:
@@ -84,6 +84,10 @@ class Data(BaseInterface):
         """
         if schema is not None:
             assert isinstance(schema, BaseSchema), f"Expected a BaseSchema, but received {type(schema)}"
-            assert Data._check_if_data_entry_matches_schema(data, schema), f"Expected data to match schema, but received {data} and {schema}"
+            
+        if schema_to_enforce is not None:
+            assert isinstance(schema_to_enforce, BaseSchema), f"Expected a BaseSchema, but received {type(schema_to_enforce)}"
+        
+            assert Data._check_if_data_entry_matches_schema(data, schema_to_enforce), f"Expected data to match schema, but received {data} and {schema}"
 
         return cls(entry=data, schema=schema)
