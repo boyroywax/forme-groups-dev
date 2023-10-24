@@ -1,4 +1,3 @@
-from lib2to3.pytree import convert
 from attrs import define, field, validators
 from typing import Optional, Tuple
 

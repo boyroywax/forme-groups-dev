@@ -74,8 +74,9 @@ class Pool:
             bool: True if the GroupUnit exists in the Pool, False otherwise
         """
         package_hash: str = group_unit._hash_package().root()
+        nonce_hash: str = group_unit.nonce._hash().root()
 
-        return self._check_if_hash_exists((package_hash, ))
+        return self._check_if_hash_exists((package_hash, nonce_hash), lookup='all')
     
     def add_group_unit(self, group_unit: GroupUnit) -> None:
         """Add a GroupUnit to the Pool
@@ -92,6 +93,7 @@ class Pool:
         group_unit_hash: str | None = group_unit._hash_package().root()
         nonce_hash: str | None = group_unit.nonce._hash().root()
 
+        print(f'group_unit_hash: {group_unit_hash}, nonce_hash: {nonce_hash}')
         assert group_unit_hash is not None, f'Expected group_unit_hash to be str, got {type(group_unit_hash)}'
         assert nonce_hash is not None, f'Expected nonce_hash to be str, got {type(nonce_hash)}'
 

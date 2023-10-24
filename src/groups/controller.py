@@ -48,6 +48,8 @@ class Controller:
         """
         self.pool.add_group_unit(group_unit)
 
+    
+
     def _create_group_unit(
         self,
         data: Data,
@@ -73,24 +75,36 @@ class Controller:
         """        
         schema_to_enforce: Optional[BaseSchema] = None
 
-        if is_sub_unit:
+        print(f'is_sub_unit: {is_sub_unit}, super_unit_schema: {super_unit_schema}, super_unit_hash: {super_unit_hash}')
+
+        if is_sub_unit is None or is_sub_unit is False:
+            nonce = self.active.nonce._next_active_nonce()
+            print(f'nonce: {nonce}')
+            print(f'active: {self.active}')
+            if super_unit_schema is not None:
+                schema_to_enforce = super_unit_schema
+            elif super_unit_hash is not None:
+                schema_to_enforce = self._get_group_unit(super_unit_hash).data.schema
+            else:
+                super_nonce = Nonce(BaseContainer(self.active.nonce._chain.items[:1]))
+                print(f'super_nonce: {super_nonce}')
+                schema_to_enforce = self._get_group_unit_from_nonce(super_nonce).data.schema
+                
+        elif is_sub_unit:
             nonce = self.active.nonce._next_sub_nonce()
             if self.active.data.has_schema:
                 schema_to_enforce = self.active.data.schema
                 if super_unit_schema is not None:
                     assert super_unit_schema == schema_to_enforce, "Sub Unit schema must match super Unit schema"
-    
-        elif not is_sub_unit or is_sub_unit is None:
-            nonce = self.active.nonce._next_active_nonce()
-            if super_unit_schema is not None:
-                schema_to_enforce = super_unit_schema
-            elif super_unit_hash is not None:
-                schema_to_enforce = self._get_group_unit(super_unit_hash).data.schema
-
-        data = Data._from(data.entry, data.schema, schema_to_enforce)
+                elif super_unit_hash is not None:
+                    assert self._get_group_unit(super_unit_hash).data.schema == schema_to_enforce, "Sub Unit schema must match super Unit schema"
+                
+        print(f'schema_to_enforce: {schema_to_enforce}')
+        new_data = Data._from(data.entry, data.schema, schema_to_enforce)
+        print(f'data: {new_data}')
         credential = Credential()
         owner = Owner()
-        group_unit = GroupUnit(nonce, owner, credential, data)
+        group_unit = GroupUnit(nonce, owner, credential, new_data)
         self._add_group_unit(group_unit)
         return group_unit
 
