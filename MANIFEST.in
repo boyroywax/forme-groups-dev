@@ -2,7 +2,7 @@
 include README.md
 
 # Include all Python source files
-recursive-include src/groups *.py
+recursive-include src *.py
 
 # Exclude all compiled Python files
 global-exclude *test*.pyc

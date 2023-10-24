@@ -1,7 +1,7 @@
 from attrs import define, field, validators
 from typing import Optional, Tuple
 
-from src.groups.utils.crypto import MerkleTree
+from ..utils.crypto import MerkleTree
 
 from ..base.value import BaseValue
 from ..base.types import BaseContainerTypes, BaseValueTypes
