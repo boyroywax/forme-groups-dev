@@ -1,4 +1,5 @@
-from attrs import define, field, validators
+from attrs import define, field, validators, asdict
+import json
 
 from ..base.interface import BaseInterface
 from .credential import Credential
@@ -23,6 +24,30 @@ class GroupUnit(BaseInterface):
 
     data: Data = field(
         validator=validators.instance_of(Data))
+    
+    def to_dict(self):
+        return {
+            "nonce": asdict(self.nonce),
+            "owner": asdict(self.owner),
+            "credential": asdict(self.credential),
+            "data": asdict(self.data),
+        }
 
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            nonce=data["nonce"],
+            owner=data["owner"],
+            credential=data["credential"],
+            data=data["data"],
+        )
+
+    @classmethod
+    def from_json(cls, json_data):
+        data = json.loads(json_data)
+        return cls.from_dict(data)
 
 __all__ = ["GroupUnit", "Credential", "Data", "Owner", "Nonce"]

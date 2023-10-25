@@ -4,6 +4,9 @@ from groups.base import BaseContainer, BaseSchema
 from groups.unit import GroupUnit, Credential, Data, Owner, Nonce
 
 
+groups = Groups()
+
+
 def main():
     parser = argparse.ArgumentParser(description='Forme Groups CLI & SDK')
     parser.add_argument('-b', '--beep', help='Description of argument 2', required=False)
@@ -11,8 +14,6 @@ def main():
 
     args = parser.parse_args()
     print(args)
-
-    groups = Groups()
    
     if args.beep:
         print('beep')
@@ -21,7 +22,8 @@ def main():
         print('create, {}'.format(args.create))
         data: Data = Data(BaseContainer((args.create), "tuple"))
         groups.controller._create_group_unit(data=data)
-        print(groups.controller.active.nonce)
+        print(groups.controller.active)
+        # groups.save_state()
 
 
 if __name__ == '__main__':

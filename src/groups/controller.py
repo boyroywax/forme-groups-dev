@@ -41,6 +41,10 @@ class Controller:
     def active(self) -> GroupUnit | None:
         self._active = self.pool.group_units[-1][2]
         return self._active
+    
+    @active.setter
+    def active(self, group_unit: GroupUnit) -> None:
+        self._active = group_unit
 
     def _add_group_unit(self, group_unit: GroupUnit) -> None:
         """Adds a GroupUnit to the Pool
