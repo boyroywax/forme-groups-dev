@@ -28,10 +28,13 @@ class Groups:
                 with open(self.state_file, 'r') as f:
                     state = json.load(f)
                     print(state)
+                    self.save_state()
             except Exception as e:
                 print(e)
-                # print("Error loading state, creating new state file")
-                # self.save_state()
+                print("Error loading state, creating new state file")
+                self.save_state()
+        else:
+            self.save_state()
 
     def save_state(self):
         state = {
