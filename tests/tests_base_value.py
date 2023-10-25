@@ -419,3 +419,14 @@ class TestBaseValue(unittest.TestCase):
     def test_to_dict(self):
         value = BaseValue(1)
         self.assertEqual(value._to_dict(), {"value": 1, "type": "int"})
+
+    def test_from_dict(self):
+        value_dict: dict = {"value": 1, "type": "int"}
+        base_value = BaseValue._from_dict(value_dict)
+        self.assertEqual(base_value.value, 1)
+
+    def test_bad_from_dict(self):
+        value_dict: dict = {"value": b'0x0000', "type": "int"}
+        base_value = BaseValue._from_dict(value_dict)
+        print(base_value)
+        

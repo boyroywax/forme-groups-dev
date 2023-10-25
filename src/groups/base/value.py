@@ -252,3 +252,7 @@ class BaseValue(BaseInterface):
             "value": self.value,
             "type": self.get_type_str()
         }
+    
+    @classmethod
+    def _from_dict(cls, data: dict) -> 'BaseValue':
+        return BaseValue._force_type(data["value"], data["type"])
