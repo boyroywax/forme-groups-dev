@@ -124,7 +124,7 @@ class Data(BaseInterface):
     def _to_dict(self) -> dict[str, Any]:
         return {
             "entry": self.entry._to_dict(),
-            "schema": self.schema._to_dict()
+            "schema": self.schema._to_dict() if self.schema is not None else None
         }
     
     def _to_dict_without_schema(self) -> dict[str, Any]:
@@ -136,12 +136,12 @@ class Data(BaseInterface):
     def _from_dict_without_schema(cls, data: dict[str, BaseContainer | BaseSchema]) -> 'Data':
         return Data._from(
             entry=BaseContainer._from_dict(data["entry"]),
-            schema=None
+            schema=[]
         )
     
     @classmethod
     def _from_dict(cls, data: dict[str, BaseContainer | BaseSchema]) -> 'Data':
         return Data._from(
             entry=BaseContainer._from_dict(data["entry"]),
-            schema=BaseSchema._from_dict(data["schema"])
+            schema=BaseSchema._from_dict(data["schema"]) if data["schema"] is not None else []
         )

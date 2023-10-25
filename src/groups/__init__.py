@@ -40,6 +40,9 @@ class Groups:
         with open(self.state_file, 'w') as f:
             json.dump(state, f, indent=4)
 
+    def __del__(self):
+        self.save_state()
+
     
 
 __all__ = [

@@ -1,3 +1,54 @@
 {
-    "active": {
-        "nonce": 
+    "nonce": {
+        "chain": {
+            "items": [
+                {
+                    "value": 0,
+                    "type": "int"
+                }
+            ],
+            "type": "tuple"
+        }
+    },
+    "owner": {
+        "owner": {
+            "items": [
+                {
+                    "value": 1,
+                    "type": "int"
+                }
+            ],
+            "type": "tuple"
+        }
+    },
+    "credential": {
+        "credential": {
+            "items": [
+                {
+                    "value": 1,
+                    "type": "int"
+                }
+            ],
+            "type": "tuple"
+        }
+    },
+    "data": {
+        "entry": {
+            "items": [
+                {
+                    "value": 1,
+                    "type": "int"
+                }
+            ],
+            "type": "tuple"
+        },
+        "schema": {
+            "entries": [
+                {
+                    "key": "test",
+                    "value": "int"
+                }
+            ]
+        }
+    }
+}

@@ -93,3 +93,8 @@ class TestGroupUnit(unittest.TestCase):
     def test_print(self):
         self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
         self.assertEqual(str(self.group_unit._print()), "Group Unit:\nNonce: 0\nOwner: (1,)\nCredential: (1,)\nData: {'items': [{'value': 1, 'type': 'int'}], 'type': 'tuple'}")
+
+    def test_to_json(self):
+        self.maxDiff = None
+        self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
+        self.assertEqual(self.group_unit.to_json(), '{"nonce": {"chain": {"items": [{"value": 0, "type": "int"}], "type": "tuple"}}, "owner": {"owner": {"items": [{"value": 1, "type": "int"}], "type": "tuple"}}, "credential": {"credential": {"items": [{"value": 1, "type": "int"}], "type": "tuple"}}, "data": {"entry": {"items": [{"value": 1, "type": "int"}], "type": "tuple"}, "schema": {"entries": [{"key": "test", "value": "int"}]}}}')
