@@ -29,6 +29,24 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/tests"
             }
+        },
+        {
+            "name": "Python: Current File (Integrated Terminal)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/groups/__main__.py",
+            "args": [
+                "-c",
+                "hello_item"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "launch",
+            "module": "groups",
+            "console": "integratedTerminal"
         }
     ]
 }

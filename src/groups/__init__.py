@@ -28,16 +28,10 @@ class Groups:
                 with open(self.state_file, 'r') as f:
                     state = json.load(f)
                     print(state)
-                    if state in [None, {}, ""]:
-                        state = {}
-                        print("No state found, creating new state file")
-                        self.save_state()
-                    else:
-                        self.controller.active = GroupUnit.from_json(state.get('active', None))
             except Exception as e:
                 print(e)
-                print("Error loading state, creating new state file")
-                self.save_state()
+                # print("Error loading state, creating new state file")
+                # self.save_state()
 
     def save_state(self):
         state = {
