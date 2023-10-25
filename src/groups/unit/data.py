@@ -1,5 +1,5 @@
 from attrs import define, field, validators
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
 from ..utils.crypto import MerkleTree
 
@@ -7,7 +7,7 @@ from ..base.value import BaseValue
 from ..base.types import BaseContainerTypes, BaseValueTypes
 from ..base.interface import BaseInterface
 from ..base.container import BaseContainer
-from ..base.schema import BaseSchema
+from ..base.schema import BaseSchema, SchemaEntry
 
 
 def _convert_to_entry(item: BaseContainer | BaseValue | BaseContainerTypes | BaseValueTypes ) -> BaseContainer:
@@ -120,3 +120,28 @@ class Data(BaseInterface):
     
     def _hash(self) -> MerkleTree:
         return self.entry._hash()
+
+    def _to_dict(self) -> dict[str, Any]:
+        return {
+            "entry": self.entry._to_dict(),
+            "schema": self.schema._to_dict()
+        }
+    
+    def _to_dict_without_schema(self) -> dict[str, Any]:
+        return {
+            "entry": self.entry._to_dict()
+        }
+    
+    @classmethod
+    def _from_dict_without_schema(cls, data: dict[str, BaseContainer | BaseSchema]) -> 'Data':
+        return Data._from(
+            entry=BaseContainer._from_dict(data["entry"]),
+            schema=None
+        )
+    
+    @classmethod
+    def _from_dict(cls, data: dict[str, BaseContainer | BaseSchema]) -> 'Data':
+        return Data._from(
+            entry=BaseContainer._from_dict(data["entry"]),
+            schema=BaseSchema._from_dict(data["schema"])
+        )

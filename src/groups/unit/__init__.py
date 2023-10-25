@@ -27,10 +27,10 @@ class GroupUnit(BaseInterface):
     
     def to_dict(self):
         return {
-            "nonce": asdict(self.nonce),
-            "owner": asdict(self.owner),
-            "credential": asdict(self.credential),
-            "data": asdict(self.data),
+            "nonce": self.nonce._to_dict(),
+            "owner": self.owner._to_dict(),
+            "credential": self.credential._to_dict(),
+            "data": self.data._to_dict(),
         }
 
     def to_json(self):
@@ -39,10 +39,10 @@ class GroupUnit(BaseInterface):
     @classmethod
     def from_dict(cls, data):
         return cls(
-            nonce=data["nonce"],
-            owner=data["owner"],
-            credential=data["credential"],
-            data=data["data"],
+            nonce=Nonce._from_dict(data["nonce"]),
+            owner=Owner._from_dict(data["owner"]),
+            credential=Credential._from_dict(data["credential"]),
+            data=Data._from_dict(data["data"]),
         )
 
     @classmethod

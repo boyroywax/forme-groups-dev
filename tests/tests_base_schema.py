@@ -51,3 +51,18 @@ class TestBaseSchema(unittest.TestCase):
 
     def test_init_with_improper_schema_entry(self):
         self.assertRaises(GroupBaseTypeException, SchemaEntry, "name", "bad_type")
+
+    def test_schema_entry_to_dict(self):
+        self.assertEqual(self.schema_entry_one._to_dict(), {'key': 'name', 'value': 'str'})
+
+    def test_schema_entry_from_dict(self):
+        self.assertEqual(SchemaEntry._from_dict({'key': 'name', 'value': 'str'}), self.schema_entry_one)
+
+    def test_schema_to_dict(self):
+        self.assertEqual(self.schema_base_one._to_dict(), {'entries': ({'key': 'name', 'value': 'str'}, {'key': 'age', 'value': 'int'})})
+
+    def test_schema_from_dict(self):
+        self.assertEqual(BaseSchema._from_dict({'entries': [{'key': 'name', 'value': 'str'}, {'key': 'age', 'value': 'int'}]}), self.schema_base_one)
+
+    def test_schema_from_dict_no_schema_entries(self):
+        self.assertRaises(KeyError, BaseSchema._from_dict, {'bad_entries': [{'key': 'name', 'value': 'str'}, {'key': 'age', 'value': 'int'}]})

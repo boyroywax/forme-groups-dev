@@ -68,3 +68,13 @@ class TestGroupUnit(unittest.TestCase):
             group_units.append(GroupUnit(nonce, owner, credential, data))
 
         self.assertEqual(len(group_units), __RANGE__)
+
+    
+    def test_to_dict(self):
+        self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
+        self.assertEqual(self.group_unit.to_dict(), {
+            "nonce": self.group_unit.nonce._to_dict(),
+            "owner": self.group_unit.owner._to_dict(),
+            "credential": self.group_unit.credential._to_dict(),
+            "data": self.group_unit.data._to_dict()
+        })

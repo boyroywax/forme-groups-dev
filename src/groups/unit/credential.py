@@ -17,3 +17,14 @@ class Credential(BaseInterface):
     @property
     def credential(self) -> BaseContainer | None:
         return self._credential
+    
+    def _to_dict(self):
+        return {
+            "credential": self.credential._to_dict() if self.credential is not None else None
+        }
+    
+    @classmethod
+    def _from_dict(cls, data):
+        return cls(
+            _credential=data["credential"]
+        )

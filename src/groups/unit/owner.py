@@ -20,7 +20,7 @@ class Owner(BaseInterface):
     
     def _to_dict(self):
         return {
-            "owner": self.owner._to_dict()
+            "owner": self.owner._to_dict() if self.owner is not None else None
         }
     
     @classmethod

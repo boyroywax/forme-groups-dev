@@ -153,7 +153,7 @@ class SchemaEntry(BaseInterface):
     
     @classmethod
     def _from_dict(cls, _dict: dict) -> 'SchemaEntry':
-        return cls(_key=_dict['key'], _value=_dict['value'])
+        return cls(key=_dict['key'], value=_dict['value'])
     
 
 def _key_is_duplicate(key: str, entries: Tuple[SchemaEntry, ...]) -> bool:
@@ -299,3 +299,12 @@ class BaseSchema(BaseInterface):
             hashed_entries += (entry._hash().root(), )
             
         return MerkleTree(hashed_data=hashed_entries)
+    
+    def _to_dict(self):
+        return {
+            "entries": tuple(entry._to_dict() for entry in self.entries)
+        }
+    
+    @classmethod
+    def _from_dict(cls, _dict: dict) -> 'BaseSchema':
+        return cls(entries=tuple(SchemaEntry._from_dict(entry) for entry in _dict['entries']))
