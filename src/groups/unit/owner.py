@@ -15,17 +15,17 @@ class Owner(BaseInterface):
         default=None)
 
     @property
-    def owner(self) -> BaseContainer:
+    def owner(self) -> BaseContainer | None:
         return self._owner
     
     def _to_dict(self):
         return {
-            "owner": self.owner._to_dict() if self.owner is not None else None
+            "owner": self.owner._to_dict() if self.owner is not None else []
         }
     
     @classmethod
     def _from_dict(cls, data):
         return cls(
-            _owner=data["owner"]
+            owner=BaseContainer._from_dict(data["owner"])
         )
 

@@ -1,3 +1,4 @@
+from unittest.mock import Base
 from attrs import define, field, validators
 from typing import Optional
 from ..base.interface import BaseInterface
@@ -20,11 +21,11 @@ class Credential(BaseInterface):
     
     def _to_dict(self):
         return {
-            "credential": self.credential._to_dict() if self.credential is not None else None
+            "credential": self.credential._to_dict() if self.credential is not None else []
         }
     
     @classmethod
     def _from_dict(cls, data):
         return cls(
-            _credential=data["credential"]
+            credential=BaseContainer._from_dict(data["credential"])
         )

@@ -25,18 +25,18 @@ class TestGroupUnit(unittest.TestCase):
         self.base_container = BaseContainer((BaseValue(1), ), "tuple")
         self.data = Data(self.base_container, self.schema)
         self.nonce = Nonce()
-        self.credential = Credential()
-        self.owner = Owner()
+        self.credential = Credential(self.base_container)
+        self.owner = Owner(self.base_container)
 
     def test_init(self):
         self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
         self.assertEqual(repr(self.group_unit.nonce), "Nonce(chain=BaseContainer(items=(BaseValue(value=0, type=int),), type=tuple))")
         self.assertEqual(str(self.group_unit.nonce), "0")
 
-        self.assertEqual(repr(self.group_unit.owner), "Owner(_owner=None)")
+        self.assertEqual(repr(self.group_unit.owner), "Owner(_owner=BaseContainer(items=(BaseValue(value=1, type=int),), type=tuple))")
         self.assertEqual(str(self.group_unit.owner), "")
 
-        self.assertEqual(repr(self.group_unit.credential), "Credential(_credential=None)")
+        self.assertEqual(repr(self.group_unit.credential), "Credential(_credential=BaseContainer(items=(BaseValue(value=1, type=int),), type=tuple))")
         self.assertEqual(str(self.group_unit.credential), "")
 
         self.assertEqual(repr(self.group_unit.data), "Data(entry=BaseContainer(items=(BaseValue(value=1, type=int),), type=tuple), schema=BaseSchema(entries=(SchemaEntry(key='test', value=int),)))")
@@ -78,3 +78,18 @@ class TestGroupUnit(unittest.TestCase):
             "credential": self.group_unit.credential._to_dict(),
             "data": self.group_unit.data._to_dict()
         })
+
+    def test_from_dict(self):
+        group_unit_dict: dict = {
+            "nonce": self.nonce._to_dict(),
+            "owner": self.owner._to_dict(),
+            "credential": self.credential._to_dict(),
+            "data": self.data._to_dict()
+        }
+        print(group_unit_dict)
+        group_unit = GroupUnit.from_dict(group_unit_dict)
+        self.assertEqual(group_unit, GroupUnit.from_dict(group_unit.to_dict()))
+
+    def test_print(self):
+        self.group_unit = GroupUnit(self.nonce, self.owner, self.credential, self.data)
+        self.assertEqual(str(self.group_unit._print()), "Group Unit:\nNonce: 0\nOwner: (1,)\nCredential: (1,)\nData: {'items': [{'value': 1, 'type': 'int'}], 'type': 'tuple'}")

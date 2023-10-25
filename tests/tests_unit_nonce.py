@@ -72,8 +72,8 @@ class TestUnitNonce(unittest.TestCase):
         self.assertEqual(nonce_eight._hash_nonce_str(), 'd84ab3917255aeaf744710ac925920a25aa479d4a4cf37fbbcbaf04ae0e2ed82')
 
     def test_to_dict(self):
-        self.assertEqual(self.nonce._to_dict(), {'nonce': {'items': [{'value': 0, 'type': 'int'}], 'type': 'tuple'}})
+        self.assertEqual(self.nonce._to_dict(), {'chain': {'items': [{'value': 0, 'type': 'int'}], 'type': 'tuple'}})
 
     def test_from_dict(self):
-        nonce_dict: dict = {'nonce': {'items': [{'value': 0, 'type': 'int'}], 'type': 'tuple'}}
+        nonce_dict: dict = {'chain': {'items': [{'value': 0, 'type': 'int'}], 'type': 'tuple'}}
         self.assertEqual(Nonce._from_dict(nonce_dict), self.nonce)

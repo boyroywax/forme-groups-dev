@@ -49,5 +49,12 @@ class GroupUnit(BaseInterface):
     def from_json(cls, json_data):
         data = json.loads(json_data)
         return cls.from_dict(data)
+    
+    def _print(self):
+        return (f"Group Unit:\n"
+            f"Nonce: {self.nonce._get_active().value}\n"
+            f"Owner: {self.owner.owner.__str__()}\n"
+            f"Credential: {self.credential.credential.__str__()}\n"
+            f"Data: {self.data.entry._to_dict()}")
 
 __all__ = ["GroupUnit", "Credential", "Data", "Owner", "Nonce"]

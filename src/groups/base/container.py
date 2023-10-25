@@ -243,4 +243,13 @@ class BaseContainer(BaseInterface):
     
     @classmethod
     def _from_dict(cls, _dict: dict) -> 'BaseContainer':
-        return cls(tuple(BaseValue._from_dict(item) for item in _dict["items"]), _dict["type"])
+        container_tuple: tuple[BaseValue, ...] = tuple()
+        if _dict is None:
+            return None
+        # for item in _dict["items"]:
+        #     assert isinstance(item, dict), f"Expected a dict, but received {type(item)}"
+        #     assert "value" in item, f"Expected a value, but received {item}"
+        #     assert "type" in item, f"Expected a type, but received {item}"
+        container_tuple += tuple(BaseValue._from_dict(item) for item in _dict["items"])
+
+        return cls(tuple(BaseValue._from_dict(item) for item in _dict["items"]), _dict["type"] if isinstance(_dict["type"], str) else _dict["type"].__name__)

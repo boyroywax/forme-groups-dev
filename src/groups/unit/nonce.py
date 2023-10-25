@@ -142,12 +142,12 @@ class Nonce(BaseInterface):
     
     def _to_dict(self) -> dict:
         return {
-            "nonce": self.nonce._to_dict()
+            "chain": self.nonce._to_dict()
         }
     
     @classmethod
     def _from_dict(cls, _dict: dict) -> 'Nonce':
         # parse the nonce chain
-        nonce_chain = BaseContainer._from_dict(_dict['nonce'])
+        nonce_chain = BaseContainer._from_dict(_dict['chain'])
         
         return cls(nonce_chain)
