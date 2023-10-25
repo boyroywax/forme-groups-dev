@@ -31,7 +31,7 @@
             }
         },
         {
-            "name": "Python: Current File (Integrated Terminal)",
+            "name": "Python: Launch Main (Integrated Terminal)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/groups/__main__.py",
