@@ -234,3 +234,9 @@ class BaseContainer(BaseInterface):
         tree = self._hash_items()
 
         return tree.verify(leaf_hash)
+    
+    def _to_dict(self):
+        return {
+            "items": [item._to_dict() for item in self.items],
+            "type": self.type
+        }

@@ -415,3 +415,7 @@ class TestBaseValue(unittest.TestCase):
         value = BaseValue('1')
         self.assertEqual(value._hash_value(), "9a7622b24ae73586214f453f44ed438ce5c63aa07c720c2ccc29ae5bd7ec5322")
         self.assertEqual(value._hash_type(), "8c25cb3686462e9a86d2883c5688a22fe738b0bbc85f458d2d2b5f3f667c6d5a")
+
+    def test_to_dict(self):
+        value = BaseValue(1)
+        self.assertEqual(value._to_dict(), {"value": 1, "type": "int"})

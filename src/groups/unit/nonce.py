@@ -139,3 +139,15 @@ class Nonce(BaseInterface):
     def _hash(self) -> MerkleTree:
         # return MerkleTree(self._hash_nonce_units())
         return MerkleTree((self._hash_nonce_str(),))
+    
+    def _to_dict(self) -> dict:
+        return {
+            "nonce": self.nonce._to_dict()
+        }
+    
+    @classmethod
+    def _from_dict(cls, _dict: dict) -> 'Nonce':
+        # parse the nonce chain
+        nonce_chain: tuple = tuple(BaseValue(item) for item in _dict["nonce"].split(__DEFAULT_NONCE_SEPERATOR__))
+
+        return cls(BaseContainer(nonce_chain))

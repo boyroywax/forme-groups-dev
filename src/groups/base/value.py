@@ -246,3 +246,9 @@ class BaseValue(BaseInterface):
                 True
         """
         return self._hash().root() == hash_
+    
+    def _to_dict(self):
+        return {
+            "value": self.value,
+            "type": self.get_type_str()
+        }

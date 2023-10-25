@@ -324,3 +324,12 @@ class BaseInterface(ABC):
         private_tree = self._hash_private_slots()
 
         return public_tree.verify(leaf_hash) or private_tree.verify(leaf_hash)
+    
+    # def _to_dict(self) -> dict:
+    #     """Returns a dictionary representation of the object.
+
+    #     Returns:
+    #         dict: A dictionary representation of the object.
+
+    #     """
+    #     return {slot: getattr(self, slot) for slot in self.__iter_slots__(include_underscored_slots=True, private_only=False)}

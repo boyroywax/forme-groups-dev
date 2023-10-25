@@ -98,3 +98,7 @@ class TestBaseContainer(unittest.TestCase):
     def test_creating_container_with_uneven_items_for_type_dict(self):
         container_dict_invalid = BaseContainer(("a", 1, "b", 2, "c"), "dictionary")
         self.assertRaises(Exception, f'{container_dict_invalid}')
+
+    def test_to_dict(self):
+        container = BaseContainer((1, 2, 3), "tuple")
+        self.assertEqual(container._to_dict(), {'items': [{'type': 'int', 'value': 1}, {'type': 'int', 'value': 2}, {'type': 'int', 'value': 3}], 'type': 'tuple'})
