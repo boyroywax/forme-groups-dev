@@ -145,6 +145,16 @@ class SchemaEntry(BaseInterface):
         value_hash = MerkleTree._hash_func(self._str_value(value))
         return value_hash == self._hash_value()
     
+    def _to_dict(self):
+        return {
+            "key": self._key,
+            "value": self._str_value(self._value)
+        }
+    
+    @classmethod
+    def _from_dict(cls, _dict: dict) -> 'SchemaEntry':
+        return cls(_key=_dict['key'], _value=_dict['value'])
+    
 
 def _key_is_duplicate(key: str, entries: Tuple[SchemaEntry, ...]) -> bool:
     """Checks if the key is in the entries
@@ -186,6 +196,7 @@ def _validate_schema_entries(instance, attribute, value):
             raise TypeError(f"Expected a Tuple of SchemaEntry, but received {type(value)}")
         if _key_is_duplicate(item._key, value):
             raise TypeError(f"Expected a Tuple of SchemaEntry with unique keys, but received {value}")
+            
 
 
 @define(frozen=True, slots=True, weakref_slot=False)

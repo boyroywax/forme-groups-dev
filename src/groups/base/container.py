@@ -240,3 +240,7 @@ class BaseContainer(BaseInterface):
             "items": [item._to_dict() for item in self.items],
             "type": self.type
         }
+    
+    @classmethod
+    def _from_dict(cls, _dict: dict) -> 'BaseContainer':
+        return cls(tuple(BaseValue._from_dict(item) for item in _dict["items"]), _dict["type"])

@@ -17,4 +17,15 @@ class Owner(BaseInterface):
     @property
     def owner(self) -> BaseContainer:
         return self._owner
+    
+    def _to_dict(self):
+        return {
+            "owner": self.owner._to_dict()
+        }
+    
+    @classmethod
+    def _from_dict(cls, data):
+        return cls(
+            _owner=data["owner"]
+        )
 

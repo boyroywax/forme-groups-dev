@@ -148,6 +148,6 @@ class Nonce(BaseInterface):
     @classmethod
     def _from_dict(cls, _dict: dict) -> 'Nonce':
         # parse the nonce chain
-        nonce_chain: tuple = tuple(BaseValue(item) for item in _dict["nonce"].split(__DEFAULT_NONCE_SEPERATOR__))
-
-        return cls(BaseContainer(nonce_chain))
+        nonce_chain = BaseContainer._from_dict(_dict['nonce'])
+        
+        return cls(nonce_chain)

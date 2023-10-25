@@ -102,3 +102,10 @@ class TestBaseContainer(unittest.TestCase):
     def test_to_dict(self):
         container = BaseContainer((1, 2, 3), "tuple")
         self.assertEqual(container._to_dict(), {'items': [{'type': 'int', 'value': 1}, {'type': 'int', 'value': 2}, {'type': 'int', 'value': 3}], 'type': 'tuple'})
+
+    def test_from_dict(self):
+        container = BaseContainer((1, 2, 3), "tuple")
+        container_dict = container._to_dict()
+        container_from_dict = BaseContainer._from_dict(container_dict)
+        print(container_from_dict)
+        self.assertEqual(container_from_dict, container)

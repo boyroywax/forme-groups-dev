@@ -73,3 +73,7 @@ class TestUnitNonce(unittest.TestCase):
 
     def test_to_dict(self):
         self.assertEqual(self.nonce._to_dict(), {'nonce': {'items': [{'value': 0, 'type': 'int'}], 'type': 'tuple'}})
+
+    def test_from_dict(self):
+        nonce_dict: dict = {'nonce': {'items': [{'value': 0, 'type': 'int'}], 'type': 'tuple'}}
+        self.assertEqual(Nonce._from_dict(nonce_dict), self.nonce)
