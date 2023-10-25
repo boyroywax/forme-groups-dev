@@ -37,7 +37,7 @@ class GroupUnit(BaseInterface):
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict) -> "GroupUnit":
         return cls(
             nonce=Nonce._from_dict(data.get("nonce")),
             owner=Owner._from_dict(data["owner"]),

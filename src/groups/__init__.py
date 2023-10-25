@@ -29,8 +29,9 @@ class Groups:
             active_state = state.get('active')
             # print(f'Loading state: {json.loads(state)}')
             print(f'action_state: {active_state=}')
+            print(f'active_state: {json.loads(active_state)}')
             if active_state:
-                self.controller._add_group_unit(GroupUnit.from_dict(active_state))
+                self.controller._add_group_unit(GroupUnit.from_dict(json.loads(active_state)))
 
     def save_state(self):
         state = {

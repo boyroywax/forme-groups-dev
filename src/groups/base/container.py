@@ -245,7 +245,7 @@ class BaseContainer(BaseInterface):
     def _from_dict(cls, _dict: dict) -> 'BaseContainer':
         container_tuple: tuple[BaseValue, ...] = tuple()
         if _dict is None:
-            return None
+            return BaseContainer(("null", ), "tuple")
         # for item in _dict["items"]:
         #     assert isinstance(item, dict), f"Expected a dict, but received {type(item)}"
         #     assert "value" in item, f"Expected a value, but received {item}"

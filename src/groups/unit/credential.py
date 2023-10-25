@@ -12,7 +12,7 @@ class Credential(BaseInterface):
 
     _credential: Optional[BaseContainer] = field(
         validator=validators.optional(validators.instance_of(BaseContainer)),
-        default=None
+        default=BaseContainer(('0x000', ), "tuple")
     )
 
     @property
@@ -21,7 +21,7 @@ class Credential(BaseInterface):
     
     def _to_dict(self):
         return {
-            "credential": self.credential._to_dict() if self.credential is not None else []
+            "credential": self.credential._to_dict() if self.credential is not None else BaseContainer(('0x000', ), "tuple")
         }
     
     @classmethod

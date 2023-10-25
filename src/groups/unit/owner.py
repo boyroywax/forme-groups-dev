@@ -12,7 +12,7 @@ class Owner(BaseInterface):
 
     _owner: Optional[BaseContainer] = field(
         validator=validators.optional(validators.instance_of(BaseContainer)),
-        default=None)
+        default=BaseContainer(('0x000', ), "tuple"))
 
     @property
     def owner(self) -> BaseContainer | None:
@@ -26,6 +26,6 @@ class Owner(BaseInterface):
     @classmethod
     def _from_dict(cls, data):
         return cls(
-            owner=BaseContainer._from_dict(data["owner"]) if data["owner"] else None
+            owner=BaseContainer._from_dict(data["owner"]) if data["owner"] else BaseContainer(('0x000', ), "tuple")
         )
 

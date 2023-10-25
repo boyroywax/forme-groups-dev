@@ -1,5 +1,5 @@
 from attrs import define, field, validators, Factory
-from typing import Optional
+from typing import Optional, Any
 
 # from src.groups.base.value import BaseValue
 
@@ -132,4 +132,16 @@ class Controller:
             GroupUnit: The GroupUnit from the Pool
         """
         return self._get_group_unit(nonce._hash().root())
+    
+    def _group_unit_from_dict(self, data: dict[str, Any]) -> GroupUnit:
+        """Creates a GroupUnit from a dict
+
+        Args:
+            data (dict[str, Any]): The dict to create the GroupUnit from
+
+        Returns:
+            GroupUnit: The GroupUnit created from the dict
+        """
+        return self._add_group_unit(GroupUnit.from_dict(data))
+
 
