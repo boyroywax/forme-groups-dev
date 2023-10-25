@@ -39,7 +39,7 @@ class GroupUnit(BaseInterface):
     @classmethod
     def from_dict(cls, data):
         return cls(
-            nonce=Nonce._from_dict(data["nonce"]),
+            nonce=Nonce._from_dict(data.get("nonce")),
             owner=Owner._from_dict(data["owner"]),
             credential=Credential._from_dict(data["credential"]),
             data=Data._from_dict(data["data"]),

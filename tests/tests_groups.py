@@ -23,7 +23,7 @@ class TestGroups(unittest.TestCase):
         with open('state-test.json', 'w') as f:
             f.write(json.dumps(self.group_unit.to_dict()))
 
-        self.groups = Groups(state_file=json.dumps(self.group_unit.to_dict()))
+        self.groups = Groups(state_file='state-test.json')
         print(self.groups.controller.active)
 
     def test_groups_creation(self):

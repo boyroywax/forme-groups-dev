@@ -26,6 +26,6 @@ class Owner(BaseInterface):
     @classmethod
     def _from_dict(cls, data):
         return cls(
-            owner=BaseContainer._from_dict(data["owner"])
+            owner=BaseContainer._from_dict(data["owner"]) if data["owner"] else None
         )
 
