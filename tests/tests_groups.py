@@ -20,9 +20,10 @@ class TestGroups(unittest.TestCase):
         self.data = Data(self.container_mock)
         self.nonce = Nonce(BaseContainer((0, )))
         self.group_unit = GroupUnit(self.nonce, self.owner, self.credentials, self.data)
-        with open('state-test.json', 'w') as f:
-            f.write(json.dumps(self.group_unit.to_dict()))
+        # with open('state-test.json', 'w') as f:
+        #     f.write(json.dumps(self.group_unit.to_dict()))
 
+    def test_groups_creation_init(self):
         self.groups = Groups(state_file='state-test.json')
         print(self.groups.controller.active)
 

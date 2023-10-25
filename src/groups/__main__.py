@@ -19,6 +19,7 @@ def main():
         print('beep')
 
     if args.create:
+        groups.load_state()
         print('create, {}'.format(args.create))
         data: Data = Data(BaseContainer((args.create), "tuple"))
         groups.controller._create_group_unit(data=data)

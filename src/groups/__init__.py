@@ -21,7 +21,7 @@ class Groups:
     def __init__(self, state_file='groups.json'):
         self.controller = Controller()
         self.state_file = state_file
-        self.load_state()
+        # self.load_state()
 
     def load_state(self):
         with open(self.state_file, 'r') as f:
