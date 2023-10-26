@@ -521,10 +521,6 @@ class _BaseTypes(BaseInterface):
 
 # Base Type Categories
 BaseTypes = _BaseTypes()
-# BaseValueTypes = BaseTypes.all("value")
-# BaseContainerType: type | TypeAlias = BaseTypes.all("container")
-# class BaseContainerTypes(List | Tuple | Set | FrozenSet | Dict):
-#     pass
 
 class BaseValueTypes(Enum):
     """The BaseValueTypes Enum holds the types of the BaseValue

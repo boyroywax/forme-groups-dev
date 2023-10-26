@@ -3,9 +3,9 @@ import sys
 
 sys.path.append("../forme-groups-python-3-12/")
 
-from src.groups.utils.checks import (
+from src.groups.utils.validators import (
     is_base_container_type,
-    is_base_value_type,
+    _is_base_value_type,
     is_linear_container,
     is_named_container,
     contains_sub_container
@@ -14,21 +14,21 @@ from src.groups.utils.checks import (
 
 class TestChecks(unittest.TestCase):
     def test_is_base_value_type(self):
-        self.assertTrue(is_base_value_type("BaseValue"))
+        self.assertTrue(_is_base_value_type("BaseValue"))
 
     def test_is_base_value_type_false(self):
-        self.assertFalse(is_base_value_type([]))
-        self.assertFalse(is_base_value_type(()))
-        self.assertFalse(is_base_value_type({}))
-        self.assertFalse(is_base_value_type(set()))
-        self.assertFalse(is_base_value_type(frozenset()))
+        self.assertFalse(_is_base_value_type([]))
+        self.assertFalse(_is_base_value_type(()))
+        self.assertFalse(_is_base_value_type({}))
+        self.assertFalse(_is_base_value_type(set()))
+        self.assertFalse(_is_base_value_type(frozenset()))
 
     def test_is_base_value_type_true(self):
-        self.assertTrue(is_base_value_type(1))
-        self.assertTrue(is_base_value_type(1.0))
-        self.assertTrue(is_base_value_type(True))
-        self.assertTrue(is_base_value_type(False))
-        self.assertTrue(is_base_value_type(""))
+        self.assertTrue(_is_base_value_type(1))
+        self.assertTrue(_is_base_value_type(1.0))
+        self.assertTrue(_is_base_value_type(True))
+        self.assertTrue(_is_base_value_type(False))
+        self.assertTrue(_is_base_value_type(""))
 
     def test_is_base_container_type(self):
         self.assertFalse(is_base_container_type("BaseContainer"))

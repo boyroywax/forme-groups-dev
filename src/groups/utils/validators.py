@@ -2,7 +2,7 @@ from typing import Any
 from ..base.types import BaseValueType, LinearContainer, NamedContainer, BaseContainerType
 
 
-def is_base_value_type(item: Any) -> bool:
+def _is_base_value_type(item: Any) -> bool:
     """
     Checks if item is a base value
 
@@ -12,6 +12,16 @@ def is_base_value_type(item: Any) -> bool:
     return isinstance(item, BaseValueType)
 
 
+def validate_base_value_type(instance, attribute, value) -> None:
+    """
+    Validates the item is a base value
+
+    Args:
+        item (BaseValueTypes): The item to validate
+    """
+    assert _is_base_value_type(value), f"Expected a base value, but received {type(value)}"
+
+
 def is_base_container_type(item: Any) -> bool:
     """
     Checks if item is a base container
@@ -19,7 +29,7 @@ def is_base_container_type(item: Any) -> bool:
     return isinstance(item, BaseContainerType)
 
 
-def is_linear_container(item: LinearContainer) -> bool:
+def is_linear_container(item: Any) -> bool:
     """
     Checks if item is a linear container
     """

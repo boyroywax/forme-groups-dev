@@ -11,29 +11,30 @@ from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
 from ..utils.converters import force_value_type
+from ..utils.validators import validate_base_value_type
 
 
 __DEFAULT_VALUE__ = None
 
 
-def _is_base_value(instance, attribute, value):
-    """Validates the argument is a BaseValueTypes
+# def _is_base_value(instance, attribute, value):
+#     """Validates the argument is a BaseValueTypes
 
-    Args:
-        instance (Any): The instance
-        attribute (Any): The attribute
-        value (Any): The value
+#     Args:
+#         instance (Any): The instance
+#         attribute (Any): The attribute
+#         value (Any): The value
 
-    Raises:
-        GroupBaseValueException: If the value is not a BaseValueTypes
-    """
-    if isinstance(value, NoneType):
-        return None
-    for type_ in BaseValueTypes:
-        if isinstance(value, type_.value):
-            return value
-    else:
-        raise GroupBaseValueException(f"Expected a BaseValueTypes, but received {type(value)}")
+#     Raises:
+#         GroupBaseValueException: If the value is not a BaseValueTypes
+#     """
+#     if isinstance(value, NoneType):
+#         return None
+#     for type_ in BaseValueTypes:
+#         if isinstance(value, type_.value):
+#             return value
+#     else:
+#         raise GroupBaseValueException(f"Expected a BaseValueTypes, but received {type(value)}")
             
 
 
@@ -53,8 +54,9 @@ class BaseValue(BaseInterface):
         BaseValue(value=1, type=int)
     """
     _value: BaseValueType = field(
-        validator=_is_base_value,
-        default="")
+        default="Null",
+        validator=validate_base_value_type
+       )
 
     @property
     def value(self) -> BaseValueType:
