@@ -8,6 +8,15 @@ def hash_sha256(data: str | bytes) -> str:
         data = data.encode()
     return hashlib.sha256(data).hexdigest()
 
+class SHA256Hash(str):
+    """A SHA256 Hash object.
+    """
+
+    def __new__(cls, data: str | bytes) -> str:
+        if isinstance(data, str):
+            data = data.encode()
+        return hashlib.sha256(data).hexdigest()
+
 
 @define(slots=True)
 class MerkleTree:

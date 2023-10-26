@@ -548,14 +548,16 @@ class BaseContainerTypes(Enum):
     TUPLE = tuple
     SET = set
     FROZENSET = frozenset
+    LINEAR = Union[list, tuple, set, frozenset]
+    NAMED = dict
     ALL = Union[dict, list, tuple, set, frozenset]
 
 BaseContainerType: TypeAlias = BaseContainerTypes.ALL.value
 
-LinearContainer: type | TypeAlias = BaseTypes.all("linear")
-NamedContainer: type | TypeAlias = BaseTypes.all("named")
-Text: type | TypeAlias = BaseTypes.all("text")
-Number: type | TypeAlias = BaseTypes.all("number")
+LinearContainer: TypeAlias = BaseContainerTypes.LINEAR.value
+NamedContainer: TypeAlias = BaseContainerTypes.NAMED.value
+Text: TypeAlias = BaseValueTypes.TEXT.value
+Number: TypeAlias = BaseValueTypes.NUMBER.value
 
 # Base Type Aliases in Tuple Format
 BaseValueTypesTuple: Tuple[type | TypeAlias, ...] = BaseTypes.all("value", "tuple")

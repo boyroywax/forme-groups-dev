@@ -4,7 +4,7 @@ from typing import Optional, Tuple, Any
 from ..utils.crypto import MerkleTree
 
 from ..base.value import BaseValue
-from ..base.types import BaseContainerType, BaseValueTypes
+from ..base.types import BaseContainerType, BaseValueTypes, BaseValueType
 from ..base.interface import BaseInterface
 from ..base.container import BaseContainer
 from ..base.schema import BaseSchema, SchemaEntry
@@ -25,7 +25,7 @@ def _convert_to_entry(item: BaseContainer | BaseValue | BaseContainerType | Base
         return BaseContainer((item,))
     elif isinstance(item, BaseContainerType):
         return BaseContainer(item)
-    elif isinstance(item, BaseValueTypes):
+    elif isinstance(item, BaseValueType):
         return BaseContainer((BaseValue(item),))
     else:
         raise TypeError(f"Expected a BaseContainer, but received {type(item)}")

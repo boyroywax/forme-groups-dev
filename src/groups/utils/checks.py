@@ -1,5 +1,5 @@
 from typing import Any
-from ..base.types import BaseValueTypes, LinearContainer, NamedContainer, BaseContainerType
+from ..base.types import BaseValueType, LinearContainer, NamedContainer, BaseContainerType
 
 
 def is_base_value_type(item: Any) -> bool:
@@ -9,7 +9,7 @@ def is_base_value_type(item: Any) -> bool:
     Args:
         item (BaseValueTypes): The item to check
     """
-    return isinstance(item, BaseValueTypes)
+    return isinstance(item, BaseValueType)
 
 
 def is_base_container_type(item: Any) -> bool:
