@@ -3,27 +3,17 @@ from enum import Enum
 from types import NoneType
 from typing import TypeAlias, override, Any, Union
 from unittest.mock import Base
-from attrs import define, field
+from attrs import define, field, Factory
 
 
-# from .types import BaseValueTypes, BaseValueTypes
+from .types import BaseValueTypes, BaseValueType
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
 from ..utils.converters import force_value_type
 
 
-class BaseValueTypes(Enum):
-    """The BaseValueTypes Enum holds the types of the BaseValue
-    """
-    INTEGER = int
-    FLOAT = float
-    STRING = str
-    BOOLEAN = bool
-    BYTES = bytes
-    ALL = Union[int, float, str, bool, bytes, NoneType]
-
-AllBaseValueTypes: TypeAlias = BaseValueTypes.ALL.value
+__DEFAULT_VALUE__ = None
 
 
 def _is_base_value(instance, attribute, value):
@@ -62,12 +52,12 @@ class BaseValue(BaseInterface):
         >>> value
         BaseValue(value=1, type=int)
     """
-    _value: AllBaseValueTypes = field(
+    _value: BaseValueType = field(
         validator=_is_base_value,
-        default=None)
+        default="")
 
     @property
-    def value(self) -> AllBaseValueTypes:
+    def value(self) -> BaseValueType:
         """The single base value held by the BaseValue Class
 
         Returns:
@@ -81,13 +71,13 @@ class BaseValue(BaseInterface):
         return self._value
     
     @value.getter
-    def value(self) -> AllBaseValueTypes:
+    def value(self) -> BaseValueType:
         """The single base value held by the BaseValue Class
         """
         return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> AllBaseValueTypes:
+    def _peek_value(value: 'BaseValue') -> BaseValueType:
         """Peeks the value of a BaseValue
 
         Args:
@@ -106,7 +96,7 @@ class BaseValue(BaseInterface):
     
     @staticmethod
     def _force_type(
-        value: "BaseValue" | AllBaseValueTypes,
+        value: "BaseValue" | BaseValueType,
         type_alias: str
     ) -> 'BaseValue':
         """Forces a value to a type
@@ -129,7 +119,7 @@ class BaseValue(BaseInterface):
         """
         if isinstance(value, BaseValue):
             value = value.value
-        elif not isinstance(value, AllBaseValueTypes):
+        elif not isinstance(value, BaseValueType):
             raise TypeError(f"Expected a value, but received {type(value)}")
 
         if value is None:
@@ -277,4 +267,4 @@ class BaseValue(BaseInterface):
     
     @classmethod
     def _from_dict(cls, data: dict) -> 'BaseValue':
-        return BaseValue._force_type(data["value"], data["type"])
+        return cls._force_type(data["value"], data["type"])

@@ -1,5 +1,7 @@
 from abc import ABC
+from enum import Enum
 from attrs import define, field, validators
+from types import NoneType
 from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override, List, Set, FrozenSet, Dict
 
 from .interface import BaseInterface
@@ -513,12 +515,42 @@ class _BaseTypes(BaseInterface):
         return MerkleTree(hashed_data=hashed_types)
 
 
+
+
+
+
 # Base Type Categories
 BaseTypes = _BaseTypes()
-BaseValueTypes = BaseTypes.all("value")
-BaseContainerTypes: type | TypeAlias = BaseTypes.all("container")
+# BaseValueTypes = BaseTypes.all("value")
+# BaseContainerType: type | TypeAlias = BaseTypes.all("container")
 # class BaseContainerTypes(List | Tuple | Set | FrozenSet | Dict):
 #     pass
+
+class BaseValueTypes(Enum):
+    """The BaseValueTypes Enum holds the types of the BaseValue
+    """
+    INTEGER = int
+    FLOAT = float
+    STRING = str
+    BOOLEAN = bool
+    BYTES = bytes
+    TEXT = Union[str, bytes]
+    NUMBER = Union[int, float]
+    ALL = Union[int, float, str, bool, bytes, NoneType]
+
+BaseValueType: TypeAlias = BaseValueTypes.ALL.value
+
+class BaseContainerTypes(Enum):
+    """The BaseContainerTypes Enum holds the types of the BaseContainer
+    """
+    DICTIONARY = dict
+    LIST = list
+    TUPLE = tuple
+    SET = set
+    FROZENSET = frozenset
+    ALL = Union[dict, list, tuple, set, frozenset]
+
+BaseContainerType: TypeAlias = BaseContainerTypes.ALL.value
 
 LinearContainer: type | TypeAlias = BaseTypes.all("linear")
 NamedContainer: type | TypeAlias = BaseTypes.all("named")
@@ -531,13 +563,13 @@ BaseContainerTypesTuple: Tuple[type | TypeAlias, ...] = BaseTypes.all("container
 
 # Base Object Types
 Object = object | None
-KeyValue = Tuple[BaseValueTypes, BaseValueTypes]
-UnitTypes = BaseValueTypes | BaseContainerTypes | Object
+KeyValue = Tuple[BaseValueType, BaseValueType]
+UnitTypes = BaseValueType | BaseContainerType | Object
 
 # Base Text Types
 TextSet = set[Text]
-TextOrContainer = Text | BaseContainerTypes
-TextContainersDict = dict[Text, BaseContainerTypes]
+TextOrContainer = Text | BaseContainerType
+TextContainersDict = dict[Text, BaseContainerType]
 
 # Base Schema Types
 BaseSchemaType = dict[Text, Any]

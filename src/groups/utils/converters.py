@@ -1,14 +1,14 @@
 import struct
 from typing import Any, TypeAlias
 
-from ..base.types import BaseTypes, BaseValueTypes, BaseContainerTypesTuple
+from ..base.types import BaseTypes, BaseValueType, BaseContainerTypesTuple
 
 
 def convert_to_bytes(value: Any) -> bytes:
     """Converts a value to bytes
 
     Args:
-        value (BaseValueTypes): The value to convert
+        value (BaseValueType): The value to convert
     """
     if isinstance(value, str):
         return bytes(value.encode())
@@ -26,7 +26,7 @@ def convert_to_str(value: Any) -> str:
     """Converts a value to str
 
     Args:
-        value (BaseValueTypes): The value to convert
+        value (BaseValueType): The value to convert
     """
 
     if isinstance(value, bytes):
@@ -41,7 +41,7 @@ def convert_to_int(value: Any) -> int:
     """Converts a value to int
 
     Args:
-        value (BaseValueTypes): The value to convert
+        value (BaseValueType): The value to convert
     """
     if isinstance(value, (str, int, float, bool)):
         return int(value)
@@ -55,7 +55,7 @@ def convert_to_float(value: Any) -> float:
     """Converts a value to float
 
     Args:
-        value (BaseValueTypes): The value to convert
+        value (BaseValueType): The value to convert
     """
     if isinstance(value, (str, int, float, bool)):
         return float(value)
@@ -69,7 +69,7 @@ def convert_to_bool(value: Any) -> bool:
     """Converts a value to bool
 
     Args:
-        value (BaseValueTypes): The value to convert
+        value (BaseValueType): The value to convert
     """
     if isinstance(value, (str, int, float, bool)):
         return bool(value)
@@ -79,15 +79,15 @@ def convert_to_bool(value: Any) -> bool:
         raise TypeError(f"Could not convert {value} to bool")
 
 
-def force_value_type(value: BaseValueTypes, type_alias: str) -> BaseValueTypes:
-    assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
+def force_value_type(value: BaseValueType, type_alias: str) -> BaseValueType:
+    assert isinstance(value, BaseValueType), f"Expected a value, but received {type(value)}"
     assert isinstance(type_alias, str), f"Expected a string, but received {type(type_alias)}"
 
     if value is None or type_alias == "None":
         return None
 
     type_from_alias: TypeAlias | type = BaseTypes._get_type_from_alias(type_alias)
-    assert isinstance(type_from_alias(), BaseValueTypes), f"Expected a value type, but received {type_alias}"
+    assert isinstance(type_from_alias(), BaseValueType), f"Expected a value type, but received {type_alias}"
 
     if isinstance(value, type_from_alias):
         return value
@@ -112,7 +112,7 @@ def force_value_type(value: BaseValueTypes, type_alias: str) -> BaseValueTypes:
 def convert_tuple(container: tuple[Any, ...], type_alias: str):
     """
     Args:
-        container tuple(BaseValueTypes): The container to convert
+        container tuple(BaseValueType): The container to convert
     """
     exc_msg: str = f"Expected a container, but received {type(container)}"
     assert isinstance(container, tuple), exc_msg

@@ -1,5 +1,5 @@
 from typing import Any
-from ..base.types import BaseValueTypes, LinearContainer, NamedContainer, BaseContainerTypes
+from ..base.types import BaseValueTypes, LinearContainer, NamedContainer, BaseContainerType
 
 
 def is_base_value_type(item: Any) -> bool:
@@ -16,7 +16,7 @@ def is_base_container_type(item: Any) -> bool:
     """
     Checks if item is a base container
     """
-    return isinstance(item, BaseContainerTypes)
+    return isinstance(item, BaseContainerType)
 
 
 def is_linear_container(item: LinearContainer) -> bool:

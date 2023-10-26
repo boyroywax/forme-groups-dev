@@ -8,7 +8,7 @@ from attrs import define, field, validators
 from typing import TypeAlias, override, Tuple
 
 from .interface import BaseInterface
-from .types import BaseTypes, BaseContainerTypes
+from .types import BaseTypes, BaseContainerType
 from ..utils.crypto import MerkleTree
 
 
@@ -59,7 +59,7 @@ def _base_type_converter(item: str | type) -> TypeAlias | type:
     elif isinstance(item, type):
         type_from_alias = item
 
-    elif isinstance(item, BaseContainerTypes):
+    elif isinstance(item, BaseContainerType):
         type_from_alias = item.__class__
 
     return type_from_alias

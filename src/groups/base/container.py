@@ -2,14 +2,14 @@ from attrs import define, field, validators
 from typing import Optional, TypeAlias, Type, override
 
 from .interface import BaseInterface
-from .types import BaseTypes, BaseValueTypes, BaseContainerTypes, BaseContainerTypesTuple
+from .types import BaseTypes, BaseValueType, BaseContainerType, BaseContainerTypesTuple
 from .value import BaseValue
 from .exceptions import GroupBaseContainerException
 from ..utils.crypto import MerkleTree
 from ..utils.checks import contains_sub_container, is_linear_container, is_named_container, is_base_container_type
 
 
-def _base_container_type_converter(item: BaseContainerTypes | str | type) -> BaseContainerTypes:
+def _base_container_type_converter(item: BaseContainerType | str | type) -> BaseContainerType:
     """
     Converter function for _type field
     """
@@ -19,13 +19,13 @@ def _base_container_type_converter(item: BaseContainerTypes | str | type) -> Bas
 
     if type_from_alias is None or type_from_alias not in BaseContainerTypesTuple:
         raise GroupBaseContainerException(f"Expected a container type, but received {item}")
-    elif isinstance(item, BaseContainerTypes):
+    elif isinstance(item, BaseContainerType):
         type_from_alias = type(item)
 
     return type_from_alias
 
 
-def _base_container_converter(item: BaseContainerTypes) -> tuple[BaseValue]:
+def _base_container_converter(item: BaseContainerType) -> tuple[BaseValue]:
     """
     Converter function for _items field
     """
@@ -78,11 +78,11 @@ class BaseContainer(BaseInterface):
     """
 
     _items: tuple[BaseValue, ...] = field(
-        validator=validators.deep_iterable(validators.instance_of((BaseValue, BaseValueTypes)),
+        validator=validators.deep_iterable(validators.instance_of((BaseValue, BaseValueType)),
         iterable_validator=validators.instance_of(tuple)),
         converter=_base_container_converter
     )
-    _type: Optional[Type[BaseContainerTypes] | str] = field(
+    _type: Optional[Type[BaseContainerType] | str] = field(
         validator=validators.instance_of((type, str)),
         converter=_base_container_type_converter,
         default="tuple"
@@ -103,7 +103,7 @@ class BaseContainer(BaseInterface):
         return self._items
 
     @property
-    def type(self) -> Type[BaseContainerTypes] | str:
+    def type(self) -> Type[BaseContainerType] | str:
         """The type of the BaseContainer
 
         Returns:
@@ -117,7 +117,7 @@ class BaseContainer(BaseInterface):
         return self._type.__name__ if isinstance(self._type, type) else self._type
 
     @staticmethod
-    def _unpack(item: BaseContainerTypes, type_: TypeAlias | type) -> BaseContainerTypes:
+    def _unpack(item: BaseContainerType, type_: TypeAlias | type) -> BaseContainerType:
         """
         Repackages the container
         """
