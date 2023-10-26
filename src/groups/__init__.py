@@ -27,48 +27,20 @@ class Groups:
         with open(self.state_file, 'r') as f:
             state = json.load(f)
             active_state = state.get('active')
-            # print(f'Loading state: {json.loads(state)}')
-            print(f'action_state: {active_state=}')
-            print(f'active_state: {json.loads(active_state)}')
             if active_state:
-                self.controller._add_group_unit(GroupUnit.from_dict(json.loads(active_state)))
+                self.controller._add_group_unit(GroupUnit.from_dict(active_state))
 
     def save_state(self):
         state = {
-            'active': self.controller.active.to_json() if self.controller.active else []
+            'active': self.controller.active
         }
         with open(self.state_file, 'w') as f:
-            json.dump(state, f, indent=4, default=GroupUnit.from_json)
+            json.dump(state, f, indent=4, default=self.json_encoder)
 
     def json_encoder(self, obj):
         if isinstance(obj, GroupUnit):
             return obj.to_dict()
         return obj
-
-    # def load_state(self):
-    #     if os.path.exists(self.state_file):
-    #         try:
-    #             with open(self.state_file, 'r') as f:
-    #                 state: str = json.read(f)
-    #                 print(type(state))
-
-
-    #             self.controller.active = GroupUnit.from_dict(state['active'])
-    #                 # self.save_state()
-    #         except Exception as e:
-    #             print(e)
-    #             print("Error loading state, creating new state file")
-    #             self.save_state()
-    #     # else:
-    #     #     self.save_state()
-
-    # def save_state(self):
-    #     state = {
-    #         'active': self.controller.active.to_json()
-    #     }
-    #     print(f'Saving state: {state=}')
-    #     with open(self.state_file, 'w') as f:
-    #         json.dump(state, f, indent=4)
 
     def __del__(self):
         self.save_state()

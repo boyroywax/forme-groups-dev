@@ -24,11 +24,13 @@ class TestGroups(unittest.TestCase):
         #     f.write(json.dumps(self.group_unit.to_dict()))
 
     def test_groups_creation_init(self):
-        self.groups = Groups(state_file='state-test.json')
-        print(self.groups.controller.active)
+        groups = Groups(state_file='state-test.json')
+        print(groups.controller.active)
 
     def test_groups_creation(self):
-        self.assertEqual(self.groups.controller.pool.group_units[-1][2].owner, self.owner)
+        groups = Groups(state_file='state-test.json')
+        self.assertEqual(groups.controller.pool.group_units[-1][2].owner, self.owner)
 
     def test_groups_has_slots(self):
-        self.assertEqual(self.groups.__slots__, ('controller', 'state_file'))
+        groups = Groups(state_file='state-test.json')
+        self.assertEqual(groups.__slots__, ('controller', 'state_file'))

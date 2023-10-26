@@ -1,3 +1,49 @@
 {
-    "active": "{\"nonce\": {\"chain\": {\"items\": [{\"value\": 3, \"type\": \"int\"}], \"type\": \"tuple\"}}, \"owner\": {\"owner\": {\"items\": [{\"value\": \"0x000\", \"type\": \"str\"}], \"type\": \"tuple\"}}, \"credential\": {\"credential\": {\"items\": [{\"value\": \"0x000\", \"type\": \"str\"}], \"type\": \"tuple\"}}, \"data\": {\"entry\": {\"items\": [{\"value\": \"new_unit3\", \"type\": \"str\"}], \"type\": \"tuple\"}, \"schema\": null}}"
+    "active": {
+        "nonce": {
+            "chain": {
+                "items": [
+                    {
+                        "value": 0,
+                        "type": "int"
+                    }
+                ],
+                "type": "tuple"
+            }
+        },
+        "owner": {
+            "owner": {
+                "items": [
+                    {
+                        "value": "0x000",
+                        "type": "str"
+                    }
+                ],
+                "type": "tuple"
+            }
+        },
+        "credential": {
+            "credential": {
+                "items": [
+                    {
+                        "value": "0x000",
+                        "type": "str"
+                    }
+                ],
+                "type": "tuple"
+            }
+        },
+        "data": {
+            "entry": {
+                "items": [
+                    {
+                        "value": 0,
+                        "type": "int"
+                    }
+                ],
+                "type": "tuple"
+            },
+            "schema": null
+        }
+    }
 }
