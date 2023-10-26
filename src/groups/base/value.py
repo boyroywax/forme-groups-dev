@@ -1,17 +1,32 @@
 import struct
-from functools import lru_cache
-from typing import override, Any, Union
+from enum import Enum
+from types import NoneType
+from typing import TypeAlias, override, Any, Union
+from unittest.mock import Base
 from attrs import define, field
 
 
-from .types import BaseValueTypes, BaseValueTypes
+# from .types import BaseValueTypes, BaseValueTypes
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
 from ..utils.converters import force_value_type
 
 
-def _base_value_validator(instance, attribute, value):
+class BaseValueTypes(Enum):
+    """The BaseValueTypes Enum holds the types of the BaseValue
+    """
+    INTEGER = int
+    FLOAT = float
+    STRING = str
+    BOOLEAN = bool
+    BYTES = bytes
+    ALL = Union[int, float, str, bool, bytes, NoneType]
+
+AllBaseValueTypes: TypeAlias = BaseValueTypes.ALL.value
+
+
+def _is_base_value(instance, attribute, value):
     """Validates the argument is a BaseValueTypes
 
     Args:
@@ -22,8 +37,14 @@ def _base_value_validator(instance, attribute, value):
     Raises:
         GroupBaseValueException: If the value is not a BaseValueTypes
     """
-    if not isinstance(value, BaseValueTypes):
-        raise GroupBaseValueException(f"Expected a value, but received {type(value)}")
+    if isinstance(value, NoneType):
+        return None
+    for type_ in BaseValueTypes:
+        if isinstance(value, type_.value):
+            return value
+    else:
+        raise GroupBaseValueException(f"Expected a BaseValueTypes, but received {type(value)}")
+            
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -41,10 +62,12 @@ class BaseValue(BaseInterface):
         >>> value
         BaseValue(value=1, type=int)
     """
-    _value: BaseValueTypes = field(validator=_base_value_validator)
+    _value: AllBaseValueTypes = field(
+        validator=_is_base_value,
+        default=None)
 
     @property
-    def value(self) -> BaseValueTypes:
+    def value(self) -> AllBaseValueTypes:
         """The single base value held by the BaseValue Class
 
         Returns:
@@ -58,13 +81,13 @@ class BaseValue(BaseInterface):
         return self._value
     
     @value.getter
-    def value(self) -> BaseValueTypes:
+    def value(self) -> AllBaseValueTypes:
         """The single base value held by the BaseValue Class
         """
         return self._value
 
     @staticmethod
-    def _peek_value(value: 'BaseValue') -> BaseValueTypes:
+    def _peek_value(value: 'BaseValue') -> AllBaseValueTypes:
         """Peeks the value of a BaseValue
 
         Args:
@@ -83,7 +106,7 @@ class BaseValue(BaseInterface):
     
     @staticmethod
     def _force_type(
-        value: Union["BaseValue", BaseValueTypes],
+        value: "BaseValue" | AllBaseValueTypes,
         type_alias: str
     ) -> 'BaseValue':
         """Forces a value to a type
@@ -106,11 +129,13 @@ class BaseValue(BaseInterface):
         """
         if isinstance(value, BaseValue):
             value = value.value
+        elif not isinstance(value, AllBaseValueTypes):
+            raise TypeError(f"Expected a value, but received {type(value)}")
 
         if value is None:
             return BaseValue(None)
         
-        assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
+        # assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
 
         forced_value: Any = force_value_type(value, type_alias)
 
@@ -157,7 +182,6 @@ class BaseValue(BaseInterface):
         """
         return f"{self.__class__.__name__}(value={repr(self.value)}, type={self.get_type_str()})"
 
-    # @lru_cache(maxsize=1)
     def _hash_value(self) -> str:
         """Hashes the repr(value) of the BaseValue
 
@@ -171,7 +195,6 @@ class BaseValue(BaseInterface):
         """
         return MerkleTree._hash_func(repr(self.value))
 
-    # @lru_cache(maxsize=1)
     def _hash_type(self) -> str:
         """Hashes the type of the BaseValue
 
@@ -185,7 +208,6 @@ class BaseValue(BaseInterface):
         """
         return MerkleTree._hash_func(self.get_type_str())
 
-    # @lru_cache(maxsize=1)
     def _hash(self) -> MerkleTree:
         """Hashes the BaseValue by hashing the value and type separatly
 

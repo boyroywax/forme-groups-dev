@@ -21,7 +21,7 @@ class Credential(BaseInterface):
     
     def _to_dict(self):
         return {
-            "credential": self.credential._to_dict() if self.credential is not None else BaseContainer(('0x000', ), "tuple")
+            "credential": self.credential._to_dict()
         }
     
     @classmethod

@@ -1,11 +1,28 @@
 from attrs import define, field, validators, Factory
-from typing import Tuple, Optional, override
+from typing import NamedTuple, Tuple, Optional, override
 
 from .base import BaseContainer, BaseSchema, BaseValue
 from .unit import GroupUnit, Nonce
 
 
-def _validate_group_unit_entry(instance, attr, value: tuple[str, str, GroupUnit]) -> tuple[str, str, GroupUnit]:
+class SHA256Hash(str):
+    """The SHA256Hash class is used to define a SHA256Hash
+    """
+    pass
+        
+     
+
+class GroupUnitEntry(NamedTuple):
+    """The GroupUnitEntry class is used to define a GroupUnitEntry
+    """
+    package_hash: str
+    nonce_hash: str
+    group_unit: GroupUnit
+
+
+
+
+def _validate_group_unit_entry(instance, attr, value: GroupUnitEntry) -> GroupUnitEntry:
     if not isinstance(value, tuple):
         raise TypeError(f'Expected tuple, got {type(value)}')
 
@@ -19,9 +36,11 @@ def _validate_group_unit_entry(instance, attr, value: tuple[str, str, GroupUnit]
         raise TypeError(f'Expected str, got {type(value[1])}')
 
     if not isinstance(value[2], GroupUnit):
-        raise TypeError(f'Expected GroupUnit, got {type(value[1])}')
+        raise TypeError(f'Expected GroupUnit, got {type(value[2])}')
 
     return value
+
+
 
 
 @define(slots=True, weakref_slot=False)
@@ -35,12 +54,12 @@ class Pool:
     Examples:
         >>> pool = Pool(group_units=(('package_hash', 'nonce_hash', GroupUnit()),))
     """
-    group_units: Tuple[Tuple[str, str, GroupUnit], ...] = field(
-        default=Factory(tuple[str, str, GroupUnit]),
+    group_units: Tuple[GroupUnitEntry, ...] = field(
+        default=Factory(tuple),
         validator=validators.optional(validators.deep_iterable(_validate_group_unit_entry,
         iterable_validator=validators.instance_of(tuple))))
     
-    def _check_if_hash_exists(self, hash_: tuple[str, ...], lookup: str = "all") -> bool:
+    def _check_if_hash_exists(self, hashs: tuple[str, ...], lookup: str = "all") -> bool:
         """Check if a GroupUnit exists in the Pool
 
         Args:
@@ -51,12 +70,12 @@ class Pool:
             bool: True if the GroupUnit exists in the Pool, False otherwise
         """
 
-        assert isinstance(hash_, tuple), f'Expected hash_ to be tuple, got {type(hash_)}'
-        assert len(hash_) > 0, f'Expected hash_ to be non-empty tuple, got {len(hash_)}'
+        assert isinstance(hashs, tuple), f'Expected hash_ to be tuple, got {type(hashs)}'
+        assert len(hashs) > 0, f'Expected hash_ to be non-empty tuple, got {len(hashs)}'
 
         assert lookup in ('unit', 'nonce', 'all'), f'Expected lookup to be package_hash or nonce_hash, got {lookup}'
 
-        for hash_item in hash_:
+        for hash_item in hashs:
             # print(f'hash_item: {hash_item}')
             for item in iter(self):
                 if item[0] == hash_item and (lookup == 'unit' or lookup == 'all'):

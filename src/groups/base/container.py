@@ -77,7 +77,7 @@ class BaseContainer(BaseInterface):
         BaseContainer(items=(BaseValue(value=1, type=int), BaseValue(value=2, type=int), BaseValue(value=3, type=int)), type=tuple)
     """
 
-    _items: tuple[BaseValue] = field(
+    _items: tuple[BaseValue, ...] = field(
         validator=validators.deep_iterable(validators.instance_of((BaseValue, BaseValueTypes)),
         iterable_validator=validators.instance_of(tuple)),
         converter=_base_container_converter

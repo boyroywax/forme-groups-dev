@@ -20,12 +20,12 @@ class Owner(BaseInterface):
     
     def _to_dict(self):
         return {
-            "owner": self.owner._to_dict() if self.owner is not None else []
+            "owner": self.owner._to_dict()
         }
     
     @classmethod
     def _from_dict(cls, data):
         return cls(
-            owner=BaseContainer._from_dict(data["owner"]) if data["owner"] else BaseContainer(('0x000', ), "tuple")
+            owner=BaseContainer._from_dict(data["owner"])
         )
 

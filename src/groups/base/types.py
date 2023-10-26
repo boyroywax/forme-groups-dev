@@ -1,6 +1,6 @@
 from abc import ABC
 from attrs import define, field, validators
-from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override
+from typing import Any, Union, TypeAlias, TypeVar, Type, Tuple, Optional, Callable, override, List, Set, FrozenSet, Dict
 
 from .interface import BaseInterface
 from .exceptions import GroupBaseTypeException
@@ -517,6 +517,9 @@ class _BaseTypes(BaseInterface):
 BaseTypes = _BaseTypes()
 BaseValueTypes = BaseTypes.all("value")
 BaseContainerTypes: type | TypeAlias = BaseTypes.all("container")
+# class BaseContainerTypes(List | Tuple | Set | FrozenSet | Dict):
+#     pass
+
 LinearContainer: type | TypeAlias = BaseTypes.all("linear")
 NamedContainer: type | TypeAlias = BaseTypes.all("named")
 Text: type | TypeAlias = BaseTypes.all("text")
