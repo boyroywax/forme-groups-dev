@@ -1,5 +1,7 @@
+from types import NoneType
 from typing import Any
 from ..base.types import BaseValueType, LinearContainer, NamedContainer, BaseContainerType
+from ..base.exceptions import GroupBaseValueException
 
 
 def _is_base_value_type(item: Any) -> bool:
@@ -13,13 +15,18 @@ def _is_base_value_type(item: Any) -> bool:
 
 
 def validate_base_value_type(instance, attribute, value) -> None:
-    """
-    Validates the item is a base value
+    """Validates the argument is a BaseValueTypes
 
     Args:
-        item (BaseValueTypes): The item to validate
+        instance (Any): The instance
+        attribute (Any): The attribute
+        value (Any): The value
+
+    Raises:
+        GroupBaseValueException: If the value is not a BaseValueTypes
     """
-    assert _is_base_value_type(value), f"Expected a base value, but received {type(value)}"
+    if not _is_base_value_type(value):
+        raise GroupBaseValueException(f"Expected a BaseValueTypes, but received {value}, which is of type {type(value)}")
 
 
 def is_base_container_type(item: Any) -> bool:

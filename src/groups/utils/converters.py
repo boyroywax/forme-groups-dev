@@ -1,8 +1,41 @@
 import struct
 from typing import Any, TypeAlias
 
-from ..base.types import BaseTypes, BaseValueType, BaseContainerTypesTuple
+from ..base.types import BaseTypes, BaseValueType, BaseContainerTypesTuple, BaseValueTypes
 
+
+__ALLOW_NONE_VALUE__ = True
+__DEFAULT_VALUE__ = None
+
+
+def convert_none_to_default_value(value: Any) -> Any:
+    """Converts None to default value
+
+    Args:
+        value (Any): The value to convert
+    """
+    if (value is None or
+        value == "None" or
+        value == "Null" or
+        value == "null" or
+        value == "NONE" or
+        value == "NULL" or
+        value == "" or
+        value == " " or
+        value == {} or
+        value == [] or
+        value == () or
+        value == set() or
+        value == frozenset()
+    ):
+        if __ALLOW_NONE_VALUE__:
+            return __DEFAULT_VALUE__
+        
+        raise ValueError(
+            f"Expected a value, but received {value} which is type {type(value)}"
+            f" and __ALLOW_NONE_VALUE__ is set to {__ALLOW_NONE_VALUE__}")
+    else:
+        return value
 
 def convert_to_bytes(value: Any) -> bytes:
     """Converts a value to bytes
@@ -87,7 +120,8 @@ def force_value_type(value: BaseValueType, type_alias: str) -> BaseValueType:
         return None
 
     type_from_alias: TypeAlias | type = BaseTypes._get_type_from_alias(type_alias)
-    assert isinstance(type_from_alias(), BaseValueType), f"Expected a value type, but received {type_alias}"
+    # assert isinstance(type_from_alias, BaseValueType), f"Expected a value type, but received {type_alias}"
+    assert type_from_alias in BaseValueTypes, f"Expected a value type, but received {type_alias}"
 
     if isinstance(value, type_from_alias):
         return value

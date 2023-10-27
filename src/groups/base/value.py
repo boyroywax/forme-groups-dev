@@ -6,36 +6,16 @@ from unittest.mock import Base
 from attrs import define, field, Factory
 
 
-from .types import BaseValueTypes, BaseValueType
+from .types import BaseValueType
 from .interface import BaseInterface
 from .exceptions import GroupBaseValueException
 from ..utils.crypto import MerkleTree
-from ..utils.converters import force_value_type
+from ..utils.converters import force_value_type, convert_none_to_default_value
 from ..utils.validators import validate_base_value_type
 
 
-__DEFAULT_VALUE__ = None
-
-
-# def _is_base_value(instance, attribute, value):
-#     """Validates the argument is a BaseValueTypes
-
-#     Args:
-#         instance (Any): The instance
-#         attribute (Any): The attribute
-#         value (Any): The value
-
-#     Raises:
-#         GroupBaseValueException: If the value is not a BaseValueTypes
-#     """
-#     if isinstance(value, NoneType):
-#         return None
-#     for type_ in BaseValueTypes:
-#         if isinstance(value, type_.value):
-#             return value
-#     else:
-#         raise GroupBaseValueException(f"Expected a BaseValueTypes, but received {type(value)}")
-            
+__ALLOW_NONE_VALUE__ = True
+__DEFAULT_VALUE__ = "Null"
 
 
 @define(frozen=True, slots=True, weakref_slot=False)
@@ -54,9 +34,10 @@ class BaseValue(BaseInterface):
         BaseValue(value=1, type=int)
     """
     _value: BaseValueType = field(
-        default="Null",
+        default=__DEFAULT_VALUE__,
+        converter=convert_none_to_default_value,
         validator=validate_base_value_type
-       )
+    )
 
     @property
     def value(self) -> BaseValueType:
@@ -96,8 +77,9 @@ class BaseValue(BaseInterface):
 
         raise GroupBaseValueException(f"Expected a BaseValue, but received {type(value)}")
     
-    @staticmethod
+    @classmethod
     def _force_type(
+        cls,
         value: "BaseValue" | BaseValueType,
         type_alias: str
     ) -> 'BaseValue':
@@ -124,10 +106,10 @@ class BaseValue(BaseInterface):
         elif not isinstance(value, BaseValueType):
             raise TypeError(f"Expected a value, but received {type(value)}")
 
-        if value is None:
-            return BaseValue(None)
+        # if value is None:
+        #     return BaseValue(None)
         
-        # assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
+        # # assert isinstance(value, BaseValueTypes), f"Expected a value, but received {type(value)}"
 
         forced_value: Any = force_value_type(value, type_alias)
 

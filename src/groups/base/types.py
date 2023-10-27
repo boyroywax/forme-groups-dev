@@ -515,6 +515,43 @@ class _BaseTypes(BaseInterface):
         return MerkleTree(hashed_data=hashed_types)
 
 
+class TypeAliases(Enum):
+    """The TypeAliases Enum holds the aliases of the type
+    """
+    INTEGER = ("INTEGER", "INT", "Integer", "Int", "integer", "int", "IntegerType", "IntType", "integer_type", "int_type", "INT_TYPE")
+    FLOAT = ("FLOAT", "FLOATING_POINT", "Float", "float", "FloatingPoint", "floating_point", "FloatType", "float_type", "FloatingPointType", "floating_point_type", "FLOAT_TYPE", "FLOATING_POINT_TYPE")
+    BOOLEAN = ("BOOLEAN", "BOOL", "Boolean", "Bool", "boolean", "bool", "BooleanType", "BoolType", "boolean_type", "bool_type", "BOOL_TYPE")
+    STRING = ("STRING", "STR", "String", "Str", "string", "str", "StringType", "StrType", "string_type", "str_type", "STR_TYPE")
+    BYTES = ("BYTES", "Bytes", "bytes", "BytesType", "bytes_type", "BYTES_TYPE")
+    DICTIONARY = ("DICTIONARY", "DICT", "Dictionary", "Dict", "dictionary", "dict", "DictionaryType", "DictType", "dictionary_type", "dict_type", "DICT_TYPE")
+    LIST = ("LIST", "List", "list", "ListType", "list_type", "LIST_TYPE")
+    TUPLE = ("TUPLE", "Tuple", "tuple", "TupleType", "tuple_type", "TUPLE_TYPE")
+    SET = ("SET", "Set", "set", "SetType", "set_type", "SET_TYPE")
+    FROZENSET = ("FROZENSET", "FrozenSet", "frozenset", "FrozenSetType", "frozenset_type", "FROZENSET_TYPE")
+
+    def __contains__(self, alias: str) -> bool:
+        """Checks if the alias is in the TypeAliases Enum
+
+        Args:
+            alias (str): The alias to check
+
+        Returns:
+            bool: Whether the alias is in the TypeAliases Enum
+        """
+        return alias in self.value
+
+    def __iter__(self):
+        """Iterates over the TypeAliases Enum
+        """
+        for type_aliases in self.__class__:
+            yield type_aliases
+
+    def _get_type_from_alias(self, alias: str) -> Type:
+        """Gets a base type from an alias
+        """
+        for type_aliases in self:
+            if alias in type_aliases.value:
+                return type_aliases.name
 
 
 
