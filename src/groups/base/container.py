@@ -1,5 +1,5 @@
 from attrs import define, field, validators
-from typing import Optional, TypeAlias, Type, override
+from typing import Optional, Tuple, TypeAlias, Type, override
 
 from .interface import BaseInterface
 from .types import BaseTypes, BaseValueType, BaseContainerType, BaseContainerTypesTuple
@@ -78,18 +78,19 @@ class BaseContainer(BaseInterface):
     """
 
     _items: tuple[BaseValue, ...] = field(
+        converter=_base_container_converter,
         validator=validators.deep_iterable(validators.instance_of((BaseValue, BaseValueType)),
-        iterable_validator=validators.instance_of(tuple)),
-        converter=_base_container_converter
+        iterable_validator=validators.instance_of(tuple))
     )
-    _type: Optional[Type[BaseContainerType] | str] = field(
+
+    _type: Type[BaseContainerType] | str = field(
+        default="tuple",
         validator=validators.instance_of((type, str)),
-        converter=_base_container_type_converter,
-        default="tuple"
+        converter=_base_container_type_converter
     )
 
     @property
-    def items(self) -> tuple[BaseValue]:
+    def items(self) -> Tuple[BaseValue, ...]:
         """The items held by the BaseContainer Class
 
         Returns:
@@ -176,7 +177,7 @@ class BaseContainer(BaseInterface):
         """
         assert hasattr(self, slot_name), f"Expected a slot name, but received {slot_name}"
 
-        items: tuple = getattr(self, slot_name)
+        items: tuple | dict = getattr(self, slot_name)
 
         if is_linear_container(items):
             for value in items:

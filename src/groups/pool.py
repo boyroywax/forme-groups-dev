@@ -9,8 +9,7 @@ class SHA256Hash(str):
     """The SHA256Hash class is used to define a SHA256Hash
     """
     pass
-        
-     
+
 
 class GroupUnitEntry(NamedTuple):
     """The GroupUnitEntry class is used to define a GroupUnitEntry
@@ -18,8 +17,6 @@ class GroupUnitEntry(NamedTuple):
     package_hash: str
     nonce_hash: str
     group_unit: GroupUnit
-
-
 
 
 def _validate_group_unit_entry(instance, attr, value: GroupUnitEntry) -> GroupUnitEntry:
@@ -39,8 +36,6 @@ def _validate_group_unit_entry(instance, attr, value: GroupUnitEntry) -> GroupUn
         raise TypeError(f'Expected GroupUnit, got {type(value[2])}')
 
     return value
-
-
 
 
 @define(slots=True, weakref_slot=False)

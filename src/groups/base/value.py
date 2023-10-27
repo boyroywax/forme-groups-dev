@@ -36,7 +36,8 @@ class BaseValue(BaseInterface):
     _value: BaseValueType = field(
         default=__DEFAULT_VALUE__,
         converter=convert_none_to_default_value,
-        validator=validate_base_value_type
+        validator=validate_base_value_type,
+        alias="value"
     )
 
     @property

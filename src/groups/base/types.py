@@ -515,7 +515,7 @@ class _BaseTypes(BaseInterface):
         return MerkleTree(hashed_data=hashed_types)
 
 
-class TypeAliases(Enum):
+class BaseTypeAliases(Enum):
     """The TypeAliases Enum holds the aliases of the type
     """
     INTEGER = ("INTEGER", "INT", "Integer", "Int", "integer", "int", "IntegerType", "IntType", "integer_type", "int_type", "INT_TYPE")

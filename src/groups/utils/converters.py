@@ -37,6 +37,7 @@ def convert_none_to_default_value(value: Any) -> Any:
     else:
         return value
 
+
 def convert_to_bytes(value: Any) -> bytes:
     """Converts a value to bytes
 
@@ -120,7 +121,6 @@ def force_value_type(value: BaseValueType, type_alias: str) -> BaseValueType:
         return None
 
     type_from_alias: TypeAlias | type = BaseTypes._get_type_from_alias(type_alias)
-    # assert isinstance(type_from_alias, BaseValueType), f"Expected a value type, but received {type_alias}"
     assert type_from_alias in BaseValueTypes, f"Expected a value type, but received {type_alias}"
 
     if isinstance(value, type_from_alias):

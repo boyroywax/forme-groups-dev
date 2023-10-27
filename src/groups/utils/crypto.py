@@ -1,6 +1,8 @@
 import hashlib
+import re
 from attrs import define, field, validators, Factory
-from typing import Tuple
+from typing import NamedTuple, Tuple, override
+# from ..base.types import BaseValueType
 
 
 def hash_sha256(data: str | bytes) -> str:
@@ -8,14 +10,44 @@ def hash_sha256(data: str | bytes) -> str:
         data = data.encode()
     return hashlib.sha256(data).hexdigest()
 
+
+@define(frozen=True, slots=True, weakref_slot=False)
 class SHA256Hash(str):
     """A SHA256 Hash object.
     """
 
-    def __new__(cls, data: str | bytes) -> str:
-        if isinstance(data, str):
-            data = data.encode()
-        return hashlib.sha256(data).hexdigest()
+
+
+    @staticmethod
+    def is_valid(instance, attr, value: str) -> bool:
+        """Checks if a string is a valid SHA256 hash
+
+        Args:
+            value (str): The string to check
+
+        Returns:
+            bool: Whether the string is a valid SHA256 hash
+        """
+        if not isinstance(value, str):
+            return False
+        if len(value) != 64:
+            return False
+        if not re.match(r'^[0-9a-fA-F]+$', value):
+            return False
+        return True
+
+
+# class Leaves(NamedTuple):
+#     """A Leaves object.
+#     """
+#     leaves: Tuple[SHA256Hash, ...] = field(
+#         default=Factory(Tuple[SHA256Hash, ...]),
+#         validator=validators.deep_iterable(SHA256Hash.is_valid,
+#         iterable_validator=validators.instance_of(Tuple)))
+
+
+#     def __new__(cls, data: Tuple[SHA256Hash, ...] = ()) -> Tuple[SHA256Hash, ...]:
+#         return data
 
 
 @define(slots=True)
