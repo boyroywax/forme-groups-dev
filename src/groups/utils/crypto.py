@@ -16,10 +16,16 @@ class SHA256Hash(str):
     """A SHA256 Hash object.
     """
 
-
+    def __init__(self, data: str) -> None:
+        if not self.is_valid(data):
+            raise ValueError(f"{data} is not a valid SHA256 hash")
+        
+    @classmethod
+    def from_str(cls, data: str | bytes) -> str:
+        return cls(hash_sha256(data))
 
     @staticmethod
-    def is_valid(instance, attr, value: str) -> bool:
+    def is_valid(value: str) -> bool:
         """Checks if a string is a valid SHA256 hash
 
         Args:
