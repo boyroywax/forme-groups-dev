@@ -13,6 +13,6 @@
     // "python.linting.enabled": true,
     // "python.linting.pylintEnabled": true,
     "python.languageServer": "Default",
-    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.typeCheckingMode": "off",
     "python.analysis.autoImportCompletions": true
 }

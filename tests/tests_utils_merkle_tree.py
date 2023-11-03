@@ -2,7 +2,7 @@ import unittest
 import sys
 
 sys.path.append("../forme-groups-python-3-12/")
-from src.groups.utils.crypto import MerkleTree
+from src.groups.utils.crypto import MerkleTree, SHA256Hash
 
 
 class TestMerkleTree(unittest.TestCase):
@@ -103,3 +103,7 @@ class TestMerkleTree(unittest.TestCase):
         hash_test_func = MerkleTree._hash_func("test")
         with self.assertRaises(TypeError):
             mt = MerkleTree((hash_test_func, 1))
+            
+    def test_sha256_hash(self):
+        hash_test_func = SHA256Hash.from_str("test")
+        self.assertEqual(hash_test_func, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")

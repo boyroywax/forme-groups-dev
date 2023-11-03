@@ -5,24 +5,49 @@ from typing import NamedTuple, Tuple, override
 # from ..base.types import BaseValueType
 
 
-def hash_sha256(data: str | bytes) -> str:
-    if isinstance(data, str):
-        data = data.encode()
-    return hashlib.sha256(data).hexdigest()
-
-
 @define(frozen=True, slots=True, weakref_slot=False)
 class SHA256Hash(str):
     """A SHA256 Hash object.
     """
 
+    @override
     def __init__(self, data: str) -> None:
-        if not self.is_valid(data):
+        if not SHA256Hash.is_valid(data):
             raise ValueError(f"{data} is not a valid SHA256 hash")
+        super().__init__()
+        self = data
+
+    @override
+    def __str__(self) -> str:
+        return f"{super().__str__()}"
+    
+    @override
+    def __repr__(self) -> str:
+        return f"{super().__str__()}"
         
     @classmethod
-    def from_str(cls, data: str | bytes) -> str:
-        return cls(hash_sha256(data))
+    def from_str(cls, data: str) -> str:
+        return cls(SHA256Hash.hash(data.encode()))
+    
+    @classmethod
+    def from_bytes(cls, data: bytes) -> str:
+        return cls(SHA256Hash.hash(data))
+    
+    @classmethod
+    def from_hex(cls, data: str) -> str:
+        return cls(SHA256Hash.hash(bytes.fromhex(data)))
+
+    @staticmethod
+    def hash(data: bytes) -> str:
+        """Hashes a string using SHA256
+
+        Args:
+            data (str): The string to hash
+        
+        Returns:
+            str: The hashed string
+        """
+        return hashlib.sha256(data).hexdigest()
 
     @staticmethod
     def is_valid(value: str) -> bool:
@@ -43,17 +68,34 @@ class SHA256Hash(str):
         return True
 
 
-# class Leaves(NamedTuple):
-#     """A Leaves object.
-#     """
-#     leaves: Tuple[SHA256Hash, ...] = field(
-#         default=Factory(Tuple[SHA256Hash, ...]),
-#         validator=validators.deep_iterable(SHA256Hash.is_valid,
-#         iterable_validator=validators.instance_of(Tuple)))
+class Leaves(Tuple):
+    """A Leaves object.
+    """
 
+    def __init__(self, data: Tuple[SHA256Hash, ...] | Tuple[str, ...]) -> None:
+        if not Leaves.is_valid(data):
+            raise ValueError(f"{data} is not a valid Leaves object")
+        super().__init__()
+        self = data
 
-#     def __new__(cls, data: Tuple[SHA256Hash, ...] = ()) -> Tuple[SHA256Hash, ...]:
-#         return data
+    @staticmethod
+    def is_valid(value: Tuple[SHA256Hash, ...] | Tuple[str, ...]) -> bool:
+        """Checks if a tuple is a valid Leaves object
+
+        Args:
+            value (tuple[str, ...]): The tuple to check
+
+        Returns:
+            bool: Whether the tuple is a valid Leaves object
+        """
+        if not isinstance(value, Tuple):
+            return False
+        if len(value) == 0:
+            return False
+        for item in value:
+            if not isinstance(item, (SHA256Hash, str)):
+                return False
+        return True
 
 
 @define(slots=True)
@@ -61,10 +103,14 @@ class MerkleTree:
     """A Merkle Tree object.
     """
 
-    leaves: tuple[str, ...] = field(
-        default=Factory(Tuple),
-        validator=validators.deep_iterable(validators.instance_of(str),
-        iterable_validator=validators.instance_of(Tuple)))
+    # leaves: tuple[str, ...] = field(
+    #     default=Factory(Tuple),
+    #     validator=validators.deep_iterable(validators.instance_of(str),
+    #     iterable_validator=validators.instance_of(Tuple)))
+
+    leaves: Leaves = field(
+        default=Factory(Leaves),
+        validator=validators.instance_of((Leaves, Tuple)))
     
     levels: tuple[tuple[str, ...]] = field(
         default=Factory(Tuple),
@@ -91,13 +137,19 @@ class MerkleTree:
 
     @staticmethod
     def _hash_func(data: str | bytes) -> str:
-        return hash_sha256(data)
+        if isinstance(data, str):
+            return SHA256Hash.from_str(data)
+        
+        if isinstance(data, bytes):
+            return SHA256Hash.from_bytes(data)
+        
+        raise ValueError(f"Expected data to be str or bytes, got {type(data)}")
 
     @staticmethod
     def _hash_items(item1: str | bytes | None = None, item2: str | bytes | None = None) -> str:
         # assert ((type(item1) is str) or (type(item2) is None)), f"{type(item2)} must be str or None"
         if item1 is None:
-            raise ValueError(f'item1 cannot be None, but received {T}')
+            raise ValueError(f'item1 cannot be None, but received {type(item1)})')
 
         if item2 is None:
             return MerkleTree._hash_items(item1, item1)
