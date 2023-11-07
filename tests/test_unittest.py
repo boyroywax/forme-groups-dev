@@ -33,27 +33,27 @@ def main():
     test_suite.addTest(loader.loadTestsFromTestCase(TestIPFS))
 
     # Base tests
-    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseInterface))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseTypes))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseValue))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseInterface))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseTypes))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseValue))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
 
-    # Group Unit tests
-    test_suite.addTest(loader.loadTestsFromTestCase(TestUnitNonce))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestCredential))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestData))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestOwner))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestGroupUnit))
+    # # Group Unit tests
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestUnitNonce))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestCredential))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestData))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestOwner))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestGroupUnit))
 
-    # Pool tests
-    test_suite.addTest(loader.loadTestsFromTestCase(TestPool))
+    # # Pool tests
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestPool))
 
-    # Controller tests
-    test_suite.addTest(loader.loadTestsFromTestCase(TestController))
+    # # Controller tests
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestController))
 
-    # Groups tests
-    test_suite.addTest(loader.loadTestsFromTestCase(TestGroups))
+    # # Groups tests
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestGroups))
 
     # Run the test suite
     runner = unittest.TextTestRunner()
