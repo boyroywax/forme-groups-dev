@@ -15,8 +15,11 @@ from binascii import hexlify
 from typing import Iterable
 from io import BytesIO
 from ipfs_cid import cid_sha256_hash_chunked, cid_sha256_wrap_digest, cid_sha256_unwrap_digest
+from .crypto import MerkleTree, Leaves, SHA256Hash
+# import pymerkle
 
-__IPFS_DEFAULT_URL__ = '/ip4/127.0.0.1/tcp/5541/http/'
+# __IPFS_DEFAULT_URL__ = '/ip4/127.0.0.1/tcp/5541/http/'
+__IPFS_DEFAULT_URL__ = '/ip4/127.0.0.1/tcp/5001'
 
 @define(slots=True)
 class IPFS:
@@ -44,11 +47,11 @@ class IPFS:
         # return self.client.publish(file)
 
     def add_bytes(self, data: bytes):
-        with self.client.connect('/ip4/127.0.0.1/tcp/5541/http/') as c:
+        with self.client.connect(__IPFS_DEFAULT_URL__) as c:
             return c.add_bytes(data)
 
     def add_str(self, string: str):
-        with self.client.connect('/ip4/127.0.0.1/tcp/5541/http/') as c:
+        with self.client.connect(__IPFS_DEFAULT_URL__) as c:
             return c.add_str(string)
 
     def add_json(self, json_obj: dict):
@@ -58,10 +61,17 @@ class IPFS:
     def compute_ipfs_hash_from_bytes(data: bytes):
 
         # print(hexlify(hashlib.sha256(dumps(data)).digest()))
+        sha256_1 = SHA256Hash.from_bytes(data)
+        print(f'{sha256_1=}')
+
+        hexed = hexlify(hashlib.sha256(data).digest())
+        print(f'{hexed=}')
 
         def as_chunks(stream: BytesIO, chunk_size: int) -> Iterable[bytes]:
-            while len((chunk := stream.read(chunk_size))) > 0:
+            while len(chunk := stream.read(chunk_size)) > 0:
                 yield chunk
+
+        
 
         # digest = hashlib.sha256(data).digest()
         # print(f'{digest=}')
@@ -75,25 +85,53 @@ class IPFS:
         # wrapped_digest = cid_sha256_hash_chunked(as_chunks(BytesIO(dumps(data)), 4))
         # print(f'{wrapped_digest=}')
 
-        buffer = BytesIO(dumps(data))
-        print(f'{buffer=}')
+        buffer1 = BytesIO(data)
+        print(f'{buffer1=}')
 
-        digest = hashlib.sha256(data).digest()
-        # digest = cid_sha256_hash_chunked(as_chunks(buffer, 4))
-        print(f'{digest=}')
+        digest_leaves: list = []
+        for chunk in as_chunks(buffer1, 4):
+            print(chunk)
+            digest_leaves.append((SHA256Hash.from_bytes_to_bytes(chunk)))
 
-        mh = multihash.encode(digest, 'sha2-256')
-        print(f'{mh=}')
-        mh_b58 = multihash.to_b58_string(mh)
-        print(f'{mh_b58=}')
-        # multibase_prefix = multibase.encode('base58btc', wrapped_digest)
-        # print(f'{multibase_prefix=}')
+        # leaves: Leaves = Leaves(tuple(digest_leaves))
 
-        cid0 = cid.CIDv0(mh)
-        print(f'{cid0=}')
-        # print(f'{cid0.encode()}')
+        print(f'{digest_leaves=}')
 
-        cid1 = cid.CIDv1('dag-pb', mh)
+        mt = MerkleTree(tuple(digest_leaves, ))
+        print(f'{mt=}')
+
+        mt_root = mt.root()
+        print(f'{mt_root=}')
+
+        mh = multihash.from_hex_string(mt_root)
+
+        # mt_root_digest = hashlib.sha256(str(mt_root).encode('utf-8')).hexdigest()
+        # print(f'{mt_root_digest=}')
+
+        # print(f'{digest_leaves=}')
+
+        # mt_root_digest = hashlib.sha256(str(mt_root).encode('utf-8')).hexdigest()
+        # print(f'{mt_root_digest=}')
+
+        # digest = cid_sha256_hash_chunked(digest_leaves)
+        # print(f'{digest=}')
+
+        # mh = multihash.
+        # print(f'{mh=}')
+        # print(f'{mh=}')
+        # mh_b58 = base58.b58encode(mt_root).decode('utf-8')
+        # print(f'{mh_b58=}')
+        # # multibase_prefix = multibase.encode('base58btc', wrapped_digest)
+        # # print(f'{multibase_prefix=}')
+
+        # cid0 = cid.CIDv0(mh_b58)
+        # print(f'{cid0=}')
+        # # print(f'{cid0.encode()}')
+
+        # cid1 = cid.CIDv1('dag-pb', mh)
+        # print(f'{cid1=}')
+
+        # print(cid1.to_v0().encode())
 
         # ipfs_cid = base58.b58encode(cid0.to_v0().buffer).decode('utf-8')
         # print(f'{ipfs_cid=}')
