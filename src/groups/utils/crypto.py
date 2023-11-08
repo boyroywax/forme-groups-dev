@@ -207,18 +207,18 @@ class MerkleTree:
     @staticmethod
     def _hash_func_iter(data: str | bytes | tuple | SHA256Hash) -> Iterable[bytes]:
         if isinstance(data, str):
-            yield SHA256Hash.from_str_to_bytes(data)
+            yield SHA256Hash.from_str(data).hash
         
         if isinstance(data, bytes):
-            yield SHA256Hash.from_bytes_to_bytes(data)
+            yield SHA256Hash.from_bytes(data).hash
         
         if isinstance(data, tuple):
             for item in data:
                 if isinstance(item, str):
-                    yield SHA256Hash.from_str_to_bytes(item)
+                    yield SHA256Hash.from_str(item).hash
                 
                 if isinstance(item, bytes):
-                    yield SHA256Hash.from_bytes_to_bytes(item)
+                    yield SHA256Hash.from_bytes(item).hash
                 
                 if isinstance(item, SHA256Hash):
                     yield item.hash

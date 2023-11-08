@@ -92,7 +92,7 @@ class IPFS:
         digest_leaves: List[SHA256Hash] = []
         for chunk in as_chunks(buffer1, 4):
             print(chunk)
-            digest_leaves.append(SHA256Hash.from_bytes(chunk))
+            digest_leaves.append(SHA256Hash.from_(chunk))
 
         print(f'{digest_leaves=}')
 

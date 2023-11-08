@@ -1,7 +1,7 @@
 import hashlib
 import re
 from attrs import define, field, Factory
-from typing import Any, Iterable, override
+from typing import Any, Iterable, overload, override
 
 
 def convert_str_to_bytes(data: str | bytes) -> bytes:
@@ -73,30 +73,38 @@ class SHA256Hash:
             return cls(hashlib.sha256(data).digest())
         
         raise ValueError(f"Expected data to be bytes, got {type(data)}")
-    
-    @override
-    def __str__(self) -> str:
-        return f"{self.hash.hex()}"
-    
-    @override
-    def __repr__(self) -> str:
-        return f"{str(self.string)}"
-        
+
     @classmethod
     def from_str(cls, data: str) -> 'SHA256Hash':
         assert data not in [None, '', ' ', b'', b' '], "Expected data to be not None or empty string"
         return cls.hash_sha256(data.encode())
-    
+
     @classmethod
     def from_bytes(cls, data: bytes) -> 'SHA256Hash':
         return cls.hash_sha256(data)
-    
+
     @classmethod
     def from_hex(cls, data: str) -> 'SHA256Hash':
         return cls.hash_sha256(bytes.fromhex(data))
-    
+
+    @overload
     @classmethod
-    def from_(cls, data: str | bytes | Any) -> 'SHA256Hash':
+    def from_(cls, data: bytes) -> 'SHA256Hash': ...
+
+    @overload
+    @classmethod
+    def from_(cls, data: str) -> 'SHA256Hash': ...
+
+    @overload
+    @classmethod
+    def from_(cls, data: int) -> 'SHA256Hash': ...
+
+    @overload
+    @classmethod
+    def from_(cls, data: 'SHA256Hash') -> 'SHA256Hash': ...
+
+    @classmethod
+    def from_(cls, data: str | bytes | int | Any) -> 'SHA256Hash':
         if isinstance(data, str):
             return cls.from_str(data)
         if isinstance(data, bytes):
@@ -106,7 +114,15 @@ class SHA256Hash:
         if isinstance(data, SHA256Hash):
             return data
         raise ValueError(f"Expected data to be str, bytes or SHA256Hash, got {type(data)}")
+
+    @override
+    def __str__(self) -> str:
+        return f"{self.hash.hex()}"
     
+    @override
+    def __repr__(self) -> str:
+        return f"{str(self.string)}"
+
     @override
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, SHA256Hash):
@@ -116,17 +132,17 @@ class SHA256Hash:
         if isinstance(other, bytes):
             return self.hash == other
         return False
-    
+
     @override
     def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)
-    
+
     def __call__(self) -> str:
         return self.__str__()
-    
+
     def __add__(self, other: 'SHA256Hash') -> bytes:
         assert isinstance(other, SHA256Hash), f"{type(other)} must be SHA256Hash"
         return self.hash + other.hash
-    
+
     def __iter__(self) -> Iterable[bytes]:
         yield self.hash
