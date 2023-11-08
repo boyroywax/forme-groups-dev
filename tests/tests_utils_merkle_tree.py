@@ -101,12 +101,15 @@ class TestLevel(unittest.TestCase):
         with self.assertRaises(AssertionError):
             Levels((Leaves((SHA256Hash.from_str(""), SHA256Hash.from_str("test2"))), Leaves((SHA256Hash.from_str("test3"), SHA256Hash.from_str("test4")))))
 
+    def test_append(self):
+        self.level.append(Leaves((SHA256Hash.from_str("test5"), SHA256Hash.from_str("test6"))))
+        self.assertEqual(self.level, Levels((Leaves((SHA256Hash.from_str("test"), SHA256Hash.from_str("test2"))), Leaves((SHA256Hash.from_str("test3"), SHA256Hash.from_str("test4"))), Leaves((SHA256Hash.from_str("test5"), SHA256Hash.from_str("test6"))))))
 
 class TestMerkleTree(unittest.TestCase):
     def test_init(self):
         mt = MerkleTree()
         self.assertEqual(mt.root, None)
-        self.assertEqual(mt.leaves, ())
+        self.assertEqual(mt.leaves, Leaves(leaves=()))
 
 #     def test_hash_single_value(self):
 #         hash_test_func = MerkleTree._hash_func("test")

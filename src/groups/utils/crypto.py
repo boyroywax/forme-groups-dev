@@ -66,6 +66,9 @@ class Leaves:
         converter=convert_to_leaf,
         validator=validators.deep_iterable(validators.instance_of((Leaf)),
         iterable_validator=validators.instance_of(tuple)))
+    
+    def __add__(self, other: 'Leaves') -> 'Leaves':
+        return Leaves(self.leaves + other.leaves)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Leaves):
@@ -103,26 +106,30 @@ class Levels:
     """A Level object.
     """
 
-    level: Tuple[Leaves, ...] = field(
+    levels: Tuple[Leaves, ...] = field(
         default=tuple(),
         # converter=convert_to_leaf,
-        validator=validators.deep_iterable(validators.instance_of((Leaves)),
+        validator=validators.deep_iterable(validators.instance_of(Leaves),
         iterable_validator=validators.instance_of(tuple)))
     
     def append(self, leaves: Leaves) -> None:
-        self.level = self.level + (leaves, )
+        self.levels = self.levels + (leaves, )
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Levels):
             return False
-        return self.level == other.level
+        return self.levels == other.levels
     
     def __len__(self) -> int:
-        return len(self.level)
+        return len(self.levels)
     
     def __iter__(self) -> Iterable[Leaves]:
-        for leaves in self.level:
-            yield leaves
+        assert self.levels is not None
+        for leaves in self.levels:
+            yield leaves.leaves
+
+    def __add__(self, other: 'Levels') -> 'Levels':
+        return Levels(self.levels + other.levels)
 
 
 @define(slots=True)
@@ -137,31 +144,37 @@ class MerkleTree:
 
     leaves: Optional[Leaves] = field(
         default=None,
-        converter=convert_loose_leaves_to_levels,
+        # converter=convert_loose_leaves_to_levels,
         validator=validators.optional(validators.instance_of(Leaves)))
     
-    levels: Optional[Tuple[Leaves, ...]] = field(default=tuple())
-        # validator=validators.deep_iterable(validators.instance_of(Leaves | tuple),
-        # iterable_validator=validators.instance_of(tuple)))
+    _levels: Optional[Levels] = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(Levels)))
 
     def __init__(self, hashed_data: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...] | Leaves = (), use_all_bytes: bool = True) -> None:
         self.leaves = hashed_data if isinstance(hashed_data, Leaves) else convert_loose_leaves_to_levels(hashed_data)
-        _levels = (self.leaves, )
-        # self.levels = convert_loose_leaves_to_levels(_levels)
-        self.levels = _levels
-        self.build()
+        
+        if self.leaves is None:
+            self.leaves = Leaves(tuple())
+        _levels = Levels((self.leaves, ))
+        # self.levels = _levels
+        self._levels = _levels
+        # self.build()
 
     def build(self) -> None:
-        level = (self.leaves, )
+        if self._levels is None:
+            return None
 
-        if len(self.levels[0]) == 1:
-            self.levels = self.levels + (self._hash_items(level[0]), )
+        level = self._levels
+
+        if len(self._levels) == 1:
+            self._levels = self._levels + (self._hash_items(level[0]), )
 
         while len(level) > 1:
             hashed_level = self.hash_level(level)
-            self.levels = self.levels + (hashed_level, )
+            self._levels = self._levels + (hashed_level, )
 
-            level = self.levels[-1]
+            level = (hashed_level, )
 
     @staticmethod
     def _hash_func(data:  str | bytes | tuple | SHA256Hash) -> bytes:
@@ -239,13 +252,14 @@ class MerkleTree:
         return hashed_level
 
     def _find_levels_count(self) -> int:
-        return len(self.levels)
+        return len(self._levels)
     
     @property
-    def root(self) -> str:
-        if self.levels[-1] is None or len(self.levels) == 0 or len(self.leaves) == 0:
+    def root(self) -> str | None:
+        if not self._levels or len(self._levels) == 0:
             return None
-        return self.levels[-1][0]
+        if self._levels.levels is None or len(self._levels.levels) == 0 or len(self.leaves.leaves) == 0:
+            return None
 
     def verify(self, leaf_hash: str | bytes) -> bool:
         if leaf_hash not in self.leaves:
