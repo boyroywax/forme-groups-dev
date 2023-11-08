@@ -14,3 +14,9 @@ class TestIPFSCID(unittest.TestCase):
         data = b"test"
         cid = ipfs_cid.generate_cid(data)
         self.assertEqual(cid, "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
+
+    def test_generate_cid_str(self):
+        ipfs_cid = IPFSCID()
+        data = "test"
+        cid = ipfs_cid.generate_cid(data)
+        self.assertEqual(cid, "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
