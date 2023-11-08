@@ -105,6 +105,7 @@ class TestLevel(unittest.TestCase):
         self.level.append(Leaves((SHA256Hash.from_str("test5"), SHA256Hash.from_str("test6"))))
         self.assertEqual(self.level, Levels((Leaves((SHA256Hash.from_str("test"), SHA256Hash.from_str("test2"))), Leaves((SHA256Hash.from_str("test3"), SHA256Hash.from_str("test4"))), Leaves((SHA256Hash.from_str("test5"), SHA256Hash.from_str("test6"))))))
 
+
 class TestMerkleTree(unittest.TestCase):
     def test_init(self):
         mt = MerkleTree()
@@ -115,10 +116,10 @@ class TestMerkleTree(unittest.TestCase):
         hash_test_func = MerkleTree._hash_func("test")
         self.assertEqual(hash_test_func.hex(), "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")
 
-    # def test_hash_items_not_identical(self):
-    #     hash_test_func = MerkleTree._hash_func("test")
-    #     hash_test_func2 = MerkleTree._hash_func("test2")
-    #     self.assertNotEqual(hash_test_func, hash_test_func2)
+    def test_hash_items_not_identical(self):
+        hash_test_func = MerkleTree._hash_func("test")
+        hash_test_func2 = MerkleTree._hash_func("test2")
+        self.assertNotEqual(hash_test_func.hex(), hash_test_func2.hex())
 
     # def test_hash_items_identical_single(self):
     #     hash_test_func = MerkleTree._hash_func("test")

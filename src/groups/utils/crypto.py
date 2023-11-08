@@ -29,7 +29,7 @@ class Leaf:
             raise ValueError(f"Expected hash to be SHA256Hash, got {type(value)}")
 
 
-def convert_to_leaf(data: Tuple[str | bytes | SHA256Hash | Leaf, ...]) -> Tuple[Leaf, ...]:
+def convert_to_leaves(data: Tuple[str | bytes | SHA256Hash | Leaf, ...]) -> Tuple[Leaf, ...]:
     """Converts a string to bytes
 
     Args:
@@ -63,7 +63,7 @@ class Leaves:
 
     leaves: Tuple[Leaf, ...] = field(
         default=tuple(),
-        converter=convert_to_leaf,
+        converter=convert_to_leaves,
         validator=validators.deep_iterable(validators.instance_of((Leaf)),
         iterable_validator=validators.instance_of(tuple)))
     
@@ -79,6 +79,9 @@ class Leaves:
         return len(self.leaves)
     
     def __iter__(self) -> Iterable[Leaf]:
+        return iter(self.leaves)
+
+    def __next__(self) -> Leaf:
         for leaf in self.leaves:
             yield leaf
 
@@ -126,10 +129,12 @@ class Levels:
     def __iter__(self) -> Iterable[Leaves]:
         assert self.levels is not None
         for leaves in self.levels:
-            yield leaves.leaves
+            yield leaves
 
     def __add__(self, other: 'Levels') -> 'Levels':
-        return Levels(self.levels + other.levels)
+        for leaves in other.levels:
+            self.append(leaves)
+        return self
 
 
 @define(slots=True)
@@ -157,9 +162,13 @@ class MerkleTree:
         if self.leaves is None:
             self.leaves = Leaves(tuple())
         _levels = Levels((self.leaves, ))
+        print(f'{_levels=}')
         # self.levels = _levels
         self._levels = _levels
-        # self.build()
+        print(f'{self._levels=}')
+        self.build()
+
+    # def build(self) -> None:
 
     def build(self) -> None:
         if self._levels is None:
@@ -168,13 +177,15 @@ class MerkleTree:
         level = self._levels
 
         if len(self._levels) == 1:
-            self._levels = self._levels + (self._hash_items(level[0]), )
-
+            self._levels = self._levels.levels + (self._hash_items(self._levels.levels), )
         while len(level) > 1:
             hashed_level = self.hash_level(level)
             self._levels = self._levels + (hashed_level, )
 
             level = (hashed_level, )
+
+    def __add__(self, other: 'MerkleTree') -> 'MerkleTree':
+        return MerkleTree(self.leaves + other.leaves)
 
     @staticmethod
     def _hash_func(data:  str | bytes | tuple | SHA256Hash) -> bytes:
@@ -186,26 +197,15 @@ class MerkleTree:
         Returns:
             str: The hashed string
         """
-        possible_multiple_data_items = MerkleTree._hash_func_iter(data)
+        # possible_multiple_data_items = MerkleTree._hash_func_iter(data)
 
-        for item in possible_multiple_data_items:
 
-            if isinstance(item, SHA256Hash):
-                return item.hash
-
-            if isinstance(item, str):
-                return item
-            
-            if isinstance(item, bytes):
-                return item
-            
-            raise ValueError(f"Expected data to be str or bytes, got {type(item)}")
-
-        return hashlib.sha256(data).digest()
-
+        for item in MerkleTree._hash_func_iter(data):
+            print(f'{item=}')
+            return item
 
     @staticmethod
-    def _hash_func_iter(data: str | bytes | tuple | SHA256Hash) -> Iterable[bytes]:
+    def _hash_func_iter(data: str | bytes | tuple | SHA256Hash | Leaves) -> Iterable[bytes]:
         if isinstance(data, str):
             yield SHA256Hash.from_str(data).hash
         
@@ -222,10 +222,14 @@ class MerkleTree:
                 
                 if isinstance(item, SHA256Hash):
                     yield item.hash
+
+        if isinstance(data, Leaves):
+            for item in data.leaves:
+                yield item.hash.hash
                 
                 raise ValueError(f"Expected data to be str or bytes, or SHA256Hash, got {type(item)}")
         
-        raise ValueError(f"Expected data to be str or bytes, got {type(data)}")
+        # raise ValueError(f"Expected data to be str or bytes or tuple, got {type(data)}")
 
     @staticmethod
     def _hash_items(item1: bytes | None = None, item2: bytes | None = None) -> bytes:
