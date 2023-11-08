@@ -12,7 +12,7 @@ import multibase
 from multiformats_cid import make_cid, CIDv0, CIDv1, cid
 from cbor2 import dumps, loads
 from binascii import hexlify
-from typing import Iterable
+from typing import Iterable, Tuple, List
 from io import BytesIO
 from ipfs_cid import cid_sha256_hash_chunked, cid_sha256_wrap_digest, cid_sha256_unwrap_digest
 from .crypto import MerkleTree, Leaves, SHA256Hash
@@ -61,10 +61,11 @@ class IPFS:
     def compute_ipfs_hash_from_bytes(data: bytes):
 
         # print(hexlify(hashlib.sha256(dumps(data)).digest()))
-        sha256_1 = SHA256Hash.from_bytes(data)
+        sha256_1 = SHA256Hash.from_bytes_to_bytes(data)
         print(f'{sha256_1=}')
 
-        hexed = hexlify(hashlib.sha256(data).digest())
+        # hexed = hexlify(hashlib.sha256(data).digest())
+        hexed = sha256_1.hex()
         print(f'{hexed=}')
 
         def as_chunks(stream: BytesIO, chunk_size: int) -> Iterable[bytes]:
@@ -88,24 +89,42 @@ class IPFS:
         buffer1 = BytesIO(data)
         print(f'{buffer1=}')
 
-        digest_leaves: list = []
+        digest_leaves: List[SHA256Hash] = []
         for chunk in as_chunks(buffer1, 4):
             print(chunk)
-            digest_leaves.append((SHA256Hash.from_bytes_to_bytes(chunk)))
-
-        # leaves: Leaves = Leaves(tuple(digest_leaves))
+            digest_leaves.append(SHA256Hash.from_bytes(chunk))
 
         print(f'{digest_leaves=}')
 
-        mt = MerkleTree(tuple(digest_leaves, ))
+        # leaves: Leaves = Leaves(tuple(digest_leaves))
+        # extracted_leaves = tuple([SHA256Hash.from_bytes_to_bytes(chunk) for chunk in as_chunks(BytesIO(data), 4)])
+        # leaves: Tuple[SHA256Hash, ...] = tuple()
+        # for leaf in digest_leaves:
+        #     leaves += (SHA256Hash.from_bytes(leaf), )
+        # print(f'{leaves=}')
+
+        mt = MerkleTree(tuple(digest_leaves))
         print(f'{mt=}')
 
-        mt_root = mt.root()
+        mt_root = mt.root
         print(f'{mt_root=}')
 
-        mh = multihash.from_hex_string(mt_root)
+        mh = multihash.encode(mt_root, 'sha2-256', 32)
+        print(f'{mh=}')
+
+        # mh_h = multicodec.add_prefix('raw', mh)
+        # print(f'{mh_h=}')
+
+        int_from_bytes = int.from_bytes(mh, 'big')
+
+        mh_b58 = base58.b58encode_int(int_from_bytes).decode('ascii')
+        print(f'{mh_b58=}')
+
+        # return mh_b58
+
 
         # mt_root_digest = hashlib.sha256(str(mt_root).encode('utf-8')).hexdigest()
+        # mt_root_digest = mt_root.hex()
         # print(f'{mt_root_digest=}')
 
         # print(f'{digest_leaves=}')
@@ -113,18 +132,17 @@ class IPFS:
         # mt_root_digest = hashlib.sha256(str(mt_root).encode('utf-8')).hexdigest()
         # print(f'{mt_root_digest=}')
 
-        # digest = cid_sha256_hash_chunked(digest_leaves)
-        # print(f'{digest=}')
+        digest = cid_sha256_hash_chunked(b"".join([leaf.hash for leaf in leaves]))
+        print(f'{digest=}')
 
         # mh = multihash.
         # print(f'{mh=}')
         # print(f'{mh=}')
         # mh_b58 = base58.b58encode(mt_root).decode('utf-8')
         # print(f'{mh_b58=}')
-        # # multibase_prefix = multibase.encode('base58btc', wrapped_digest)
+        multibase_prefix = multibase.encode('base58btc', digest)
+        print(f'{multibase_prefix=}')
         # # print(f'{multibase_prefix=}')
-
-        # cid0 = cid.CIDv0(mh_b58)
         # print(f'{cid0=}')
         # # print(f'{cid0.encode()}')
 

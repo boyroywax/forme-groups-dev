@@ -26,3 +26,6 @@ env/
 
 # Ignore all .env files
 *.env.example
+
+#ignore ipfs testing container files
+tests/ipfs/data/

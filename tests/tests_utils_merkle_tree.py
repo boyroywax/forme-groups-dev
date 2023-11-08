@@ -8,7 +8,7 @@ from src.groups.utils.crypto import MerkleTree, SHA256Hash
 class TestMerkleTree(unittest.TestCase):
     def test_init(self):
         mt = MerkleTree()
-        self.assertEqual(mt.root(), None)
+        self.assertEqual(mt.root, None)
         self.assertEqual(mt.leaves, ())
 
     def test_hash_single_value(self):
@@ -81,23 +81,23 @@ class TestMerkleTree(unittest.TestCase):
         hash_test_func2 = MerkleTree._hash_func("test2")
         hashed_items = MerkleTree._hash_items(hash_test_func, hash_test_func2)
         mt = MerkleTree((hash_test_func, hash_test_func2))
-        self.assertEqual(mt.root(), hashed_items)
+        self.assertEqual(mt.root, hashed_items)
    
     def test_hash_items_not_identical(self):
         hash_test_func = MerkleTree._hash_func("test")
         hash_test_func2 = MerkleTree._hash_func("test2")
         mt = MerkleTree((hash_test_func, hash_test_func2))
-        self.assertEqual(mt.root(), '694299f8eb01a328732fb21f4163fbfaa8f60d5662f04f52ad33bec63953ec7f')
+        self.assertEqual(mt.root, '694299f8eb01a328732fb21f4163fbfaa8f60d5662f04f52ad33bec63953ec7f')
 
     def test_hash_items_identical_single2(self):
         hash_test_func = MerkleTree._hash_func("test")
         mt = MerkleTree((hash_test_func,))
-        self.assertEqual(mt.root(), '0839734cbb5ab81cab6474a5ea4bd6a39ac09e3a7da1dd07f35d6b827d9a2177')
+        self.assertEqual(mt.root, '0839734cbb5ab81cab6474a5ea4bd6a39ac09e3a7da1dd07f35d6b827d9a2177')
 
     def test_hash_items_identical_two_values2(self):
         hash_test_func = MerkleTree._hash_func("test")
         mt = MerkleTree((hash_test_func, hash_test_func))
-        self.assertEqual(mt.root(), '0839734cbb5ab81cab6474a5ea4bd6a39ac09e3a7da1dd07f35d6b827d9a2177')
+        self.assertEqual(mt.root, '0839734cbb5ab81cab6474a5ea4bd6a39ac09e3a7da1dd07f35d6b827d9a2177')
 
     def test_hash_items_with_wrong_data_type(self):
         hash_test_func = MerkleTree._hash_func("test")

@@ -38,3 +38,15 @@
 19:10:23.567492 version@stat F·[1] S·979B[979B] Sc·[0.25]
 19:10:23.609647 db@janitor F·3 G·0
 19:10:23.610158 db@open done T·56.58889ms
+22:28:43.556104 db@close closing
+22:28:43.557292 db@close done T·1.155863ms
+=============== Nov 7, 2023 (UTC) ===============
+22:55:19.591135 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+22:55:19.597621 version@stat F·[1] S·979B[979B] Sc·[0.25]
+22:55:19.598233 db@open opening
+22:55:19.598910 journal@recovery F·1
+22:55:19.605860 journal@recovery recovering @7
+22:55:19.630827 memdb@flush created L0@9 N·920 S·54KiB "/F5..CLI,v10":"/pr..AS2,v209"
+22:55:19.634480 version@stat F·[2] S·55KiB[55KiB] Sc·[0.50]
+22:55:19.649934 db@janitor F·4 G·0
+22:55:19.650388 db@open done T·51.627306ms
