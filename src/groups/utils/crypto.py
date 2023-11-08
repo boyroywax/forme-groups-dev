@@ -28,6 +28,7 @@ class Leaf:
         if not isinstance(value, SHA256Hash):
             raise ValueError(f"Expected hash to be SHA256Hash, got {type(value)}")
 
+
 def convert_to_SHA256Hash(data: Tuple[str | bytes | SHA256Hash, ...]) -> Tuple['SHA256Hash', ...]:
     """Converts a string to bytes
 

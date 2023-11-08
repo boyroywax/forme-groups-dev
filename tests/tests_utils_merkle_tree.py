@@ -71,7 +71,7 @@ class TestLeaf(unittest.TestCase):
         self.leaf = Leaf(SHA256Hash.from_str("test"))
 
     def test_init(self):
-        self.assertEqual(self.leaf.hash, SHA256Hash.from_str("test"))
+        self.assertEqual(self.leaf.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
 
 
 class TestMerkleTree(unittest.TestCase):

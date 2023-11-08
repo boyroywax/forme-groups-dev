@@ -1,7 +1,7 @@
 import hashlib
 import re
-from attrs import define, field, validators, Factory, converters
-from typing import Any, Iterable, NamedTuple, Tuple, override, Optional
+from attrs import define, field, Factory
+from typing import Any, Iterable, override
 
 
 def convert_str_to_bytes(data: str | bytes) -> bytes:
@@ -18,6 +18,7 @@ def convert_str_to_bytes(data: str | bytes) -> bytes:
     if isinstance(data, bytes):
         return data
     raise ValueError(f"Expected data to be str or bytes, got {type(data)}")
+
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class SHA256Hash:
@@ -102,48 +103,14 @@ class SHA256Hash:
             return data
         raise ValueError(f"Expected data to be str, bytes or SHA256Hash, got {type(data)}")
     
-    # @staticmethod
-    # def from_str_to_bytes(data: str) -> bytes:
-    #     return SHA256Hash.hash_sha256(data.encode()).hash
-    #     # return cls(SHA256Hash.hash_bytes(data))
-    
-    # @staticmethod
-    # def from_bytes_to_bytes(data: bytes) -> bytes:
-    #     return SHA256Hash.hash_sha256(data).hash
-    
-    # @staticmethod
-    # def from_hex_to_bytes(data: str) -> bytes:
-    #     return SHA256Hash.hash_sha256(bytes.fromhex(data)).hash
-
-    @staticmethod
-    def is_valid(value: str | bytes) -> bool:
-        """Checks if a string is a valid SHA256 hash
-
-        Args:
-            value (str): The string to check
-
-        Returns:
-            bool: Whether the string is a valid SHA256 hash
-        """
-        # if isinstance(value, bytes):
-        #     value = value.decode()
-
-        if not isinstance(value, (str, bytes)):
-            return False
-        if len(value) != 64:
-            return False
-        if not re.match(r'^[0-9a-fA-F]+$', value):
-            return False
-        return True
-    
     @override
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, SHA256Hash):
-            return self._raw_hash == other._raw_hash
+            return self.hash == other.hash
         if isinstance(other, str):
-            return self._raw_hash == other.encode()
+            return self.hash == other.encode()
         if isinstance(other, bytes):
-            return self._raw_hash == other
+            return self.hash == other
         return False
     
     @override
