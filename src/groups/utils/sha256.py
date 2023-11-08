@@ -1,4 +1,5 @@
 import hashlib
+import re
 from attrs import define, field, validators, Factory, converters
 from typing import Any, Iterable, NamedTuple, Tuple, override, Optional
 
@@ -23,14 +24,18 @@ class SHA256Hash:
     """A SHA256 Hash object.
     """
 
-    raw_hash: bytes = field(
-        default=Factory(bytes),
-        converter=convert_str_to_bytes,
-        validator=validators.instance_of(bytes))
+    raw_hash: Optional[bytes | str] = field(
+        default=None,
+        # converter=convert_str_to_bytes,
+        validator=validators.instance_of((bytes, str)))
     
     @property
     def hash(self) -> bytes:
-        return self.raw_hash
+        return convert_str_to_bytes(self.raw_hash)
+    
+    @property
+    def hex(self) -> str:
+        return self.hash.hex()
 
     @classmethod
     def hash_sha256(cls, data: bytes) -> 'SHA256Hash':
@@ -45,7 +50,7 @@ class SHA256Hash:
         if isinstance(data, bytes):
             return cls(hashlib.sha256(data).digest())
         
-        raise ValueError(f"Expected data to be str or bytes, got {type(data)}")
+        raise ValueError(f"Expected data to be bytes, got {type(data)}")
     
     @override
     def __str__(self) -> str:
@@ -53,57 +58,32 @@ class SHA256Hash:
     
     @override
     def __repr__(self) -> str:
-        return f"{str(self.hash)}"
+        return f"{str(self.hash.decode())}"
         
     @classmethod
     def from_str(cls, data: str) -> 'SHA256Hash':
-        return SHA256Hash.hash_sha256(data.encode())
+        return cls.hash_sha256(data.encode())
     
     @classmethod
     def from_bytes(cls, data: bytes) -> 'SHA256Hash':
-        return SHA256Hash.hash_sha256(data)
+        return cls.hash_sha256(data)
     
     @classmethod
     def from_hex(cls, data: str) -> 'SHA256Hash':
-        return SHA256Hash.hash_sha256(bytes.fromhex(data))
+        return cls.hash_sha256(bytes.fromhex(data))
     
     @staticmethod
     def from_str_to_bytes(data: str) -> bytes:
-        if isinstance(data, str):
-            return SHA256Hash.hash_bytes(data.encode())
+        return SHA256Hash.hash_sha256(data.encode()).hash
         # return cls(SHA256Hash.hash_bytes(data))
     
     @staticmethod
     def from_bytes_to_bytes(data: bytes) -> bytes:
-        return SHA256Hash.hash_bytes(data)
+        return SHA256Hash.hash_sha256(data).hash
     
     @staticmethod
     def from_hex_to_bytes(data: str) -> bytes:
-        return SHA256Hash.hash_bytes(bytes.fromhex(data))
-
-    # @staticmethod
-    # def raw_hash(data: bytes) -> str:
-    #     """Hashes a string using SHA256
-
-    #     Args:
-    #         data (str): The string to hash
-        
-    #     Returns:
-    #         str: The hashed string
-    #     """
-    #     return hashlib.sha256(data).hexdigest()
-    
-    @staticmethod
-    def hash_bytes(data: bytes) -> bytes:
-        """Hashes a string using SHA256
-
-        Args:
-            data (bytes): The string to hash
-        
-        Returns:
-            bytes: The hashed string
-        """
-        return hashlib.sha256(data).digest()
+        return SHA256Hash.hash_sha256(bytes.fromhex(data)).hash
 
     @staticmethod
     def is_valid(value: str | bytes) -> bool:
@@ -141,11 +121,11 @@ class SHA256Hash:
         return not self.__eq__(other)
     
     def __call__(self) -> str:
-        return self.raw_hash
+        return self.__str__()
     
     def __add__(self, other: 'SHA256Hash') -> str:
         assert isinstance(other, SHA256Hash), f"{type(other)} must be SHA256Hash"
         return self.raw_hash + other.raw_hash
     
     def __iter__(self) -> Iterable[bytes]:
-        yield self.raw_hash
+        yield self.hash

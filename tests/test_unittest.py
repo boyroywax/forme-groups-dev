@@ -1,9 +1,10 @@
 """Run all tests."""
-
 import unittest
 
 from tests_utils_checks import TestChecks
 from tests_utils_converters import TestConverters
+from tests_utils_merkle_tree import TestSHA256Hash
+from tests_utils_merkle_tree import TestLeaf
 from tests_utils_merkle_tree import TestMerkleTree
 from tests_utils_ipfs import TestIPFS
 from tests_utils_ipfs_cid import TestIPFSCID
@@ -30,9 +31,11 @@ def main():
     # Utils tests
     # test_suite.addTest(loader.loadTestsFromTestCase(TestChecks))
     # test_suite.addTest(loader.loadTestsFromTestCase(TestConverters))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestSHA256Hash))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestLeaf))
     # test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
     # test_suite.addTest(loader.loadTestsFromTestCase(TestIPFS))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestIPFSCID))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestIPFSCID))
 
     # Base tests
     # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseInterface))

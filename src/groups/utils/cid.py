@@ -28,11 +28,16 @@ class IPFSCID:
             if self.ipfs_client.cat(cid) == data:
                 self.cid = cid
                 return cid
+            else:
+                raise ValueError("CID verification failed")
         elif isinstance(data, str):
             cid = self.ipfs_client.add_str(data)
             print(cid)
-            # if self.ipfs_client.cat(cid) == data:
-            self.cid = cid
-            return cid
+            print(self.ipfs_client.cat(cid).decode())
+            if self.ipfs_client.cat(cid).decode() == data:
+                self.cid = cid
+                return cid
+            else:
+                raise ValueError("CID verification failed")
         else:
             raise ValueError("CID verification failed")

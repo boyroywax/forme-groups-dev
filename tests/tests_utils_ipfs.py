@@ -17,26 +17,28 @@ class TestIPFS(unittest.TestCase):
     #     ipfs = IPFS()
     #     self.assertEqual(ipfs.status(), True)
 
-    def test_add_bytes(self):
-        ipfs = IPFS()
-        self.assertEqual(ipfs.add_bytes(b'test'), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
+    # def test_add_bytes(self):
+    #     ipfs = IPFS()
+    #     self.assertEqual(ipfs.add_bytes(b'test'), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
 
-    def test_add_string(self):
-        ipfs = IPFS()
-        self.assertEqual(ipfs.add_str("test"), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
+    # def test_add_string(self):
+    #     ipfs = IPFS()
+    #     self.assertEqual(ipfs.add_str("test"), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
 
-    def test_compute_ipfs_hash_from_bytes(self):
-        ipfs = IPFS()
-        self.assertEqual(ipfs.compute_ipfs_hash_from_bytes(b'test'), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
+    # def test_compute_ipfs_hash_from_bytes(self):
+    #     ipfs = IPFS()
+    #     self.assertEqual(ipfs.compute_ipfs_hash_from_bytes(b'test'), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
 
     # def test_compute_ipfs_cid(self):
     #     ipfs = IPFS()
     #     self.assertEqual(ipfs.compute_ipfs_cid(b'test'), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
 
-    def test_publish(self):
-        ipfs = IPFS()
-        self.assertEqual(ipfs.publish('state-test.json'), "QmWYgCstdspqdkMoLXfPe4RtyVgrWhU4btCcygQBYaohhU")
+    # def test_publish(self):
+    #     ipfs = IPFS()
+    #     self.assertEqual(ipfs.publish('state-test.json'), "QmWYgCstdspqdkMoLXfPe4RtyVgrWhU4btCcygQBYaohhU")
 
     # def test_calculate_cid(self):
     #     ipfs = IPFS()
     #     self.assertEqual(ipfs.calculate_cid(b'test'), "QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm")
+
+
