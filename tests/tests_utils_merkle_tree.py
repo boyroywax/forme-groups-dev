@@ -3,7 +3,7 @@ import unittest
 import sys
 
 sys.path.append("../forme-groups-python-3-12/")
-from src.groups.utils.crypto import MerkleTree, SHA256Hash, Leaf
+from src.groups.utils.crypto import MerkleTree, SHA256Hash, Leaf, Leaves
 
 
 class TestSHA256Hash(unittest.TestCase):
@@ -72,6 +72,18 @@ class TestLeaf(unittest.TestCase):
 
     def test_init(self):
         self.assertEqual(self.leaf.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+
+    def test_init_with_bad_hash(self):
+        with self.assertRaises(AssertionError):
+            Leaf(SHA256Hash.from_str(""))
+
+
+class TestLeaves(unittest.TestCase):
+    def setUp(self) -> None:
+        self.leaves = Leaves((SHA256Hash.from_str("test"), SHA256Hash.from_str("test2")))
+
+    def test_init(self):
+        self.assertEqual(self.leaves, Leaves((SHA256Hash.from_str("test"), SHA256Hash.from_str("test2"))))
 
 
 class TestMerkleTree(unittest.TestCase):

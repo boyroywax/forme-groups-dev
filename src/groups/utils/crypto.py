@@ -29,7 +29,7 @@ class Leaf:
             raise ValueError(f"Expected hash to be SHA256Hash, got {type(value)}")
 
 
-def convert_to_SHA256Hash(data: Tuple[str | bytes | SHA256Hash, ...]) -> Tuple['SHA256Hash', ...]:
+def convert_to_Leaf(data: Tuple[str | bytes | SHA256Hash | Leaf, ...]) -> Tuple[Leaf, ...]:
     """Converts a string to bytes
 
     Args:
@@ -38,57 +38,57 @@ def convert_to_SHA256Hash(data: Tuple[str | bytes | SHA256Hash, ...]) -> Tuple['
     Returns:
         bytes: The converted string
     """
-    sha256_objects: Tuple['SHA256Hash', ...] = ()
+    sha256_objects: list[Leaf] = []
     for item in data:
-        if not isinstance(item, (str, bytes, SHA256Hash)):
+        if not isinstance(item, (str, bytes, SHA256Hash, Leaf)):
             raise ValueError(f"Expected data to be str or bytes, got {type(item)}")
         if isinstance(item, str):
-            sha256_objects = sha256_objects + tuple([SHA256Hash.from_str(item)])
+            sha256_objects.append(Leaf(SHA256Hash.from_str(item)))
         if isinstance(item, bytes):
-            sha256_objects += tuple([SHA256Hash.from_bytes(item)])
+            sha256_objects.append(Leaf(SHA256Hash.from_bytes(item)))
         if isinstance(item, SHA256Hash):
-            sha256_objects += tuple(item, )
+            sha256_objects.append(Leaf(item))
+        if isinstance(item, Leaf):
+            sha256_objects.append(item)
 
-        print(f'{sha256_objects=}')
-        # raise ValueError(f"Expected data to be str or bytes or SHA256Hash, got {type(data)}")
-    return sha256_objects
+    print(f'{sha256_objects=}')
+    # raise ValueError(f"Expected data to be str or bytes or SHA256Hash, got {type(data)}")
+    return tuple(sha256_objects)
 
 @define(frozen=True, slots=True)
 class Leaves:
     """A Leaves object.
     """
 
-    leaves: Tuple[SHA256Hash, ...] = field(
+    leaves: Tuple[Leaf, ...] = field(
         default=tuple(),
-        converter=convert_to_SHA256Hash,
-        validator=validators.deep_iterable(validators.instance_of((SHA256Hash)),
+        converter=convert_to_Leaf,
+        validator=validators.deep_iterable(validators.instance_of((Leaf)),
         iterable_validator=validators.instance_of(tuple)))
     
+    # @staticmethod
+    # def is_valid(value: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...]) -> bool:
+    #     """Checks if a tuple is a valid Leaves object
 
+    #     Args:
+    #         value (tuple[str, ...]): The tuple to check
 
-    @staticmethod
-    def is_valid(value: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...]) -> bool:
-        """Checks if a tuple is a valid Leaves object
-
-        Args:
-            value (tuple[str, ...]): The tuple to check
-
-        Returns:
-            bool: Whether the tuple is a valid Leaves object
-        """
-        if not isinstance(value, tuple):
-            return False
-        if len(value) == 0:
-            return False
-        for item in value:
-            if not isinstance(item, (SHA256Hash, str, bytes)):
-                return False
-        return True
+    #     Returns:
+    #         bool: Whether the tuple is a valid Leaves object
+    #     """
+    #     if not isinstance(value, tuple):
+    #         return False
+    #     if len(value) == 0:
+    #         return False
+    #     for item in value:
+    #         if not isinstance(item, (SHA256Hash, str, bytes)):
+    #             return False
+    #     return True
     
     def __len__(self) -> int:
         return len(self.leaves)
     
-    def __iter__(self) -> Iterable[SHA256Hash]:
+    def __iter__(self) -> Iterable[Leaf]:
         for leaf in self.leaves:
             yield leaf
 

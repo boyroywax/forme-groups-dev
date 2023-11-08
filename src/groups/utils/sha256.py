@@ -25,7 +25,10 @@ class SHA256Hash:
     """A SHA256 Hash object.
     """
 
-    _raw_hash: bytes | str = field(default=Factory(bytes))
+    _raw_hash: bytes = field(
+        default=Factory(bytes),
+        converter=convert_str_to_bytes
+    )
 
     @_raw_hash.validator
     def _check_hash(self, attribute, value):
@@ -50,7 +53,7 @@ class SHA256Hash:
     
     @property
     def string(self) -> str:
-        return self.hash.decode()
+        return self.hash.hex()
     
     @property
     def hex(self) -> str:
@@ -73,14 +76,15 @@ class SHA256Hash:
     
     @override
     def __str__(self) -> str:
-        return f"{self.hash.decode()}"
+        return f"{self.hash.hex()}"
     
     @override
     def __repr__(self) -> str:
-        return f"{str(self.hash.decode())}"
+        return f"{str(self.string)}"
         
     @classmethod
     def from_str(cls, data: str) -> 'SHA256Hash':
+        assert data not in [None, '', ' ', b'', b' '], "Expected data to be not None or empty string"
         return cls.hash_sha256(data.encode())
     
     @classmethod
