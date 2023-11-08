@@ -20,18 +20,51 @@ class TestSHA256Hash(unittest.TestCase):
         hash_test_func = SHA256Hash.from_hex(test_hex)
         self.assertEqual(hash_test_func, SHA256Hash.from_hex(test_hex))
 
+    def test_from__string(self):
+        hash_test_func = SHA256Hash.from_("test")
+        self.assertEqual(hash_test_func.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+
+    def test_from__bytes(self):
+        hash_test_func = SHA256Hash.from_(b"test")
+        self.assertEqual(hash_test_func.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+
+    def test_from__hex(self):
+        test_hex = 74657374
+        hash_test_func = SHA256Hash.from_(test_hex)
+        self.assertEqual(hash_test_func.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+
     def test_from_str_to_bytes(self):
-        hash_test_func = SHA256Hash.from_str_to_bytes("test")
-        self.assertEqual(hash_test_func, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+        hash_test_func = SHA256Hash.from_str("test")
+        self.assertEqual(hash_test_func.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
 
     def test_from_bytes_to_bytes(self):
-        hash_test_func = SHA256Hash.from_bytes_to_bytes(b"test")
-        self.assertEqual(hash_test_func, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+        hash_test_func = SHA256Hash.from_bytes(b"test")
+        self.assertEqual(hash_test_func.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
 
     def test_from_hex_to_bytes(self):
         test_hex = "74657374"
-        hash_test_func = SHA256Hash.from_hex_to_bytes(test_hex)
-        self.assertEqual(hash_test_func, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+        hash_test_func = SHA256Hash.from_hex(test_hex)
+        self.assertEqual(hash_test_func.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+
+    def test_init_empty(self):
+        with self.assertRaises(ValueError):
+            SHA256Hash()
+
+    def test_init_empty_str(self):
+        with self.assertRaises(ValueError):
+            SHA256Hash("")
+    
+    def test_init_empty_bytes(self):
+        with self.assertRaises(ValueError):
+            SHA256Hash(b"")
+
+    def test_init_with_bytes(self):
+        hash_test_func = SHA256Hash(b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+        self.assertEqual(hash_test_func.hash, b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n\x08')
+
+    def test_init_with_bad_bytes(self):
+        with self.assertRaises(ValueError):
+            SHA256Hash(b'\x9f\x86\xd0\x81\x88L}e\x9a/\xea\xa0\xc5Z\xd0\x15\xa3\xbfO\x1b+\x0b\x82,\xd1]l\x15\xb0\xf0\n')
 
 class TestLeaf(unittest.TestCase):
     def setUp(self) -> None:

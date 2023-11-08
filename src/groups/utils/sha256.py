@@ -24,14 +24,32 @@ class SHA256Hash:
     """A SHA256 Hash object.
     """
 
-    raw_hash: Optional[bytes | str] = field(
-        default=None,
-        # converter=convert_str_to_bytes,
-        validator=validators.instance_of((bytes, str)))
-    
+    _raw_hash: bytes | str = field(default=Factory(bytes))
+
+    @_raw_hash.validator
+    def _check_hash(self, attribute, value):
+        if not isinstance(value, (str, bytes)):
+            raise ValueError(f"Expected hash to be str or bytes, got {type(value)}")
+        
+        if value in [None, '', ' ', b'', b' ']:
+            raise ValueError("Expected hash to be not None or empty string")
+        
+        if isinstance(value, str):
+            value = value.encode()
+
+        if len(value) != 32:
+            raise ValueError("Expected hash to be 32 bytes")
+        
+        if not re.match(r'^[0-9a-fA-F]+$', value.hex()):
+            raise ValueError("Expected hash to be hex")
+
     @property
     def hash(self) -> bytes:
-        return convert_str_to_bytes(self.raw_hash)
+        return convert_str_to_bytes(self._raw_hash)
+    
+    @property
+    def string(self) -> str:
+        return self.hash.decode()
     
     @property
     def hex(self) -> str:
@@ -72,18 +90,30 @@ class SHA256Hash:
     def from_hex(cls, data: str) -> 'SHA256Hash':
         return cls.hash_sha256(bytes.fromhex(data))
     
-    @staticmethod
-    def from_str_to_bytes(data: str) -> bytes:
-        return SHA256Hash.hash_sha256(data.encode()).hash
-        # return cls(SHA256Hash.hash_bytes(data))
+    @classmethod
+    def from_(cls, data: str | bytes | Any) -> 'SHA256Hash':
+        if isinstance(data, str):
+            return cls.from_str(data)
+        if isinstance(data, bytes):
+            return cls.from_bytes(data)
+        if isinstance(data, int):
+            return cls.from_hex(f"{data}")
+        if isinstance(data, SHA256Hash):
+            return data
+        raise ValueError(f"Expected data to be str, bytes or SHA256Hash, got {type(data)}")
     
-    @staticmethod
-    def from_bytes_to_bytes(data: bytes) -> bytes:
-        return SHA256Hash.hash_sha256(data).hash
+    # @staticmethod
+    # def from_str_to_bytes(data: str) -> bytes:
+    #     return SHA256Hash.hash_sha256(data.encode()).hash
+    #     # return cls(SHA256Hash.hash_bytes(data))
     
-    @staticmethod
-    def from_hex_to_bytes(data: str) -> bytes:
-        return SHA256Hash.hash_sha256(bytes.fromhex(data)).hash
+    # @staticmethod
+    # def from_bytes_to_bytes(data: bytes) -> bytes:
+    #     return SHA256Hash.hash_sha256(data).hash
+    
+    # @staticmethod
+    # def from_hex_to_bytes(data: str) -> bytes:
+    #     return SHA256Hash.hash_sha256(bytes.fromhex(data)).hash
 
     @staticmethod
     def is_valid(value: str | bytes) -> bool:
@@ -109,11 +139,11 @@ class SHA256Hash:
     @override
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, SHA256Hash):
-            return self.raw_hash == other.raw_hash
+            return self._raw_hash == other._raw_hash
         if isinstance(other, str):
-            return self.raw_hash == other.encode()
+            return self._raw_hash == other.encode()
         if isinstance(other, bytes):
-            return self.raw_hash == other
+            return self._raw_hash == other
         return False
     
     @override
@@ -123,9 +153,9 @@ class SHA256Hash:
     def __call__(self) -> str:
         return self.__str__()
     
-    def __add__(self, other: 'SHA256Hash') -> str:
+    def __add__(self, other: 'SHA256Hash') -> bytes:
         assert isinstance(other, SHA256Hash), f"{type(other)} must be SHA256Hash"
-        return self.raw_hash + other.raw_hash
+        return self.hash + other.hash
     
     def __iter__(self) -> Iterable[bytes]:
         yield self.hash
