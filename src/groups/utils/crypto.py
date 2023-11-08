@@ -1,11 +1,12 @@
 import hashlib
+from lib2to3.pytree import convert
 from attrs import define, field, validators, Factory, converters
 from typing import Any, Iterable, NamedTuple, Tuple, override, Optional
 from .sha256 import SHA256Hash
 # from ..base.types import BaseValueType
 
 
-def convert_to_SHA256Hash(data: Tuple[str | bytes | SHA256Hash, ...]) -> SHA256Hash:
+def convert_to_SHA256Hash(data: Tuple[str | bytes | SHA256Hash, ...]) -> Tuple['SHA256Hash', ...]:
     """Converts a string to bytes
 
     Args:
@@ -14,16 +15,18 @@ def convert_to_SHA256Hash(data: Tuple[str | bytes | SHA256Hash, ...]) -> SHA256H
     Returns:
         bytes: The converted string
     """
-    sha256_objects = ()
+    sha256_objects: Tuple['SHA256Hash', ...] = ()
     for item in data:
         if not isinstance(item, (str, bytes, SHA256Hash)):
             raise ValueError(f"Expected data to be str or bytes, got {type(item)}")
         if isinstance(item, str):
             sha256_objects = sha256_objects + tuple(SHA256Hash.from_str(item), )
         if isinstance(item, bytes):
-            sha256_objects += (SHA256Hash.from_bytes(item), )
+            sha256_objects += tuple([SHA256Hash.from_bytes(item)])
         if isinstance(item, SHA256Hash):
-            sha256_objects += (item,)
+            sha256_objects += tuple(item, )
+
+        print(f'{sha256_objects=}')
         # raise ValueError(f"Expected data to be str or bytes or SHA256Hash, got {type(data)}")
     return sha256_objects
 
@@ -33,7 +36,7 @@ class Leaves:
     """
 
     leaves: Tuple[SHA256Hash, ...] = field(
-        default=Factory(Tuple[SHA256Hash, ...]),
+        default=tuple(),
         converter=convert_to_SHA256Hash,
         validator=validators.deep_iterable(validators.instance_of((SHA256Hash)),
         iterable_validator=validators.instance_of(tuple)))
@@ -63,21 +66,26 @@ class Leaves:
         return len(self.leaves)
     
     def __iter__(self) -> Iterable[SHA256Hash]:
-        return iter(self.leaves)
+        for leaf in self.leaves:
+            yield leaf
 
-    
 
-def convert_loose_leaves_to_levels(data: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...]) -> Tuple[Leaves, ...]:
+def convert_loose_leaves_to_levels(data: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...]) -> Leaves:
+    leaf_hashes: list[SHA256Hash] = []
     if isinstance(data, tuple):
         if len(data) == 0:
-            return ()
+            return None
         for item in data:
             if not isinstance(item, (SHA256Hash, str, bytes)):
                 raise ValueError(f"Expected data to be str or bytes, got {type(item)}")
-        return (Leaves(data), )
-    return ()
-
-
+            if isinstance(item, str):
+                leaf_hashes.append(SHA256Hash.from_str(item))
+            if isinstance(item, bytes):
+                leaf_hashes.append(SHA256Hash.from_bytes(item))
+            if isinstance(item, SHA256Hash):
+                leaf_hashes.append(item)
+            
+        return Leaves(tuple(leaf_hashes))
 
 
 @define(slots=True)
@@ -90,23 +98,24 @@ class MerkleTree:
     #     validator=validators.deep_iterable(validators.instance_of(str),
     #     iterable_validator=validators.instance_of(Tuple)))
 
-    leaves: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...] | Leaves = field()
-        # default=Tuple[str, ...])
-        # validator=validators.instance_of((Leaves, tuple)))
+    leaves: Optional[Leaves] = field(
+        default=None,
+        converter=convert_loose_leaves_to_levels,
+        validator=validators.optional(validators.instance_of(Leaves)))
     
-    levels: Optional[Tuple[Any, ...]] = field(default=tuple())
+    levels: Optional[Tuple[Leaves, ...]] = field(default=tuple())
         # validator=validators.deep_iterable(validators.instance_of(Leaves | tuple),
         # iterable_validator=validators.instance_of(tuple)))
 
     def __init__(self, hashed_data: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...] | Leaves = (), use_all_bytes: bool = True) -> None:
-        self.leaves = Leaves(hashed_data)
-        _levels = (self.leaves, )
+        self.leaves = hashed_data if isinstance(hashed_data, Leaves) else convert_loose_leaves_to_levels(hashed_data)
+        _levels = (self.leaves.leaves, )
         # self.levels = convert_loose_leaves_to_levels(_levels)
         self.levels = _levels
         self.build()
 
     def build(self) -> None:
-        level = self.leaves
+        level = self.leaves.leaves
 
         if len(self.levels[0]) == 1:
             self.levels = self.levels + (self._hash_items(level[0]), )

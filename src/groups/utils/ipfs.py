@@ -117,7 +117,7 @@ class IPFS:
 
         int_from_bytes = int.from_bytes(mh, 'big')
 
-        mh_b58 = base58.b58encode_int(int_from_bytes).decode('ascii')
+        mh_b58 = base58.b58encode_int(int_from_bytes).decode('base58btc')
         print(f'{mh_b58=}')
 
         # return mh_b58
@@ -132,16 +132,13 @@ class IPFS:
         # mt_root_digest = hashlib.sha256(str(mt_root).encode('utf-8')).hexdigest()
         # print(f'{mt_root_digest=}')
 
-        digest = cid_sha256_hash_chunked(b"".join([leaf.hash for leaf in leaves]))
-        print(f'{digest=}')
-
         # mh = multihash.
         # print(f'{mh=}')
         # print(f'{mh=}')
         # mh_b58 = base58.b58encode(mt_root).decode('utf-8')
         # print(f'{mh_b58=}')
-        multibase_prefix = multibase.encode('base58btc', digest)
-        print(f'{multibase_prefix=}')
+        # multibase_prefix = multibase.encode('base58btc', digest)
+        # print(f'{multibase_prefix=}')
         # # print(f'{multibase_prefix=}')
         # print(f'{cid0=}')
         # # print(f'{cid0.encode()}')

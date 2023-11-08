@@ -16,7 +16,7 @@ def convert_str_to_bytes(data: str | bytes) -> bytes:
         return data.encode()
     if isinstance(data, bytes):
         return data
-    raise ValueError(f"Expected data to be str, got {type(data)}")
+    raise ValueError(f"Expected data to be str or bytes, got {type(data)}")
 
 @define(frozen=True, slots=True, weakref_slot=False)
 class SHA256Hash:
@@ -49,11 +49,11 @@ class SHA256Hash:
     
     @override
     def __str__(self) -> str:
-        return f"{self.hash.decode("ascii")}"
+        return f"{self.hash.decode()}"
     
     @override
     def __repr__(self) -> str:
-        return f"{str(self.hash.decode("ascii"))}"
+        return f"{str(self.hash)}"
         
     @classmethod
     def from_str(cls, data: str) -> 'SHA256Hash':
@@ -67,18 +67,18 @@ class SHA256Hash:
     def from_hex(cls, data: str) -> 'SHA256Hash':
         return SHA256Hash.hash_sha256(bytes.fromhex(data))
     
-    @classmethod
-    def from_str_to_bytes(cls, data: str) -> bytes:
+    @staticmethod
+    def from_str_to_bytes(data: str) -> bytes:
         if isinstance(data, str):
             return SHA256Hash.hash_bytes(data.encode())
         # return cls(SHA256Hash.hash_bytes(data))
     
-    @classmethod
-    def from_bytes_to_bytes(cls, data: bytes) -> bytes:
+    @staticmethod
+    def from_bytes_to_bytes(data: bytes) -> bytes:
         return SHA256Hash.hash_bytes(data)
     
-    @classmethod
-    def from_hex_to_bytes(cls, data: str) -> bytes:
+    @staticmethod
+    def from_hex_to_bytes(data: str) -> bytes:
         return SHA256Hash.hash_bytes(bytes.fromhex(data))
 
     # @staticmethod
@@ -146,3 +146,6 @@ class SHA256Hash:
     def __add__(self, other: 'SHA256Hash') -> str:
         assert isinstance(other, SHA256Hash), f"{type(other)} must be SHA256Hash"
         return self.raw_hash + other.raw_hash
+    
+    def __iter__(self) -> Iterable[bytes]:
+        yield self.raw_hash

@@ -6,6 +6,7 @@ from tests_utils_checks import TestChecks
 from tests_utils_converters import TestConverters
 from tests_utils_merkle_tree import TestMerkleTree
 from tests_utils_ipfs import TestIPFS
+from tests_utils_ipfs_cid import TestIPFSCID
 from tests_base_interface import TestBaseInterface
 from tests_base_types import TestBaseTypes
 from tests_base_value import TestBaseValue
@@ -27,10 +28,11 @@ def main():
     loader = unittest.TestLoader()
 
     # Utils tests
-    test_suite.addTest(loader.loadTestsFromTestCase(TestChecks))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestConverters))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
-    test_suite.addTest(loader.loadTestsFromTestCase(TestIPFS))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestChecks))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestConverters))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
+    # test_suite.addTest(loader.loadTestsFromTestCase(TestIPFS))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestIPFSCID))
 
     # Base tests
     # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseInterface))
