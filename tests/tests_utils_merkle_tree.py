@@ -3,7 +3,7 @@ import unittest
 import sys
 
 sys.path.append("../forme-groups-python-3-12/")
-from src.groups.utils.crypto import MerkleTree, SHA256Hash, Leaf, Leaves
+from src.groups.utils.crypto import MerkleTree, SHA256Hash, Leaf, Leaves, Levels
 
 
 class TestSHA256Hash(unittest.TestCase):
@@ -85,16 +85,32 @@ class TestLeaves(unittest.TestCase):
     def test_init(self):
         self.assertEqual(self.leaves, Leaves((SHA256Hash.from_str("test"), SHA256Hash.from_str("test2"))))
 
+    def test_init_with_bad_hash(self):
+        with self.assertRaises(AssertionError):
+            Leaves((SHA256Hash.from_str(""), SHA256Hash.from_str("test2")))
+
+
+class TestLevel(unittest.TestCase):
+    def setUp(self) -> None:
+        self.level = Levels((Leaves((SHA256Hash.from_str("test"), SHA256Hash.from_str("test2"))), Leaves((SHA256Hash.from_str("test3"), SHA256Hash.from_str("test4")))))
+
+    def test_init(self):
+        self.assertEqual(self.level, Levels((Leaves((SHA256Hash.from_str("test"), SHA256Hash.from_str("test2"))), Leaves((SHA256Hash.from_str("test3"), SHA256Hash.from_str("test4"))))))
+
+    def test_init_with_bad_hash(self):
+        with self.assertRaises(AssertionError):
+            Levels((Leaves((SHA256Hash.from_str(""), SHA256Hash.from_str("test2"))), Leaves((SHA256Hash.from_str("test3"), SHA256Hash.from_str("test4")))))
+
 
 class TestMerkleTree(unittest.TestCase):
     def test_init(self):
         mt = MerkleTree()
-        # self.assertEqual(mt.root, None)
-        # self.assertEqual(mt.leaves, ())
+        self.assertEqual(mt.root, None)
+        self.assertEqual(mt.leaves, ())
 
-    # def test_hash_single_value(self):
-    #     hash_test_func = MerkleTree._hash_func("test")
-    #     self.assertEqual(hash_test_func, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")
+#     def test_hash_single_value(self):
+#         hash_test_func = MerkleTree._hash_func("test")
+#         self.assertEqual(hash_test_func, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")
 
     # def test_hash_items_not_identical(self):
     #     hash_test_func = MerkleTree._hash_func("test")

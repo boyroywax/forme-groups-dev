@@ -29,7 +29,7 @@ class Leaf:
             raise ValueError(f"Expected hash to be SHA256Hash, got {type(value)}")
 
 
-def convert_to_Leaf(data: Tuple[str | bytes | SHA256Hash | Leaf, ...]) -> Tuple[Leaf, ...]:
+def convert_to_leaf(data: Tuple[str | bytes | SHA256Hash | Leaf, ...]) -> Tuple[Leaf, ...]:
     """Converts a string to bytes
 
     Args:
@@ -55,6 +55,7 @@ def convert_to_Leaf(data: Tuple[str | bytes | SHA256Hash | Leaf, ...]) -> Tuple[
     # raise ValueError(f"Expected data to be str or bytes or SHA256Hash, got {type(data)}")
     return tuple(sha256_objects)
 
+
 @define(frozen=True, slots=True)
 class Leaves:
     """A Leaves object.
@@ -62,28 +63,14 @@ class Leaves:
 
     leaves: Tuple[Leaf, ...] = field(
         default=tuple(),
-        converter=convert_to_Leaf,
+        converter=convert_to_leaf,
         validator=validators.deep_iterable(validators.instance_of((Leaf)),
         iterable_validator=validators.instance_of(tuple)))
-    
-    # @staticmethod
-    # def is_valid(value: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...]) -> bool:
-    #     """Checks if a tuple is a valid Leaves object
 
-    #     Args:
-    #         value (tuple[str, ...]): The tuple to check
-
-    #     Returns:
-    #         bool: Whether the tuple is a valid Leaves object
-    #     """
-    #     if not isinstance(value, tuple):
-    #         return False
-    #     if len(value) == 0:
-    #         return False
-    #     for item in value:
-    #         if not isinstance(item, (SHA256Hash, str, bytes)):
-    #             return False
-    #     return True
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Leaves):
+            return False
+        return self.leaves == other.leaves
     
     def __len__(self) -> int:
         return len(self.leaves)
@@ -109,6 +96,33 @@ def convert_loose_leaves_to_levels(data: Tuple[SHA256Hash, ...] | Tuple[str, ...
                 leaf_hashes.append(item)
             
         return Leaves(tuple(leaf_hashes))
+    
+
+@define(slots=True)
+class Levels:
+    """A Level object.
+    """
+
+    level: Tuple[Leaves, ...] = field(
+        default=tuple(),
+        # converter=convert_to_leaf,
+        validator=validators.deep_iterable(validators.instance_of((Leaves)),
+        iterable_validator=validators.instance_of(tuple)))
+    
+    def append(self, leaves: Leaves) -> None:
+        self.level = self.level + (leaves, )
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Levels):
+            return False
+        return self.level == other.level
+    
+    def __len__(self) -> int:
+        return len(self.level)
+    
+    def __iter__(self) -> Iterable[Leaves]:
+        for leaves in self.level:
+            yield leaves
 
 
 @define(slots=True)

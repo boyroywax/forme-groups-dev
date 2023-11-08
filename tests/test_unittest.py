@@ -6,6 +6,7 @@ from tests_utils_converters import TestConverters
 from tests_utils_merkle_tree import TestSHA256Hash
 from tests_utils_merkle_tree import TestLeaf
 from tests_utils_merkle_tree import TestLeaves
+from tests_utils_merkle_tree import TestLevel
 from tests_utils_merkle_tree import TestMerkleTree
 from tests_utils_ipfs import TestIPFS
 from tests_utils_ipfs_cid import TestIPFSCID
@@ -35,8 +36,8 @@ def main():
     test_suite.addTest(loader.loadTestsFromTestCase(TestSHA256Hash))
     test_suite.addTest(loader.loadTestsFromTestCase(TestLeaf))
     test_suite.addTest(loader.loadTestsFromTestCase(TestLeaves))
-
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestLevel))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
     # test_suite.addTest(loader.loadTestsFromTestCase(TestIPFS))
     # test_suite.addTest(loader.loadTestsFromTestCase(TestIPFSCID))
 
