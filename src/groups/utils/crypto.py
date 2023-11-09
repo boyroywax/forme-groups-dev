@@ -199,7 +199,6 @@ class MerkleTree:
         """
         # possible_multiple_data_items = MerkleTree._hash_func_iter(data)
 
-
         for item in MerkleTree._hash_func_iter(data):
             print(f'{item=}')
             return item
