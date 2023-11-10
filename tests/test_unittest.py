@@ -31,35 +31,35 @@ def main():
     loader = unittest.TestLoader()
 
     # Utils tests
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestChecks))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestConverters))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestChecks))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestConverters))
     test_suite.addTest(loader.loadTestsFromTestCase(TestSHA256Hash))
     test_suite.addTest(loader.loadTestsFromTestCase(TestLeaf))
     test_suite.addTest(loader.loadTestsFromTestCase(TestLeaves))
     test_suite.addTest(loader.loadTestsFromTestCase(TestLevel))
     test_suite.addTest(loader.loadTestsFromTestCase(TestMerkleTree))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestIPFS))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestIPFSCID))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestIPFS))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestIPFSCID))
 
     # Base tests
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseInterface))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseTypes))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseValue))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseInterface))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseTypes))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseValue))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseContainer))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestBaseSchema))
 
     # # Group Unit tests
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestUnitNonce))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestCredential))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestData))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestOwner))
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestGroupUnit))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestUnitNonce))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestCredential))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestData))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestOwner))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestGroupUnit))
 
     # # Pool tests
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestPool))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestPool))
 
     # # Controller tests
-    # test_suite.addTest(loader.loadTestsFromTestCase(TestController))
+    test_suite.addTest(loader.loadTestsFromTestCase(TestController))
 
     # # Groups tests
     # test_suite.addTest(loader.loadTestsFromTestCase(TestGroups))
