@@ -136,6 +136,23 @@ class Levels:
             self.append(leaves)
         return self
 
+def convert_tuple_to_levels(data: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...]) -> Levels:
+    leaf_hashes: list[SHA256Hash] = []
+    if isinstance(data, tuple):
+        if len(data) == 0:
+            return None
+        for item in data:
+            if not isinstance(item, (SHA256Hash, str, bytes)):
+                raise ValueError(f"Expected data to be str or bytes, got {type(item)}")
+            if isinstance(item, str):
+                leaf_hashes.append(SHA256Hash.from_str(item))
+            if isinstance(item, bytes):
+                leaf_hashes.append(SHA256Hash.from_bytes(item))
+            if isinstance(item, SHA256Hash):
+                leaf_hashes.append(item)
+            
+        return Levels(tuple(leaf_hashes))
+
 
 @define(slots=True)
 class MerkleTree:
@@ -152,9 +169,10 @@ class MerkleTree:
         # converter=convert_loose_leaves_to_levels,
         validator=validators.optional(validators.instance_of(Leaves)))
     
-    _levels: Optional[Levels] = field(
+    _levels: Optional[Levels | Tuple[Leaves, ...]] = field(
         default=None,
-        validator=validators.optional(validators.instance_of(Levels)))
+        converter=convert_tuple_to_levels,
+        validator=validators.optional(validators.instance_of(Levels | tuple)))
 
     def __init__(self, hashed_data: Tuple[SHA256Hash, ...] | Tuple[str, ...] | Tuple[bytes, ...] | Leaves = (), use_all_bytes: bool = True) -> None:
         self.leaves = hashed_data if isinstance(hashed_data, Leaves) else convert_loose_leaves_to_levels(hashed_data)
