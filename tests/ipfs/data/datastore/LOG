@@ -62,3 +62,9 @@
 17:45:30.607188 version@stat F·[3] S·1MiB[1MiB] Sc·[0.75]
 17:45:30.636922 db@janitor F·5 G·0
 17:45:30.638273 db@open done T·402.064661ms
+22:04:27.956831 table@compaction L0·3 -> L1·0 S·1MiB Q·5507
+22:04:28.015317 table@build created L1@15 N·87 S·19KiB "/F5..CLI,v3818":"/pr..AS2,v3702"
+22:04:28.016430 version@stat F·[0 1] S·19KiB[0B 19KiB] Sc·[0.00 0.00]
+22:04:28.019543 table@compaction committed F-2 S-1MiB Ke·0 D·3729 T·60.77679ms
+22:04:28.024425 table@remove removed @9
+22:04:28.030290 table@remove removed @2
