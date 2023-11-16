@@ -6,15 +6,15 @@ import json
 import hashlib
 import base58
 import multihash
-import multicodec
-import varint
-import multibase
-from multiformats_cid import make_cid, CIDv0, CIDv1, cid
+# import multicodec
+# import varint
+# import multibase
+# from multiformats_cid import make_cid, CIDv0, CIDv1, cid
 from cbor2 import dumps, loads
 from binascii import hexlify
 from typing import Iterable, Tuple, List
 from io import BytesIO
-from ipfs_cid import cid_sha256_hash_chunked, cid_sha256_wrap_digest, cid_sha256_unwrap_digest
+# from ipfs_cid import cid_sha256_hash_chunked, cid_sha256_wrap_digest, cid_sha256_unwrap_digest
 from .crypto import MerkleTree, Leaves, SHA256Hash
 # import pymerkle
 

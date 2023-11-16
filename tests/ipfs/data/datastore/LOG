@@ -52,3 +52,13 @@
 22:55:19.650388 db@open done T·51.627306ms
 =============== Nov 15, 2023 (UTC) ===============
 19:32:09.809284 db@close closing
+=============== Nov 16, 2023 (UTC) ===============
+17:45:30.225066 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:45:30.234772 version@stat F·[2] S·55KiB[55KiB] Sc·[0.50]
+17:45:30.235579 db@open opening
+17:45:30.236548 journal@recovery F·1
+17:45:30.238048 journal@recovery recovering @10
+17:45:30.598692 memdb@flush created L0@12 N·2890 S·1MiB "/F5..CLI,v3818":"/pr..AS2,v3294"
+17:45:30.607188 version@stat F·[3] S·1MiB[1MiB] Sc·[0.75]
+17:45:30.636922 db@janitor F·5 G·0
+17:45:30.638273 db@open done T·402.064661ms

@@ -1,2 +1,5 @@
 attrs
 uuid
+IPFS-Toolkit
+multihash
+merkly
