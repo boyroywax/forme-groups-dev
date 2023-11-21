@@ -68,3 +68,17 @@
 22:04:28.019543 table@compaction committed F-2 S-1MiB Ke·0 D·3729 T·60.77679ms
 22:04:28.024425 table@remove removed @9
 22:04:28.030290 table@remove removed @2
+=============== Nov 21, 2023 (UTC) ===============
+21:05:36.529179 db@close closing
+21:05:36.531261 db@close done T·2.058388ms
+=============== Nov 21, 2023 (UTC) ===============
+21:05:39.192856 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:05:39.201205 version@stat F·[0 1] S·19KiB[0B 19KiB] Sc·[0.00 0.00]
+21:05:39.201705 db@open opening
+21:05:39.202554 journal@recovery F·1
+21:05:39.204023 journal@recovery recovering @13
+21:05:39.449834 memdb@flush created L0@16 N·3529 S·1MiB "/F5..CLI,v7341":"/pr..AS2,v4057"
+21:05:39.452232 version@stat F·[1 1] S·1MiB[1MiB 19KiB] Sc·[0.25 0.00]
+21:05:39.470780 db@janitor F·5 G·1
+21:05:39.471296 db@janitor removing table-12
+21:05:39.472913 db@open done T·270.560853ms

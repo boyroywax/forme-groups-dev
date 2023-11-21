@@ -4,6 +4,7 @@ version: '3'
 services:
   ipfs:
     image: ipfs/kubo:release
+    command: ["daemon", "--enable-pubsub-experiment"]
     ports:
       - "4001:4001"
       - "5001:5001"
